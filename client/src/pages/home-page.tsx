@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet";
 import { Hero } from "@/components/home/hero";
 import { Introduction } from "@/components/home/introduction";
-import { Gallery } from "@/components/portfolio/gallery";
+import { CategoryCollage } from "@/components/home/category-collage";
 import { AboutSection } from "@/components/about/about-section";
 import { Testimonials } from "@/components/home/testimonials";
 import { ContactForm } from "@/components/contact/contact-form";
@@ -11,10 +11,6 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 
 export default function HomePage() {
-  // Fetch featured photos for the homepage
-  const { data: featuredPhotos, isLoading } = useQuery({
-    queryKey: ["/api/photos/featured"],
-  });
 
   return (
     <>
@@ -37,22 +33,8 @@ export default function HomePage() {
         <Hero />
         <Introduction />
         
-        {/* Portfolio Section */}
-        <section id="portfolio" className="py-20 bg-muted">
-          <div className="container mx-auto px-6">
-            <h2 className="text-3xl font-poppins font-semibold text-center mb-16">Portfolio</h2>
-            
-            <Gallery />
-            
-            <div className="text-center mt-16">
-              <Link href="/portfolio">
-                <a className="px-8 py-3 border-2 border-primary text-primary hover:bg-primary hover:text-white transition-colors duration-300">
-                  View All Projects
-                </a>
-              </Link>
-            </div>
-          </div>
-        </section>
+        {/* Category Collage Section */}
+        <CategoryCollage />
         
         <AboutSection />
         <Testimonials />

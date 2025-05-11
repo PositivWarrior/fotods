@@ -91,7 +91,7 @@ export function Header() {
   return (
     <header 
       className={`fixed top-0 w-full z-30 transition-all duration-300 ${
-        isScrolled ? "bg-white shadow-sm" : "bg-white/80 backdrop-blur-sm"
+        isScrolled ? "bg-white shadow-sm" : "bg-amber-50/90 backdrop-blur-sm"
       }`}
     >
       <div className="container mx-auto px-6 py-4">
