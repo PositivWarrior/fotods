@@ -13,11 +13,13 @@ export function CategoryCollage() {
     queryKey: ["/api/photos"],
   });
 
-  // Specifically use only the main categories: Housing, Lifestyle, Business
-  const mainCategoryNames = ["Housing", "Lifestyle", "Business"];
-  const mainCategories = categories?.filter(
-    cat => mainCategoryNames.includes(cat.name)
-  ) || [];
+  // Specifically use only the main categories in this order: Housing, Business, Lifestyle
+  const mainCategoryNames = ["Housing", "Business", "Lifestyle"];
+  const mainCategories = categories
+    ? mainCategoryNames
+        .map(name => categories.find(cat => cat.name === name))
+        .filter(Boolean) as Category[]
+    : [];
   
   if (categoriesLoading || photosLoading) {
     return (
@@ -103,9 +105,9 @@ export function CategoryCollage() {
                   ))}
                 </div>
                 
-                {/* Link to the specific category, not the main portfolio */}
+                {/* Link to the specific category page */}
                 <Link 
-                  href={`/portfolio?category=${category.slug}`}
+                  href={`/portfolio/${category.slug}`}
                   className="inline-flex items-center mt-auto text-primary hover:text-secondary font-medium transition-colors"
                 >
                   <span>View {category.name} Gallery</span>

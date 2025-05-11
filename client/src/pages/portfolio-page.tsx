@@ -3,16 +3,21 @@ import { Helmet } from "react-helmet";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Gallery } from "@/components/portfolio/gallery";
-import { useLocation } from "wouter";
+import { useLocation, useRoute } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Category } from "@shared/schema";
 import { motion } from "framer-motion";
 
 export default function PortfolioPage() {
-  // Parse URL search parameters to get the category
+  // Get category from route parameter
+  const [, params] = useRoute("/portfolio/:category");
+  
+  // Parse URL search parameters as fallback
   const [location] = useLocation();
   const searchParams = new URLSearchParams(location.split('?')[1] || '');
-  const categorySlug = searchParams.get("category");
+  
+  // Use the category from route params if available, otherwise check query params
+  const categorySlug = params?.category || searchParams.get("category");
   
   // Fetch category details if slug is provided
   const { data: categories } = useQuery<Category[]>({
