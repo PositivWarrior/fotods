@@ -1,9 +1,10 @@
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, ReactNode } from "react";
 import YetAnotherLightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 import { Photo } from "@shared/schema";
 
+// Create a type to define the expected lightbox component props
 interface EnhancedLightboxProps {
   isOpen: boolean;
   photos: Photo[];
@@ -11,8 +12,9 @@ interface EnhancedLightboxProps {
   onClose: () => void;
 }
 
-interface CustomButtonProps {
-  onClick: () => void;
+// Define props for button components
+interface RenderButtonProps {
+  onClick?: () => void;
 }
 
 export function EnhancedLightbox({ isOpen, photos, currentIndex, onClose }: EnhancedLightboxProps) {
@@ -35,6 +37,40 @@ export function EnhancedLightbox({ isOpen, photos, currentIndex, onClose }: Enha
     };
   }, [isOpen]);
 
+  // Custom render components for the lightbox
+  const renderButtonPrev = ({ onClick }: RenderButtonProps): ReactNode => (
+    <button 
+      type="button" 
+      className="absolute left-4 top-1/2 z-50 p-2 text-white bg-black/20 rounded-full hover:bg-black/40"
+      onClick={onClick}
+      aria-label="Previous"
+    >
+      <ChevronLeft className="h-8 w-8" />
+    </button>
+  );
+
+  const renderButtonNext = ({ onClick }: RenderButtonProps): ReactNode => (
+    <button 
+      type="button" 
+      className="absolute right-4 top-1/2 z-50 p-2 text-white bg-black/20 rounded-full hover:bg-black/40"
+      onClick={onClick}
+      aria-label="Next"
+    >
+      <ChevronRight className="h-8 w-8" />
+    </button>
+  );
+
+  const renderButtonClose = ({ onClick }: RenderButtonProps): ReactNode => (
+    <button
+      type="button"
+      className="absolute top-6 right-6 z-50 p-1 text-white hover:text-gray-300 transition-colors"
+      onClick={onClick}
+      aria-label="Close"
+    >
+      <X className="h-8 w-8" />
+    </button>
+  );
+
   return (
     <YetAnotherLightbox
       open={isOpen}
@@ -51,36 +87,9 @@ export function EnhancedLightbox({ isOpen, photos, currentIndex, onClose }: Enha
       }}
       animation={{ swipe: 250 }}
       render={{
-        buttonPrev: (props: CustomButtonProps) => (
-          <button 
-            type="button" 
-            className="absolute left-4 top-1/2 z-50 p-2 text-white bg-black/20 rounded-full hover:bg-black/40"
-            onClick={props.onClick}
-            aria-label="Previous"
-          >
-            <ChevronLeft className="h-8 w-8" />
-          </button>
-        ),
-        buttonNext: (props: CustomButtonProps) => (
-          <button 
-            type="button" 
-            className="absolute right-4 top-1/2 z-50 p-2 text-white bg-black/20 rounded-full hover:bg-black/40"
-            onClick={props.onClick}
-            aria-label="Next"
-          >
-            <ChevronRight className="h-8 w-8" />
-          </button>
-        ),
-        buttonClose: (props: CustomButtonProps) => (
-          <button
-            type="button"
-            className="absolute top-6 right-6 z-50 p-1 text-white hover:text-gray-300 transition-colors"
-            onClick={props.onClick}
-            aria-label="Close"
-          >
-            <X className="h-8 w-8" />
-          </button>
-        )
+        buttonPrev: renderButtonPrev,
+        buttonNext: renderButtonNext,
+        buttonClose: renderButtonClose
       }}
     />
   );
