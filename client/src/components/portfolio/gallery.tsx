@@ -38,11 +38,13 @@ export function Gallery({ category }: GalleryProps) {
     queryKey,
   });
   
-  // Filter photos based on active category
-  const filteredPhotos = photos?.filter(photo => {
-    if (activeFilter === "all") return true;
-    return photo.categoryId === parseInt(activeFilter);
-  }) || [];
+  // Filter photos based on active category, but don't apply additional filtering if already filtered by URL
+  const filteredPhotos = category
+    ? photos || []
+    : (photos?.filter(photo => {
+        if (activeFilter === "all") return true;
+        return photo.categoryId === parseInt(activeFilter);
+      }) || []);
   
   // Visible photos subset for infinite loading
   const visiblePhotos = filteredPhotos.slice(0, visibleCount);
@@ -74,6 +76,9 @@ export function Gallery({ category }: GalleryProps) {
     } else {
       setActiveFilter("all");
     }
+    
+    // Also reset visible count when category or filter changes
+    setVisibleCount(IMAGES_PER_PAGE);
   }, [category, categories]);
   
   const openLightbox = (index: number) => {
