@@ -91,27 +91,47 @@ export function ImageUpload() {
     }
   };
 
-  // Upload files to server (this would normally connect to a file storage service)
+  // Upload files to server using our file upload API
   const uploadFiles = async () => {
-    // Simulating file upload since we don't have a real file storage service in this example
-    // In a real implementation, you would upload the files to a service like AWS S3, Cloudinary, etc.
-    
     setUploading(true);
     
     try {
-      // Mock upload delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Create form data for file upload
+      const formData = new FormData();
       
-      // For this example, we'll use the file preview URLs as if they were real URLs
-      // In a real implementation, you would return URLs from your storage service
-      const fullImageUrl = mainImagePreview;
-      const thumbUrl = thumbnailPreview || mainImagePreview;
+      // Add main image file
+      if (mainImageFile) {
+        formData.append('mainImage', mainImageFile);
+      }
+      
+      // Add thumbnail image file if available
+      if (thumbnailFile) {
+        formData.append('thumbnailImage', thumbnailFile);
+      }
+      
+      // Send files to server
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include' // Include cookies for auth
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Upload failed');
+      }
+      
+      // Get URLs from server response
+      const { imageUrl, thumbnailUrl } = await response.json();
       
       setUploading(false);
-      return { fullImageUrl, thumbUrl };
+      return { 
+        fullImageUrl: imageUrl, 
+        thumbUrl: thumbnailUrl 
+      };
     } catch (error) {
       setUploading(false);
-      throw new Error("File upload failed");
+      throw error;
     }
   };
 

@@ -133,6 +133,91 @@ export class MemStorage implements IStorage {
     ];
     
     testimonials.forEach(testimonial => this.createTestimonial(testimonial));
+    
+    // Create sample photos for each category
+    const samplePhotos = [
+      {
+        title: "Modern Scandinavian Living Room",
+        description: "A bright, minimalist living room with natural light and clean lines",
+        imageUrl: "https://images.unsplash.com/photo-1540518614846-7eded433c457?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+        thumbnailUrl: "https://images.unsplash.com/photo-1540518614846-7eded433c457?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=60",
+        categoryId: 1, // Living Rooms
+        location: "Oslo, Norway",
+        featured: true
+      },
+      {
+        title: "Coastal Living Space",
+        description: "Open concept living area with ocean views and natural materials",
+        imageUrl: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+        thumbnailUrl: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=60",
+        categoryId: 1, // Living Rooms
+        location: "Stockholm, Sweden",
+        featured: false
+      },
+      {
+        title: "Luxury Kitchen Design",
+        description: "High-end kitchen with marble countertops and premium appliances",
+        imageUrl: "https://images.unsplash.com/photo-1600489000022-c2086d79f9d4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+        thumbnailUrl: "https://images.unsplash.com/photo-1600489000022-c2086d79f9d4?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=60",
+        categoryId: 2, // Kitchens
+        location: "Copenhagen, Denmark",
+        featured: true
+      },
+      {
+        title: "Minimalist Kitchen",
+        description: "Clean lines and efficient design in this modern kitchen space",
+        imageUrl: "https://images.unsplash.com/photo-1556909212-d5b604d0c90d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+        thumbnailUrl: "https://images.unsplash.com/photo-1556909212-d5b604d0c90d?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=60",
+        categoryId: 2, // Kitchens
+        location: "Helsinki, Finland",
+        featured: false
+      },
+      {
+        title: "Spa-Inspired Bathroom",
+        description: "Luxurious bathroom with freestanding tub and natural stone",
+        imageUrl: "https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+        thumbnailUrl: "https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=60",
+        categoryId: 3, // Bathrooms
+        location: "Oslo, Norway",
+        featured: true
+      },
+      {
+        title: "Contemporary Bathroom Design",
+        description: "Modern fixtures and clean lines in this stylish bathroom",
+        imageUrl: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+        thumbnailUrl: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=60",
+        categoryId: 3, // Bathrooms
+        location: "Bergen, Norway",
+        featured: false
+      },
+      {
+        title: "Modern Apartment Building",
+        description: "Contemporary multi-unit residential building with unique facade",
+        imageUrl: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+        thumbnailUrl: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=60",
+        categoryId: 4, // Architecture
+        location: "Stockholm, Sweden",
+        featured: true
+      },
+      {
+        title: "Residential House Design",
+        description: "Contemporary single-family home featuring glass and wood elements",
+        imageUrl: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+        thumbnailUrl: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=60",
+        categoryId: 4, // Architecture
+        location: "Copenhagen, Denmark",
+        featured: false
+      }
+    ];
+    
+    // Add sample photos to storage
+    samplePhotos.forEach(photo => {
+      const now = new Date();
+      this.createPhoto({
+        ...photo,
+        createdAt: now
+      });
+    });
   }
 
   // User operations
