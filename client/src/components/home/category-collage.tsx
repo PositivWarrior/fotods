@@ -76,7 +76,7 @@ export function CategoryCollage() {
                 <h3 className="text-xl font-poppins font-medium mb-5 text-primary">{category.name}</h3>
                 
                 {/* Main photo on top with frame */}
-                <div className="mb-3 p-1 bg-black">
+                <div className="mb-1 p-1 bg-black">
                   <div className="overflow-hidden">
                     <img 
                       src={mainPhoto.thumbnailUrl} 
@@ -87,11 +87,12 @@ export function CategoryCollage() {
                 </div>
                 
                 {/* Three smaller photos at the bottom */}
-                <div className="grid grid-cols-3 gap-3 mb-6">
-                  {smallPhotos.map((photo) => (
+                <div className="grid grid-cols-3 mb-6">
+                  {/* Ensure we always have 3 photos by duplicating if needed */}
+                  {[...smallPhotos, ...smallPhotos, ...smallPhotos].slice(0, 3).map((photo, index) => (
                     <div 
-                      key={photo.id} 
-                      className="p-1 bg-black overflow-hidden"
+                      key={`${photo.id}-${index}`} 
+                      className={`p-1 bg-black overflow-hidden ${index > 0 ? 'border-l border-white' : ''}`}
                     >
                       <img 
                         src={photo.thumbnailUrl} 

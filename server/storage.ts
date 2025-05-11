@@ -237,6 +237,24 @@ export class MemStorage implements IStorage {
         categoryId: 7, // Business
         location: "Stockholm, Sweden",
         featured: false
+      },
+      {
+        title: "Corporate Meeting Room",
+        description: "Modern conference room with natural lighting",
+        imageUrl: "https://images.unsplash.com/photo-1572025442646-866d16c84a54?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+        thumbnailUrl: "https://images.unsplash.com/photo-1572025442646-866d16c84a54?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=60",
+        categoryId: 7, // Business
+        location: "Copenhagen, Denmark",
+        featured: false
+      },
+      {
+        title: "Business Lobby",
+        description: "Elegant company reception area with modern design",
+        imageUrl: "https://images.unsplash.com/photo-1600607688969-a5bfcd646154?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+        thumbnailUrl: "https://images.unsplash.com/photo-1600607688969-a5bfcd646154?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=60",
+        categoryId: 7, // Business
+        location: "Bergen, Norway",
+        featured: false
       }
     ];
     
