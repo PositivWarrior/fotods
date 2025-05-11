@@ -99,10 +99,13 @@ export class MemStorage implements IStorage {
     
     // Create default categories
     const categories = [
-      { name: "Living Rooms", slug: "living-rooms" },
-      { name: "Kitchens", slug: "kitchens" },
-      { name: "Bathrooms", slug: "bathrooms" },
-      { name: "Architecture", slug: "architecture" }
+      { name: "Lifestyle", slug: "lifestyle" },
+      { name: "Portraits", slug: "portraits", parentCategory: "lifestyle" },
+      { name: "Weddings", slug: "weddings", parentCategory: "lifestyle" },
+      { name: "Housing", slug: "housing" },
+      { name: "Nighttime", slug: "nighttime", parentCategory: "housing" },
+      { name: "Drone", slug: "drone", parentCategory: "housing" },
+      { name: "Business", slug: "business" }
     ];
     
     categories.forEach(cat => this.createCategory(cat));
@@ -136,76 +139,103 @@ export class MemStorage implements IStorage {
     
     // Create sample photos for each category
     const samplePhotos = [
+      // Lifestyle - Portraits
       {
-        title: "Modern Scandinavian Living Room",
-        description: "A bright, minimalist living room with natural light and clean lines",
-        imageUrl: "https://images.unsplash.com/photo-1540518614846-7eded433c457?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
-        thumbnailUrl: "https://images.unsplash.com/photo-1540518614846-7eded433c457?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=60",
-        categoryId: 1, // Living Rooms
+        title: "Professional Headshot",
+        description: "Professional studio portrait with natural lighting",
+        imageUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+        thumbnailUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=60",
+        categoryId: 2, // Portraits
         location: "Oslo, Norway",
         featured: true
       },
       {
-        title: "Coastal Living Space",
-        description: "Open concept living area with ocean views and natural materials",
-        imageUrl: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
-        thumbnailUrl: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=60",
-        categoryId: 1, // Living Rooms
+        title: "Environmental Portrait",
+        description: "Natural portrait in urban setting",
+        imageUrl: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+        thumbnailUrl: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=60",
+        categoryId: 2, // Portraits
         location: "Stockholm, Sweden",
         featured: false
       },
+      
+      // Lifestyle - Weddings
       {
-        title: "Luxury Kitchen Design",
-        description: "High-end kitchen with marble countertops and premium appliances",
-        imageUrl: "https://images.unsplash.com/photo-1600489000022-c2086d79f9d4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
-        thumbnailUrl: "https://images.unsplash.com/photo-1600489000022-c2086d79f9d4?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=60",
-        categoryId: 2, // Kitchens
+        title: "Wedding Ceremony",
+        description: "Intimate wedding ceremony at sunset",
+        imageUrl: "https://images.unsplash.com/photo-1519741497674-611481863552?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+        thumbnailUrl: "https://images.unsplash.com/photo-1519741497674-611481863552?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=60",
+        categoryId: 3, // Weddings
         location: "Copenhagen, Denmark",
         featured: true
       },
       {
-        title: "Minimalist Kitchen",
-        description: "Clean lines and efficient design in this modern kitchen space",
-        imageUrl: "https://images.unsplash.com/photo-1556909212-d5b604d0c90d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
-        thumbnailUrl: "https://images.unsplash.com/photo-1556909212-d5b604d0c90d?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=60",
-        categoryId: 2, // Kitchens
+        title: "Bridal Portrait",
+        description: "Elegant bridal portrait with natural light",
+        imageUrl: "https://images.unsplash.com/photo-1606800052052-a08af7148866?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+        thumbnailUrl: "https://images.unsplash.com/photo-1606800052052-a08af7148866?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=60",
+        categoryId: 3, // Weddings
         location: "Helsinki, Finland",
         featured: false
       },
+      
+      // Housing - Nighttime
       {
-        title: "Spa-Inspired Bathroom",
-        description: "Luxurious bathroom with freestanding tub and natural stone",
-        imageUrl: "https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
-        thumbnailUrl: "https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=60",
-        categoryId: 3, // Bathrooms
+        title: "Modern Home at Night",
+        description: "Contemporary residence with dramatic night lighting",
+        imageUrl: "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+        thumbnailUrl: "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=60",
+        categoryId: 5, // Nighttime
         location: "Oslo, Norway",
         featured: true
       },
       {
-        title: "Contemporary Bathroom Design",
-        description: "Modern fixtures and clean lines in this stylish bathroom",
-        imageUrl: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
-        thumbnailUrl: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=60",
-        categoryId: 3, // Bathrooms
+        title: "City Apartment Evening View",
+        description: "Urban apartment with city lights backdrop",
+        imageUrl: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+        thumbnailUrl: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=60",
+        categoryId: 5, // Nighttime
         location: "Bergen, Norway",
         featured: false
       },
+      
+      // Housing - Drone
       {
-        title: "Modern Apartment Building",
-        description: "Contemporary multi-unit residential building with unique facade",
-        imageUrl: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
-        thumbnailUrl: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=60",
-        categoryId: 4, // Architecture
+        title: "Aerial Estate View",
+        description: "Drone photograph of luxury estate and surroundings",
+        imageUrl: "https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+        thumbnailUrl: "https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=60",
+        categoryId: 6, // Drone
         location: "Stockholm, Sweden",
         featured: true
       },
       {
-        title: "Residential House Design",
-        description: "Contemporary single-family home featuring glass and wood elements",
-        imageUrl: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
-        thumbnailUrl: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=60",
-        categoryId: 4, // Architecture
+        title: "Coastal Property Aerial",
+        description: "Seaside residence captured from above",
+        imageUrl: "https://images.unsplash.com/photo-1513584684374-8bab748fbf90?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+        thumbnailUrl: "https://images.unsplash.com/photo-1513584684374-8bab748fbf90?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=60",
+        categoryId: 6, // Drone
         location: "Copenhagen, Denmark",
+        featured: false
+      },
+      
+      // Business
+      {
+        title: "Corporate Headquarters",
+        description: "Modern office building exterior for corporate client",
+        imageUrl: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+        thumbnailUrl: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=60",
+        categoryId: 7, // Business
+        location: "Oslo, Norway",
+        featured: true
+      },
+      {
+        title: "Executive Office Interior",
+        description: "Professional office space with elegant design",
+        imageUrl: "https://images.unsplash.com/photo-1497366811353-6870744d04b2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+        thumbnailUrl: "https://images.unsplash.com/photo-1497366811353-6870744d04b2?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=60",
+        categoryId: 7, // Business
+        location: "Stockholm, Sweden",
         featured: false
       }
     ];

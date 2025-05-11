@@ -1,14 +1,32 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ChevronDown } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { Category } from "@shared/schema";
+
+type NavItemWithChildren = {
+  name: string;
+  href: string;
+  children?: Array<{ name: string; href: string }>;
+};
 
 export function Header() {
   const [location] = useLocation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const dropdownRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const { user, logoutMutation } = useAuth();
+
+  // Fetch all categories
+  const { data: categories } = useQuery<Category[]>({
+    queryKey: ["/api/categories"],
+  });
+
+  const mainCategories = categories?.filter(cat => !cat.parentCategory) || [];
+  const subcategories = categories?.filter(cat => cat.parentCategory) || [];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -19,9 +37,47 @@ export function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const navigation = [
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (activeDropdown && 
+          dropdownRefs.current[activeDropdown] && 
+          !dropdownRefs.current[activeDropdown]?.contains(event.target as Node)) {
+        setActiveDropdown(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [activeDropdown]);
+
+  // Organize navigation with dropdowns
+  const navigation: NavItemWithChildren[] = [
     { name: "Home", href: "/" },
-    { name: "Portfolio", href: "/portfolio" },
+    { 
+      name: "Lifestyle", 
+      href: "/portfolio?category=lifestyle",
+      children: subcategories
+        .filter(sub => sub.parentCategory === "lifestyle")
+        .map(cat => ({
+          name: cat.name,
+          href: `/portfolio?category=${cat.slug}`
+        }))
+    },
+    { 
+      name: "Housing", 
+      href: "/portfolio?category=housing",
+      children: subcategories
+        .filter(sub => sub.parentCategory === "housing")
+        .map(cat => ({
+          name: cat.name,
+          href: `/portfolio?category=${cat.slug}`
+        }))
+    },
+    { 
+      name: "Business", 
+      href: "/portfolio?category=business" 
+    },
     { name: "About", href: "/about" },
     { name: "Contact", href: "/contact" },
   ];
@@ -47,17 +103,59 @@ export function Header() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex space-x-10">
             {navigation.map((item) => (
-              <Link 
-                key={item.name} 
-                href={item.href}
-                className={`${
-                  isActive(item.href) 
-                    ? "text-primary" 
-                    : "text-secondary hover:text-primary"
-                } transition-colors duration-300`}
-              >
-                {item.name}
-              </Link>
+              <div key={item.name} className="relative inline-block">
+                {item.children ? (
+                  <div 
+                    ref={el => dropdownRefs.current[item.name] = el}
+                    className="inline-block"
+                  >
+                    <button
+                      className={`flex items-center space-x-1 ${
+                        isActive(item.href) 
+                          ? "text-primary" 
+                          : "text-secondary hover:text-primary"
+                      } transition-colors duration-300`}
+                      onClick={() => setActiveDropdown(activeDropdown === item.name ? null : item.name)}
+                    >
+                      <span>{item.name}</span>
+                      <ChevronDown className="h-4 w-4" />
+                    </button>
+                    
+                    {activeDropdown === item.name && (
+                      <div className="absolute left-0 mt-2 w-40 bg-white rounded-md shadow-lg py-1 z-50">
+                        <Link 
+                          href={item.href}
+                          className="block px-4 py-2 text-secondary hover:text-primary hover:bg-gray-50"
+                          onClick={() => setActiveDropdown(null)}
+                        >
+                          All {item.name}
+                        </Link>
+                        {item.children.map(child => (
+                          <Link 
+                            key={child.name}
+                            href={child.href}
+                            className="block px-4 py-2 text-secondary hover:text-primary hover:bg-gray-50"
+                            onClick={() => setActiveDropdown(null)}
+                          >
+                            {child.name}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <Link 
+                    href={item.href}
+                    className={`${
+                      isActive(item.href) 
+                        ? "text-primary" 
+                        : "text-secondary hover:text-primary"
+                    } transition-colors duration-300`}
+                  >
+                    {item.name}
+                  </Link>
+                )}
+              </div>
             ))}
             
             {user?.isAdmin && (
@@ -109,17 +207,64 @@ export function Header() {
           <div className="md:hidden bg-white py-4 space-y-4 mt-4">
             {navigation.map((item) => (
               <div key={item.name} className="text-center">
-                <Link 
-                  href={item.href}
-                  className={`${
-                    isActive(item.href) 
-                      ? "text-primary" 
-                      : "text-secondary hover:text-primary"
-                  } transition-colors duration-300`}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  {item.name}
-                </Link>
+                {item.children ? (
+                  <>
+                    <button
+                      className={`flex items-center space-x-1 mx-auto ${
+                        isActive(item.href) 
+                          ? "text-primary" 
+                          : "text-secondary hover:text-primary"
+                      } transition-colors duration-300`}
+                      onClick={() => setActiveDropdown(activeDropdown === item.name ? null : item.name)}
+                    >
+                      <span>{item.name}</span>
+                      <ChevronDown className="h-4 w-4" />
+                    </button>
+                    
+                    {activeDropdown === item.name && (
+                      <div className="bg-gray-50 py-2 mt-2 space-y-2">
+                        <div>
+                          <Link 
+                            href={item.href}
+                            className="block text-secondary hover:text-primary"
+                            onClick={() => {
+                              setActiveDropdown(null);
+                              setIsMobileMenuOpen(false);
+                            }}
+                          >
+                            All {item.name}
+                          </Link>
+                        </div>
+                        {item.children.map(child => (
+                          <div key={child.name}>
+                            <Link 
+                              href={child.href}
+                              className="block text-secondary hover:text-primary"
+                              onClick={() => {
+                                setActiveDropdown(null);
+                                setIsMobileMenuOpen(false);
+                              }}
+                            >
+                              {child.name}
+                            </Link>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <Link 
+                    href={item.href}
+                    className={`${
+                      isActive(item.href) 
+                        ? "text-primary" 
+                        : "text-secondary hover:text-primary"
+                    } transition-colors duration-300`}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {item.name}
+                  </Link>
+                )}
               </div>
             ))}
             
