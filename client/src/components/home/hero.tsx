@@ -6,9 +6,9 @@ export function Hero() {
     <section id="home" className="relative min-h-screen">
       <div className="absolute inset-0 bg-black">
         <img 
-          src="https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?ixlib=rb-4.0.3&auto=format&fit=crop&q=80&w=1920&h=1080" 
-          alt="Interior photography by FotoDS" 
-          className="w-full h-full object-cover opacity-80" 
+          src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?ixlib=rb-4.0.3&auto=format&fit=crop&q=80&w=1920&h=1080" 
+          alt="Nighttime house photography by FotoDS" 
+          className="w-full h-full object-cover opacity-85" 
         />
       </div>
       <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/50"></div>

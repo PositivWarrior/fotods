@@ -39,6 +39,7 @@ export const photos = pgTable("photos", {
   categoryId: integer("category_id").references(() => categories.id, { onDelete: "cascade" }),
   featured: boolean("featured").default(false).notNull(),
   location: text("location"),
+  displayOrder: integer("display_order").default(0).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

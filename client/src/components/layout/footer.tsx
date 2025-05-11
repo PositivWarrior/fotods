@@ -70,7 +70,7 @@ export function Footer() {
           </div>
           
           <div>
-            <h3 className="text-lg font-medium mb-4">Developer</h3>
+            <h3 className="text-lg font-medium mb-4">Created and Developed by</h3>
             <p className="text-white/80 mb-2">Kacper Margol</p>
             <ul className="space-y-2">
               <li>

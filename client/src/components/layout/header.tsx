@@ -56,16 +56,6 @@ export function Header() {
     { name: "Home", href: "/" },
     { name: "Portfolio", href: "/portfolio" },
     { 
-      name: "Lifestyle", 
-      href: "/portfolio/lifestyle",
-      children: subcategories
-        .filter(sub => sub.parentCategory === "lifestyle")
-        .map(cat => ({
-          name: cat.name,
-          href: `/portfolio/${cat.slug}`
-        }))
-    },
-    { 
       name: "Housing", 
       href: "/portfolio/housing",
       children: subcategories
@@ -78,6 +68,16 @@ export function Header() {
     { 
       name: "Business", 
       href: "/portfolio/business" 
+    },
+    { 
+      name: "Lifestyle", 
+      href: "/portfolio/lifestyle",
+      children: subcategories
+        .filter(sub => sub.parentCategory === "lifestyle")
+        .map(cat => ({
+          name: cat.name,
+          href: `/portfolio/${cat.slug}`
+        }))
     },
     { name: "About", href: "/about" },
     { name: "Contact", href: "/contact" },
