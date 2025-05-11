@@ -242,11 +242,9 @@ export class MemStorage implements IStorage {
     
     // Add sample photos to storage
     samplePhotos.forEach(photo => {
-      const now = new Date();
-      this.createPhoto({
-        ...photo,
-        createdAt: now
-      });
+      // Remove createdAt from the sample data as it's automatically added by createPhoto
+      const { createdAt, ...photoData } = photo as any;
+      this.createPhoto(photoData);
     });
   }
 
@@ -285,7 +283,11 @@ export class MemStorage implements IStorage {
   
   async createCategory(insertCategory: InsertCategory): Promise<Category> {
     const id = this.categoryId++;
-    const category: Category = { ...insertCategory, id };
+    const category: Category = { 
+      ...insertCategory, 
+      id,
+      parentCategory: insertCategory.parentCategory || null 
+    };
     this.categories.set(id, category);
     return category;
   }
@@ -336,7 +338,15 @@ export class MemStorage implements IStorage {
   async createPhoto(insertPhoto: InsertPhoto): Promise<Photo> {
     const id = this.photoId++;
     const createdAt = new Date();
-    const photo: Photo = { ...insertPhoto, id, createdAt };
+    const photo: Photo = { 
+      ...insertPhoto, 
+      id, 
+      createdAt,
+      description: insertPhoto.description || null,
+      categoryId: insertPhoto.categoryId || null,
+      location: insertPhoto.location || null,
+      featured: insertPhoto.featured || false
+    };
     this.photos.set(id, photo);
     return photo;
   }
@@ -367,7 +377,14 @@ export class MemStorage implements IStorage {
     const id = this.contactMessageId++;
     const createdAt = new Date();
     const read = false;
-    const message: ContactMessage = { ...insertMessage, id, createdAt, read };
+    const message: ContactMessage = { 
+      ...insertMessage, 
+      id, 
+      createdAt, 
+      read,
+      phone: insertMessage.phone || null,
+      service: insertMessage.service || null
+    };
     this.contactMessages.set(id, message);
     return message;
   }
@@ -402,7 +419,11 @@ export class MemStorage implements IStorage {
   
   async createTestimonial(insertTestimonial: InsertTestimonial): Promise<Testimonial> {
     const id = this.testimonialId++;
-    const testimonial: Testimonial = { ...insertTestimonial, id };
+    const testimonial: Testimonial = { 
+      ...insertTestimonial, 
+      id,
+      isActive: insertTestimonial.isActive !== undefined ? insertTestimonial.isActive : true 
+    };
     this.testimonials.set(id, testimonial);
     return testimonial;
   }
