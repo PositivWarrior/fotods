@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { Category, Photo } from "@shared/schema";
 import { motion } from "framer-motion";
-import { ChevronRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 export function CategoryCollage() {
   const { data: categories, isLoading: categoriesLoading } = useQuery<Category[]>({
@@ -13,15 +13,24 @@ export function CategoryCollage() {
     queryKey: ["/api/photos"],
   });
 
-  // Group main categories
-  const mainCategories = categories?.filter(cat => !cat.parentCategory) || [];
+  // Specifically use only the main categories: Housing, Lifestyle, Business
+  const mainCategoryNames = ["Housing", "Lifestyle", "Business"];
+  const mainCategories = categories?.filter(
+    cat => mainCategoryNames.includes(cat.name)
+  ) || [];
   
   if (categoriesLoading || photosLoading) {
-    return <div className="py-10">Loading categories...</div>;
+    return (
+      <section className="py-16 bg-muted">
+        <div className="container mx-auto px-6">
+          <div className="py-10 text-center text-muted-foreground">Loading gallery content...</div>
+        </div>
+      </section>
+    );
   }
 
-  // Returns first 3 photos for a given category or subcategory
-  const getCategoryPhotos = (categoryId: number, limit = 3) => {
+  // Returns photos for a given category and its subcategories
+  const getCategoryPhotos = (categoryId: number, limit = 4) => {
     // Get direct photos of this category
     const directPhotos = photos?.filter(photo => photo.categoryId === categoryId) || [];
     
@@ -35,55 +44,71 @@ export function CategoryCollage() {
       photos?.filter(photo => photo.categoryId === subCat.id) || []
     );
     
-    // Combine and limit
-    return [...directPhotos, ...subCategoryPhotos].slice(0, limit);
+    // Combine and limit to exactly the requested amount
+    const combined = [...directPhotos, ...subCategoryPhotos];
+    return combined.length > limit ? combined.slice(0, limit) : combined;
   };
 
   return (
-    <section className="py-16 bg-amber-50">
+    <section className="py-16 bg-muted">
       <div className="container mx-auto px-6">
         <h2 className="text-3xl font-poppins font-semibold text-center mb-16">Our Photography Services</h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
           {mainCategories.map((category) => {
-            const categoryPhotos = getCategoryPhotos(category.id);
+            const categoryPhotos = getCategoryPhotos(category.id, 4);
             
             if (categoryPhotos.length === 0) return null;
+            
+            // Main photo is first, smaller ones are the next three
+            const mainPhoto = categoryPhotos[0];
+            const smallPhotos = categoryPhotos.slice(1, 4);
             
             return (
               <motion.div 
                 key={category.id}
-                className="flex flex-col"
+                className="flex flex-col h-full"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
                 viewport={{ once: true }}
               >
-                <h3 className="text-xl font-poppins font-medium mb-6 text-primary">{category.name}</h3>
+                <h3 className="text-xl font-poppins font-medium mb-5 text-primary">{category.name}</h3>
                 
-                <div className="grid grid-cols-3 gap-2 mb-6">
-                  {categoryPhotos.map((photo, index) => (
+                {/* Main photo on top with frame */}
+                <div className="mb-3 p-1 bg-black">
+                  <div className="overflow-hidden">
+                    <img 
+                      src={mainPhoto.thumbnailUrl} 
+                      alt={mainPhoto.title}
+                      className="w-full h-56 object-cover transform hover:scale-105 transition-transform duration-500"
+                    />
+                  </div>
+                </div>
+                
+                {/* Three smaller photos at the bottom */}
+                <div className="grid grid-cols-3 gap-3 mb-6">
+                  {smallPhotos.map((photo) => (
                     <div 
                       key={photo.id} 
-                      className={`
-                        overflow-hidden ${index === 0 ? 'col-span-3 h-52' : 'col-span-1 h-24'}
-                      `}
+                      className="p-1 bg-black overflow-hidden"
                     >
                       <img 
                         src={photo.thumbnailUrl} 
                         alt={photo.title}
-                        className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-500"
+                        className="w-full h-24 object-cover transform hover:scale-105 transition-transform duration-500"
                       />
                     </div>
                   ))}
                 </div>
                 
+                {/* Link to the specific category, not the main portfolio */}
                 <Link 
                   href={`/portfolio?category=${category.slug}`}
-                  className="flex items-center mt-auto text-primary hover:text-amber-700 font-medium transition-colors"
+                  className="inline-flex items-center mt-auto text-primary hover:text-secondary font-medium transition-colors"
                 >
                   <span>View {category.name} Gallery</span>
-                  <ChevronRight className="w-4 h-4 ml-1" />
+                  <ArrowRight className="w-4 h-4 ml-1" />
                 </Link>
               </motion.div>
             );

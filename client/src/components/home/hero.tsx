@@ -26,7 +26,7 @@ export function Hero() {
           <p className="text-xl md:text-2xl mb-10 text-white/90">
             Professional interior photography by Dawid Siedlec
           </p>
-          <Link href="/contact" className="inline-block bg-amber-500 text-white px-8 py-3 font-medium rounded-none hover:bg-amber-600 transition-colors duration-300">
+          <Link href="/contact" className="inline-block bg-primary text-white px-8 py-3 font-medium rounded-none hover:bg-secondary transition-colors duration-300">
             Contact Me
           </Link>
         </motion.div>
