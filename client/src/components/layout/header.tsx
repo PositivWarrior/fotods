@@ -54,29 +54,30 @@ export function Header() {
   // Organize navigation with dropdowns
   const navigation: NavItemWithChildren[] = [
     { name: "Home", href: "/" },
+    { name: "Portfolio", href: "/portfolio" },
     { 
       name: "Lifestyle", 
-      href: "/portfolio?category=lifestyle",
+      href: "/portfolio/lifestyle",
       children: subcategories
         .filter(sub => sub.parentCategory === "lifestyle")
         .map(cat => ({
           name: cat.name,
-          href: `/portfolio?category=${cat.slug}`
+          href: `/portfolio/${cat.slug}`
         }))
     },
     { 
       name: "Housing", 
-      href: "/portfolio?category=housing",
+      href: "/portfolio/housing",
       children: subcategories
         .filter(sub => sub.parentCategory === "housing")
         .map(cat => ({
           name: cat.name,
-          href: `/portfolio?category=${cat.slug}`
+          href: `/portfolio/${cat.slug}`
         }))
     },
     { 
       name: "Business", 
-      href: "/portfolio?category=business" 
+      href: "/portfolio/business" 
     },
     { name: "About", href: "/about" },
     { name: "Contact", href: "/contact" },

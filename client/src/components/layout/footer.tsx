@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { Instagram, Facebook, Linkedin } from "lucide-react";
+import { Instagram, Facebook, Linkedin, Github, Globe } from "lucide-react";
 
 export function Footer() {
   return (
@@ -55,6 +55,12 @@ export function Footer() {
                 <Link href="/portfolio" className="text-white/80 hover:text-white transition-colors">Portfolio</Link>
               </li>
               <li>
+                <Link href="/portfolio/housing" className="text-white/80 hover:text-white transition-colors">Housing</Link>
+              </li>
+              <li>
+                <Link href="/portfolio/business" className="text-white/80 hover:text-white transition-colors">Business</Link>
+              </li>
+              <li>
                 <Link href="/about" className="text-white/80 hover:text-white transition-colors">About</Link>
               </li>
               <li>
@@ -64,27 +70,41 @@ export function Footer() {
           </div>
           
           <div>
-            <h3 className="text-lg font-medium mb-4">Services</h3>
+            <h3 className="text-lg font-medium mb-4">Developer</h3>
+            <p className="text-white/80 mb-2">Kacper Margol</p>
             <ul className="space-y-2">
               <li>
-                <Link href="/portfolio?category=lifestyle" className="text-white/80 hover:text-white transition-colors">
-                  Lifestyle Photography
-                </Link>
+                <a 
+                  href="https://linkedin.com/in/kacper-margol" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="text-white/80 hover:text-white transition-colors flex items-center gap-2"
+                >
+                  <Linkedin size={16} />
+                  <span>LinkedIn</span>
+                </a>
               </li>
               <li>
-                <Link href="/portfolio?category=housing" className="text-white/80 hover:text-white transition-colors">
-                  Housing Photography
-                </Link>
+                <a 
+                  href="https://github.com/kacpermargol" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="text-white/80 hover:text-white transition-colors flex items-center gap-2"
+                >
+                  <Github size={16} />
+                  <span>GitHub</span>
+                </a>
               </li>
               <li>
-                <Link href="/portfolio?category=nighttime" className="text-white/80 hover:text-white transition-colors">
-                  Nighttime Photography
-                </Link>
-              </li>
-              <li>
-                <Link href="/portfolio?category=business" className="text-white/80 hover:text-white transition-colors">
-                  Business Photography
-                </Link>
+                <a 
+                  href="https://kacpermargol.com" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="text-white/80 hover:text-white transition-colors flex items-center gap-2"
+                >
+                  <Globe size={16} />
+                  <span>Portfolio</span>
+                </a>
               </li>
             </ul>
           </div>
