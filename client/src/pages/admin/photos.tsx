@@ -6,8 +6,8 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { Photo, Category } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
-import { Pencil, Trash2, Star, MoreHorizontal } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Pencil, Trash2, Star, MoreHorizontal, GripVertical, Save } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -41,16 +41,40 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { 
+  DragDropContext, 
+  Droppable, 
+  Draggable, 
+  DropResult,
+  DroppableProvided,
+  DraggableProvided 
+} from "react-beautiful-dnd";
 
 export default function AdminPhotos() {
   const { toast } = useToast();
   const [showAddPhoto, setShowAddPhoto] = useState(false);
   const [photoToDelete, setPhotoToDelete] = useState<Photo | null>(null);
+  const [orderedPhotos, setOrderedPhotos] = useState<Photo[]>([]);
+  const [hasReordered, setHasReordered] = useState(false);
   
   // Fetch photos
   const { data: photos, isLoading } = useQuery<Photo[]>({
     queryKey: ["/api/photos"],
   });
+  
+  // Initialize ordered photos when photos are loaded
+  useEffect(() => {
+    if (photos) {
+      // Sort by displayOrder if available, or fallback to id
+      const sorted = [...photos].sort((a, b) => {
+        if (a.displayOrder !== undefined && b.displayOrder !== undefined) {
+          return a.displayOrder - b.displayOrder;
+        }
+        return a.id - b.id;
+      });
+      setOrderedPhotos(sorted);
+    }
+  }, [photos]);
   
   // Fetch categories for display
   const { data: categories } = useQuery<Category[]>({
@@ -102,9 +126,48 @@ export default function AdminPhotos() {
     },
   });
   
+  // Save photo order mutation
+  const { mutate: savePhotoOrder, isPending: isSavingOrder } = useMutation({
+    mutationFn: async (photos: Photo[]) => {
+      const photoOrders = photos.map((photo, index) => ({
+        id: photo.id,
+        displayOrder: index
+      }));
+      
+      await apiRequest("POST", `/api/photos/reorder`, { photoOrders });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/photos"] });
+      setHasReordered(false);
+      toast({
+        title: "Order updated",
+        description: "Photo display order has been saved",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: `Failed to update photo order: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
+  
+  // Handle drag end event
+  const handleDragEnd = (result: DropResult) => {
+    if (!result.destination) return;
+    
+    const items = Array.from(orderedPhotos);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+    
+    setOrderedPhotos(items);
+    setHasReordered(true);
+  };
+  
   // Get category name by ID
-  const getCategoryName = (categoryId?: number) => {
-    if (!categoryId || !categories) return "Uncategorized";
+  const getCategoryName = (categoryId: number | null | undefined) => {
+    if (categoryId === null || categoryId === undefined || !categories) return "Uncategorized";
     const category = categories.find(cat => cat.id === categoryId);
     return category ? category.name : "Uncategorized";
   };
@@ -115,33 +178,52 @@ export default function AdminPhotos() {
         <div>
           <h2 className="text-lg font-medium">Photo Gallery</h2>
           <p className="text-muted-foreground">
-            Add, edit, and delete photos in your portfolio.
+            Add, edit, and delete photos in your portfolio. Drag photos to reorder them.
           </p>
         </div>
-        <Button onClick={() => setShowAddPhoto(true)}>
-          Add New Photo
-        </Button>
+        <div className="flex gap-2">
+          {hasReordered && (
+            <Button 
+              onClick={() => savePhotoOrder(orderedPhotos)}
+              disabled={isSavingOrder}
+              className="gap-1"
+            >
+              {isSavingOrder ? (
+                <>Saving...</>
+              ) : (
+                <>
+                  <Save className="h-4 w-4" />
+                  Save Order
+                </>
+              )}
+            </Button>
+          )}
+          <Button onClick={() => setShowAddPhoto(true)}>
+            Add New Photo
+          </Button>
+        </div>
       </div>
       
       {/* Photos Table */}
       <Card>
         <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[100px]">Image</TableHead>
-                <TableHead>Title</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Location</TableHead>
-                <TableHead className="w-[100px]">Featured</TableHead>
-                <TableHead className="w-[100px]">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                // Loading state
-                Array.from({ length: 5 }).map((_, index) => (
+          {isLoading ? (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[40px]"></TableHead>
+                  <TableHead className="w-[100px]">Image</TableHead>
+                  <TableHead>Title</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead>Location</TableHead>
+                  <TableHead className="w-[100px]">Featured</TableHead>
+                  <TableHead className="w-[100px]">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {Array.from({ length: 5 }).map((_, index) => (
                   <TableRow key={index}>
+                    <TableCell><Skeleton className="h-5 w-5" /></TableCell>
                     <TableCell><Skeleton className="h-12 w-20" /></TableCell>
                     <TableCell><Skeleton className="h-5 w-40" /></TableCell>
                     <TableCell><Skeleton className="h-5 w-32" /></TableCell>
@@ -149,66 +231,121 @@ export default function AdminPhotos() {
                     <TableCell><Skeleton className="h-5 w-5 rounded-full" /></TableCell>
                     <TableCell><Skeleton className="h-8 w-20" /></TableCell>
                   </TableRow>
-                ))
-              ) : photos && photos.length > 0 ? (
-                photos.map(photo => (
-                  <TableRow key={photo.id}>
-                    <TableCell>
-                      <div className="h-12 w-20 bg-muted rounded overflow-hidden">
-                        <img 
-                          src={photo.thumbnailUrl} 
-                          alt={photo.title} 
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    </TableCell>
-                    <TableCell className="font-medium">{photo.title}</TableCell>
-                    <TableCell>{getCategoryName(photo.categoryId)}</TableCell>
-                    <TableCell>{photo.location || "—"}</TableCell>
-                    <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className={photo.featured ? "text-yellow-500" : "text-muted-foreground"}
-                        onClick={() => toggleFeatured({ id: photo.id, featured: !photo.featured })}
-                      >
-                        <Star className={`h-5 w-5 ${photo.featured ? "fill-yellow-500" : ""}`} />
-                      </Button>
-                    </TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoreHorizontal className="h-5 w-5" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem 
-                            className="cursor-pointer"
-                            onClick={() => {/* Edit photo functionality */}}
-                          >
-                            <Pencil className="mr-2 h-4 w-4" />Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            className="cursor-pointer text-destructive focus:text-destructive"
-                            onClick={() => setPhotoToDelete(photo)}
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
+                ))}
+              </TableBody>
+            </Table>
+          ) : orderedPhotos.length > 0 ? (
+            <DragDropContext onDragEnd={handleDragEnd}>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[40px]"></TableHead>
+                    <TableHead className="w-[100px]">Image</TableHead>
+                    <TableHead>Title</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Location</TableHead>
+                    <TableHead className="w-[100px]">Featured</TableHead>
+                    <TableHead className="w-[100px]">Actions</TableHead>
                   </TableRow>
-                ))
-              ) : (
+                </TableHeader>
+                <Droppable droppableId="photos">
+                  {(provided: DroppableProvided) => (
+                    <TableBody 
+                      {...provided.droppableProps}
+                      ref={provided.innerRef}
+                    >
+                      {orderedPhotos.map((photo, index) => (
+                        <Draggable 
+                          key={photo.id.toString()} 
+                          draggableId={photo.id.toString()} 
+                          index={index}
+                        >
+                          {(dragProvided: DraggableProvided) => (
+                            <TableRow 
+                              ref={dragProvided.innerRef}
+                              {...dragProvided.draggableProps}
+                              className={hasReordered ? "bg-muted/30" : ""}
+                            >
+                              <TableCell {...dragProvided.dragHandleProps} className="cursor-grab">
+                                <GripVertical className="h-5 w-5 text-muted-foreground" />
+                              </TableCell>
+                              <TableCell>
+                                <div className="h-12 w-20 bg-muted rounded overflow-hidden">
+                                  <img 
+                                    src={photo.thumbnailUrl} 
+                                    alt={photo.title} 
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                              </TableCell>
+                              <TableCell className="font-medium">{photo.title}</TableCell>
+                              <TableCell>{getCategoryName(photo.categoryId)}</TableCell>
+                              <TableCell>{photo.location || "—"}</TableCell>
+                              <TableCell>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className={photo.featured ? "text-yellow-500" : "text-muted-foreground"}
+                                  onClick={() => toggleFeatured({ id: photo.id, featured: !photo.featured })}
+                                >
+                                  <Star className={`h-5 w-5 ${photo.featured ? "fill-yellow-500" : ""}`} />
+                                </Button>
+                              </TableCell>
+                              <TableCell>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="icon">
+                                      <MoreHorizontal className="h-5 w-5" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem 
+                                      className="cursor-pointer"
+                                      onClick={() => {/* Edit photo functionality */}}
+                                    >
+                                      <Pencil className="mr-2 h-4 w-4" />Edit
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem 
+                                      className="cursor-pointer text-destructive focus:text-destructive"
+                                      onClick={() => setPhotoToDelete(photo)}
+                                    >
+                                      <Trash2 className="mr-2 h-4 w-4" />Delete
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </TableCell>
+                            </TableRow>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </TableBody>
+                  )}
+                </Droppable>
+              </Table>
+            </DragDropContext>
+          ) : (
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-6">
+                  <TableHead className="w-[40px]"></TableHead>
+                  <TableHead className="w-[100px]">Image</TableHead>
+                  <TableHead>Title</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead>Location</TableHead>
+                  <TableHead className="w-[100px]">Featured</TableHead>
+                  <TableHead className="w-[100px]">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-6">
                     No photos found. Add some photos to your portfolio.
                   </TableCell>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
       

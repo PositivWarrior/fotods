@@ -228,6 +228,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Reorder photos endpoint
+  app.post("/api/photos/reorder", isAdmin, async (req, res) => {
+    try {
+      const { photoOrders } = req.body;
+      
+      if (!Array.isArray(photoOrders)) {
+        return res.status(400).json({ message: "photoOrders must be an array" });
+      }
+      
+      // Validate array items
+      for (const item of photoOrders) {
+        if (typeof item !== 'object' || !item.id || typeof item.displayOrder !== 'number') {
+          return res.status(400).json({ 
+            message: "Each item must have an id and displayOrder number" 
+          });
+        }
+      }
+      
+      const success = await dataStorage.updatePhotoOrder(photoOrders);
+      
+      if (!success) {
+        return res.status(500).json({ message: "Failed to update photo order" });
+      }
+      
+      res.status(200).json({ message: "Photo order updated successfully" });
+    } catch (error) {
+      console.error("Error reordering photos:", error);
+      res.status(500).json({ message: "Failed to reorder photos" });
+    }
+  });
+
   app.delete("/api/photos/:id", isAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id);

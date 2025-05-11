@@ -49,7 +49,7 @@ export interface IStorage {
   deleteTestimonial(id: number): Promise<boolean>;
   
   // Session store for authentication
-  sessionStore: session.SessionStore;
+  sessionStore: any; // Use 'any' for the session store
 }
 
 export class MemStorage implements IStorage {
