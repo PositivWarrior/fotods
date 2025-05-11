@@ -31,6 +31,7 @@ export interface IStorage {
   createPhoto(photo: InsertPhoto): Promise<Photo>;
   updatePhoto(id: number, photo: Partial<InsertPhoto>): Promise<Photo | undefined>;
   deletePhoto(id: number): Promise<boolean>;
+  updatePhotoOrder(photoOrders: {id: number, displayOrder: number}[]): Promise<boolean>;
   
   // Contact operations
   getContactMessages(): Promise<ContactMessage[]>;
@@ -356,10 +357,18 @@ export class MemStorage implements IStorage {
   async createPhoto(insertPhoto: InsertPhoto): Promise<Photo> {
     const id = this.photoId++;
     const createdAt = new Date();
+    
+    // Get the highest current display order to place new photo at the end
+    const photos = Array.from(this.photos.values());
+    const maxOrder = photos.length > 0 
+      ? Math.max(...photos.map(p => p.displayOrder || 0)) 
+      : 0;
+    
     const photo: Photo = { 
       ...insertPhoto, 
       id, 
       createdAt,
+      displayOrder: insertPhoto.displayOrder ?? maxOrder + 1,
       description: insertPhoto.description || null,
       categoryId: insertPhoto.categoryId || null,
       location: insertPhoto.location || null,
@@ -380,6 +389,22 @@ export class MemStorage implements IStorage {
   
   async deletePhoto(id: number): Promise<boolean> {
     return this.photos.delete(id);
+  }
+  
+  async updatePhotoOrder(photoOrders: { id: number, displayOrder: number }[]): Promise<boolean> {
+    try {
+      // Update the display order for each photo
+      for (const { id, displayOrder } of photoOrders) {
+        const photo = await this.getPhoto(id);
+        if (photo) {
+          await this.updatePhoto(id, { displayOrder });
+        }
+      }
+      return true;
+    } catch (error) {
+      console.error("Error updating photo order:", error);
+      return false;
+    }
   }
   
   // Contact operations
