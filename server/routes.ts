@@ -1,6 +1,6 @@
 import type { Express, Request } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
+import { storage as dataStorage } from "./storage";
 import { setupAuth, isAdmin } from "./auth";
 import { 
   insertCategorySchema, 
@@ -21,7 +21,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Configure multer for file uploads
   // Store uploaded files in memory for this example
   // In a production environment, you'd typically use a storage service like AWS S3
-  const storage = multer.diskStorage({
+  const fileStorage = multer.diskStorage({
     destination: function (req, file, cb) {
       cb(null, 'public/uploads/');
     },
@@ -35,7 +35,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // File upload size limits
   const upload = multer({
-    storage,
+    storage: fileStorage,
     limits: {
       fileSize: 10 * 1024 * 1024, // 10MB max file size
     },
@@ -52,7 +52,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Categories
   app.get("/api/categories", async (req, res) => {
     try {
-      const categories = await storage.getCategories();
+      const categories = await dataStorage.getCategories();
       res.json(categories);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch categories" });
@@ -61,7 +61,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/categories/:slug", async (req, res) => {
     try {
-      const category = await storage.getCategoryBySlug(req.params.slug);
+      const category = await dataStorage.getCategoryBySlug(req.params.slug);
       if (!category) {
         return res.status(404).json({ message: "Category not found" });
       }
@@ -74,7 +74,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/categories", isAdmin, async (req, res) => {
     try {
       const validatedData = insertCategorySchema.parse(req.body);
-      const category = await storage.createCategory(validatedData);
+      const category = await dataStorage.createCategory(validatedData);
       res.status(201).json(category);
     } catch (error) {
       if (error instanceof ZodError) {
@@ -88,7 +88,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const validatedData = insertCategorySchema.partial().parse(req.body);
-      const category = await storage.updateCategory(id, validatedData);
+      const category = await dataStorage.updateCategory(id, validatedData);
       
       if (!category) {
         return res.status(404).json({ message: "Category not found" });
@@ -106,7 +106,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/categories/:id", isAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const success = await storage.deleteCategory(id);
+      const success = await dataStorage.deleteCategory(id);
       
       if (!success) {
         return res.status(404).json({ message: "Category not found" });
@@ -121,7 +121,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Photos
   app.get("/api/photos", async (req, res) => {
     try {
-      const photos = await storage.getPhotos();
+      const photos = await dataStorage.getPhotos();
       res.json(photos);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch photos" });
@@ -130,7 +130,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/photos/featured", async (req, res) => {
     try {
-      const photos = await storage.getFeaturedPhotos();
+      const photos = await dataStorage.getFeaturedPhotos();
       res.json(photos);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch featured photos" });
@@ -139,7 +139,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/photos/category/:slug", async (req, res) => {
     try {
-      const photos = await storage.getPhotosByCategorySlug(req.params.slug);
+      const photos = await dataStorage.getPhotosByCategorySlug(req.params.slug);
       res.json(photos);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch photos by category" });
@@ -149,7 +149,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/photos/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const photo = await storage.getPhoto(id);
+      const photo = await dataStorage.getPhoto(id);
       
       if (!photo) {
         return res.status(404).json({ message: "Photo not found" });
@@ -161,10 +161,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // File upload endpoint
+  app.post("/api/upload", isAdmin, upload.fields([
+    { name: 'mainImage', maxCount: 1 },
+    { name: 'thumbnailImage', maxCount: 1 }
+  ]), async (req, res) => {
+    try {
+      const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+      
+      // Check if files were uploaded
+      if (!files || !files.mainImage) {
+        return res.status(400).json({ message: "No files uploaded" });
+      }
+      
+      // Get file paths
+      const mainImagePath = `/uploads/${files.mainImage[0].filename}`;
+      
+      // If thumbnail isn't provided, use the main image
+      const thumbnailPath = files.thumbnailImage 
+        ? `/uploads/${files.thumbnailImage[0].filename}` 
+        : mainImagePath;
+      
+      res.status(200).json({
+        imageUrl: mainImagePath,
+        thumbnailUrl: thumbnailPath
+      });
+    } catch (error) {
+      console.error("Upload error:", error);
+      res.status(500).json({ 
+        message: error instanceof Error ? error.message : "Failed to upload files" 
+      });
+    }
+  });
+
+  // Create photo endpoint
   app.post("/api/photos", isAdmin, async (req, res) => {
     try {
       const validatedData = insertPhotoSchema.parse(req.body);
-      const photo = await storage.createPhoto(validatedData);
+      const photo = await dataStorage.createPhoto(validatedData);
       res.status(201).json(photo);
     } catch (error) {
       if (error instanceof ZodError) {
@@ -178,7 +212,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const validatedData = insertPhotoSchema.partial().parse(req.body);
-      const photo = await storage.updatePhoto(id, validatedData);
+      const photo = await dataStorage.updatePhoto(id, validatedData);
       
       if (!photo) {
         return res.status(404).json({ message: "Photo not found" });
@@ -196,7 +230,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/photos/:id", isAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const success = await storage.deletePhoto(id);
+      const success = await dataStorage.deletePhoto(id);
       
       if (!success) {
         return res.status(404).json({ message: "Photo not found" });
@@ -212,7 +246,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/contact", async (req, res) => {
     try {
       const validatedData = insertContactSchema.parse(req.body);
-      const contactMessage = await storage.createContactMessage(validatedData);
+      const contactMessage = await dataStorage.createContactMessage(validatedData);
       res.status(201).json({ 
         message: "Your message has been sent successfully! We'll get back to you soon.",
         id: contactMessage.id 
@@ -227,7 +261,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/contact", isAdmin, async (req, res) => {
     try {
-      const contactMessages = await storage.getContactMessages();
+      const contactMessages = await dataStorage.getContactMessages();
       res.json(contactMessages);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch contact messages" });
@@ -237,7 +271,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/contact/:id/read", isAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const contactMessage = await storage.markContactMessageAsRead(id);
+      const contactMessage = await dataStorage.markContactMessageAsRead(id);
       
       if (!contactMessage) {
         return res.status(404).json({ message: "Contact message not found" });
@@ -252,7 +286,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/contact/:id", isAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const success = await storage.deleteContactMessage(id);
+      const success = await dataStorage.deleteContactMessage(id);
       
       if (!success) {
         return res.status(404).json({ message: "Contact message not found" });
@@ -267,7 +301,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Testimonials
   app.get("/api/testimonials", async (req, res) => {
     try {
-      const testimonials = await storage.getActiveTestimonials();
+      const testimonials = await dataStorage.getActiveTestimonials();
       res.json(testimonials);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch testimonials" });
@@ -276,7 +310,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/admin/testimonials", isAdmin, async (req, res) => {
     try {
-      const testimonials = await storage.getTestimonials();
+      const testimonials = await dataStorage.getTestimonials();
       res.json(testimonials);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch testimonials" });
@@ -286,7 +320,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/testimonials", isAdmin, async (req, res) => {
     try {
       const validatedData = insertTestimonialSchema.parse(req.body);
-      const testimonial = await storage.createTestimonial(validatedData);
+      const testimonial = await dataStorage.createTestimonial(validatedData);
       res.status(201).json(testimonial);
     } catch (error) {
       if (error instanceof ZodError) {
@@ -300,7 +334,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const validatedData = insertTestimonialSchema.partial().parse(req.body);
-      const testimonial = await storage.updateTestimonial(id, validatedData);
+      const testimonial = await dataStorage.updateTestimonial(id, validatedData);
       
       if (!testimonial) {
         return res.status(404).json({ message: "Testimonial not found" });
@@ -318,7 +352,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/testimonials/:id", isAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const success = await storage.deleteTestimonial(id);
+      const success = await dataStorage.deleteTestimonial(id);
       
       if (!success) {
         return res.status(404).json({ message: "Testimonial not found" });
