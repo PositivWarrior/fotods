@@ -1,18 +1,28 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Category, Photo } from "@shared/schema";
-import { Lightbox } from "@/components/ui/lightbox";
+import { EnhancedLightbox } from "@/components/ui/lightbox";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
+import { useInView } from "react-intersection-observer";
+import { LazyLoadImage } from "react-lazy-load-image-component";
+import 'react-lazy-load-image-component/src/effects/blur.css';
 
 interface GalleryProps {
   category?: string;
 }
 
+// Number of images to load at once for infinite scroll
+const IMAGES_PER_PAGE = 6;
+
 export function Gallery({ category }: GalleryProps) {
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [currentImage, setCurrentImage] = useState({ src: "", alt: "" });
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [visibleCount, setVisibleCount] = useState(IMAGES_PER_PAGE);
+  
+  // Ref for bottom loader element
+  const { ref: bottomRef, inView } = useInView();
   
   // Fetch categories for filtering
   const { data: categories } = useQuery<Category[]>({
@@ -32,7 +42,25 @@ export function Gallery({ category }: GalleryProps) {
   const filteredPhotos = photos?.filter(photo => {
     if (activeFilter === "all") return true;
     return photo.categoryId === parseInt(activeFilter);
-  });
+  }) || [];
+  
+  // Visible photos subset for infinite loading
+  const visiblePhotos = filteredPhotos.slice(0, visibleCount);
+  
+  // Reset visible count when filter changes
+  useEffect(() => {
+    setVisibleCount(IMAGES_PER_PAGE);
+  }, [activeFilter, category]);
+  
+  // Handle infinite scroll loading
+  useEffect(() => {
+    if (inView && visibleCount < filteredPhotos.length) {
+      // Add more photos when scrolled to bottom
+      setTimeout(() => {
+        setVisibleCount(prev => Math.min(prev + IMAGES_PER_PAGE, filteredPhotos.length));
+      }, 300);
+    }
+  }, [inView, filteredPhotos.length, visibleCount]);
   
   // Update active filter when category prop changes
   useEffect(() => {
@@ -48,11 +76,8 @@ export function Gallery({ category }: GalleryProps) {
     }
   }, [category, categories]);
   
-  const openLightbox = (photo: Photo) => {
-    setCurrentImage({
-      src: photo.imageUrl,
-      alt: photo.title
-    });
+  const openLightbox = (index: number) => {
+    setCurrentImageIndex(index);
     setLightboxOpen(true);
   };
 
@@ -91,14 +116,14 @@ export function Gallery({ category }: GalleryProps) {
           Array.from({ length: 6 }).map((_, index) => (
             <GallerySkeleton key={index} />
           ))
-        ) : filteredPhotos?.length ? (
-          // Actual photos
-          filteredPhotos.map((photo, index) => (
+        ) : visiblePhotos.length ? (
+          // Actual photos with lazy loading
+          visiblePhotos.map((photo, index) => (
             <GalleryItem 
               key={photo.id} 
               photo={photo} 
               index={index}
-              onImageClick={() => openLightbox(photo)}
+              onImageClick={() => openLightbox(index)}
             />
           ))
         ) : (
@@ -109,13 +134,22 @@ export function Gallery({ category }: GalleryProps) {
         )}
       </div>
       
-      {/* Lightbox for viewing large images */}
-      <Lightbox 
-        isOpen={lightboxOpen}
-        imgSrc={currentImage.src}
-        imgAlt={currentImage.alt}
-        onClose={() => setLightboxOpen(false)}
-      />
+      {/* Loader for infinite scroll */}
+      {!isLoading && visibleCount < filteredPhotos.length && (
+        <div ref={bottomRef} className="py-8 flex justify-center">
+          <Skeleton className="h-10 w-10 rounded-full" />
+        </div>
+      )}
+      
+      {/* Enhanced Lightbox with navigation */}
+      {filteredPhotos.length > 0 && (
+        <EnhancedLightbox 
+          isOpen={lightboxOpen}
+          photos={filteredPhotos}
+          currentIndex={currentImageIndex}
+          onClose={() => setLightboxOpen(false)}
+        />
+      )}
     </div>
   );
 }
@@ -134,25 +168,35 @@ function GalleryItem({ photo, index, onImageClick }: GalleryItemProps) {
   
   const category = categories?.find(cat => cat.id === photo.categoryId);
   
+  // Detect when item is in view for animation
+  const { ref, inView } = useInView({
+    threshold: 0.1,
+    triggerOnce: true
+  });
+  
   return (
     <motion.div 
+      ref={ref}
       className="gallery-item"
       initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: index * 0.1 }}
+      animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+      transition={{ duration: 0.4, delay: 0.1 }}
     >
       <div 
-        className="overflow-hidden cursor-pointer gallery-img"
+        className="overflow-hidden cursor-pointer gallery-img rounded-sm"
         onClick={onImageClick}
       >
-        <img 
+        <LazyLoadImage
           src={photo.thumbnailUrl} 
-          alt={photo.title} 
-          className="w-full h-64 object-cover"
-          loading="lazy"
+          alt={photo.title}
+          effect="blur"
+          threshold={300}
+          wrapperClassName="w-full h-64"
+          className="w-full h-64 object-cover" 
+          placeholderSrc="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjYwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjYwMCIgZmlsbD0iI2YyZjJmMiIvPjwvc3ZnPg=="
         />
       </div>
-      <h3 className="font-poppins font-medium mt-3">{photo.title}</h3>
+      <h3 className="font-poppins font-medium mt-3 text-primary">{photo.title}</h3>
       <p className="text-secondary text-sm">{category?.name || 'Uncategorized'}</p>
       {photo.location && (
         <p className="text-secondary text-sm">{photo.location}</p>
@@ -164,7 +208,7 @@ function GalleryItem({ photo, index, onImageClick }: GalleryItemProps) {
 function GallerySkeleton() {
   return (
     <div className="gallery-item">
-      <Skeleton className="w-full h-64" />
+      <Skeleton className="w-full h-64 rounded-sm" />
       <Skeleton className="h-6 w-3/4 mt-3" />
       <Skeleton className="h-4 w-1/2 mt-1" />
     </div>
