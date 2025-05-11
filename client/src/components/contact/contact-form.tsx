@@ -45,7 +45,6 @@ export function ContactForm() {
       name: "",
       email: "",
       phone: "",
-      service: "",
       message: "",
     },
   });
@@ -217,32 +216,7 @@ export function ContactForm() {
                       )}
                     />
                     
-                    <FormField
-                      control={form.control}
-                      name="service"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Service Interested In</FormLabel>
-                          <Select 
-                            onValueChange={field.onChange} 
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select a service" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="real-estate">Real Estate Photography</SelectItem>
-                              <SelectItem value="interior">Interior Design Photography</SelectItem>
-                              <SelectItem value="architecture">Architectural Photography</SelectItem>
-                              <SelectItem value="commercial">Commercial Photography</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+
                     
                     <FormField
                       control={form.control}

@@ -10,7 +10,7 @@ import { motion } from "framer-motion";
 
 export default function PortfolioPage() {
   // Get category from route parameter
-  const [, params] = useRoute("/portfolio/:category");
+  const [, params] = useRoute("/portfolio/category/:category");
   
   // Parse URL search parameters as fallback
   const [location] = useLocation();

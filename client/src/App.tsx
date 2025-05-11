@@ -23,17 +23,17 @@ function Router() {
     <Switch>
       <Route path="/" component={HomePage} />
       <Route path="/portfolio" component={PortfolioPage} />
-      <Route path="/portfolio/:category" component={PortfolioPage} />
+      <Route path="/portfolio/category/:category" component={PortfolioPage} />
       <Route path="/about" component={AboutPage} />
       <Route path="/contact" component={ContactPage} />
       <Route path="/auth" component={AuthPage} />
       
       {/* Admin Routes - Protected */}
-      <ProtectedRoute path="/admin" component={AdminDashboard} adminOnly />
-      <ProtectedRoute path="/admin/photos" component={AdminPhotos} adminOnly />
-      <ProtectedRoute path="/admin/categories" component={AdminCategories} adminOnly />
-      <ProtectedRoute path="/admin/testimonials" component={AdminTestimonials} adminOnly />
-      <ProtectedRoute path="/admin/messages" component={AdminMessages} adminOnly />
+      <ProtectedRoute path="/admin" component={AdminDashboard} />
+      <ProtectedRoute path="/admin/photos" component={AdminPhotos} />
+      <ProtectedRoute path="/admin/categories" component={AdminCategories} />
+      <ProtectedRoute path="/admin/testimonials" component={AdminTestimonials} />
+      <ProtectedRoute path="/admin/messages" component={AdminMessages} />
       
       {/* Fallback to 404 */}
       <Route component={NotFound} />

@@ -52,36 +52,54 @@ export function Header() {
   }, [activeDropdown]);
 
   // Organize navigation with dropdowns
-  const navigation: NavItemWithChildren[] = [
+  let navigation: NavItemWithChildren[] = [
     { name: "Home", href: "/" },
     { name: "Portfolio", href: "/portfolio" },
     { 
       name: "Housing", 
-      href: "/portfolio/housing",
+      href: "/portfolio/category/housing",
       children: subcategories
         .filter(sub => sub.parentCategory === "housing")
         .map(cat => ({
           name: cat.name,
-          href: `/portfolio/${cat.slug}`
+          href: `/portfolio/category/${cat.slug}`
         }))
     },
     { 
       name: "Business", 
-      href: "/portfolio/business" 
+      href: "/portfolio/category/business" 
     },
     { 
       name: "Lifestyle", 
-      href: "/portfolio/lifestyle",
+      href: "/portfolio/category/lifestyle",
       children: subcategories
         .filter(sub => sub.parentCategory === "lifestyle")
         .map(cat => ({
           name: cat.name,
-          href: `/portfolio/${cat.slug}`
+          href: `/portfolio/category/${cat.slug}`
         }))
     },
     { name: "About", href: "/about" },
     { name: "Contact", href: "/contact" },
   ];
+  
+  // Add admin panel link for logged-in users
+  if (user) {
+    navigation = [
+      ...navigation,
+      { 
+        name: "Admin", 
+        href: "/admin", 
+        children: [
+          { name: "Dashboard", href: "/admin" },
+          { name: "Photos", href: "/admin/photos" },
+          { name: "Categories", href: "/admin/categories" },
+          { name: "Testimonials", href: "/admin/testimonials" },
+          { name: "Messages", href: "/admin/messages" }
+        ]
+      }
+    ];
+  }
 
   const isActive = (path: string) => {
     if (path === "/" && location === "/") return true;
