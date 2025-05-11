@@ -7,8 +7,7 @@ import { Testimonials } from "@/components/home/testimonials";
 import { ContactForm } from "@/components/contact/contact-form";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
-import { useQuery } from "@tanstack/react-query";
-import { Link } from "wouter";
+
 
 export default function HomePage() {
 

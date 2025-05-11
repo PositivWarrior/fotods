@@ -3,7 +3,7 @@ import { Instagram, Facebook, Linkedin } from "lucide-react";
 
 export function Footer() {
   return (
-    <footer className="bg-primary text-white py-12">
+    <footer className="bg-amber-800 text-white py-12">
       <div className="container mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
           <div className="col-span-1 md:col-span-2">
@@ -67,23 +67,23 @@ export function Footer() {
             <h3 className="text-lg font-medium mb-4">Services</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/portfolio?category=living-rooms" className="text-white/80 hover:text-white transition-colors">
-                  Real Estate Photography
+                <Link href="/portfolio?category=lifestyle" className="text-white/80 hover:text-white transition-colors">
+                  Lifestyle Photography
                 </Link>
               </li>
               <li>
-                <Link href="/portfolio?category=kitchens" className="text-white/80 hover:text-white transition-colors">
-                  Interior Design Photography
+                <Link href="/portfolio?category=housing" className="text-white/80 hover:text-white transition-colors">
+                  Housing Photography
                 </Link>
               </li>
               <li>
-                <Link href="/portfolio?category=architecture" className="text-white/80 hover:text-white transition-colors">
-                  Architectural Photography
+                <Link href="/portfolio?category=nighttime" className="text-white/80 hover:text-white transition-colors">
+                  Nighttime Photography
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="text-white/80 hover:text-white transition-colors">
-                  Commercial Photography
+                <Link href="/portfolio?category=business" className="text-white/80 hover:text-white transition-colors">
+                  Business Photography
                 </Link>
               </li>
             </ul>
