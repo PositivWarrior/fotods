@@ -1,5 +1,5 @@
-import { X, ChevronLeft, ChevronRight } from "lucide-react";
-import { useEffect, useState, ReactNode } from "react";
+import { X } from "lucide-react";
+import { useEffect, useState } from "react";
 import YetAnotherLightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 import { Photo } from "@shared/schema";
@@ -12,10 +12,7 @@ interface EnhancedLightboxProps {
   onClose: () => void;
 }
 
-// Define props for button components
-interface RenderButtonProps {
-  onClick?: () => void;
-}
+// Using built-in controls from yet-another-react-lightbox
 
 export function EnhancedLightbox({ isOpen, photos, currentIndex, onClose }: EnhancedLightboxProps) {
   // Filter out any photos without a valid imageUrl to prevent errors
@@ -40,39 +37,7 @@ export function EnhancedLightbox({ isOpen, photos, currentIndex, onClose }: Enha
     };
   }, [isOpen]);
 
-  // Custom render components for the lightbox
-  const renderButtonPrev = ({ onClick }: RenderButtonProps): ReactNode => (
-    <button 
-      type="button" 
-      className="absolute left-4 top-1/2 z-50 p-2 text-white bg-black/20 rounded-full hover:bg-black/40"
-      onClick={onClick}
-      aria-label="Previous"
-    >
-      <ChevronLeft className="h-8 w-8" />
-    </button>
-  );
-
-  const renderButtonNext = ({ onClick }: RenderButtonProps): ReactNode => (
-    <button 
-      type="button" 
-      className="absolute right-4 top-1/2 z-50 p-2 text-white bg-black/20 rounded-full hover:bg-black/40"
-      onClick={onClick}
-      aria-label="Next"
-    >
-      <ChevronRight className="h-8 w-8" />
-    </button>
-  );
-
-  const renderButtonClose = ({ onClick }: RenderButtonProps): ReactNode => (
-    <button
-      type="button"
-      className="absolute top-6 right-6 z-50 p-1 text-white hover:text-gray-300 transition-colors"
-      onClick={onClick}
-      aria-label="Close"
-    >
-      <X className="h-8 w-8" />
-    </button>
-  );
+  // Using yet-another-react-lightbox's built-in controls rather than custom ones
 
   // If there are no valid photos or slides, don't render the lightbox
   if (slides.length === 0) {
@@ -97,13 +62,11 @@ export function EnhancedLightbox({ isOpen, photos, currentIndex, onClose }: Enha
         closeOnPullDown: true
       }}
       animation={{ swipe: 250 }}
-      render={{
-        // @ts-ignore - type compatibility issue with yet-another-react-lightbox API
-        buttonPrev: renderButtonPrev,
-        // @ts-ignore - type compatibility issue with yet-another-react-lightbox API
-        buttonNext: renderButtonNext,
-        // @ts-ignore - type compatibility issue with yet-another-react-lightbox API
-        buttonClose: renderButtonClose
+      carousel={{
+        finite: false,
+      }}
+      toolbar={{
+        buttons: ['close']
       }}
     />
   );
