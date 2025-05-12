@@ -1,5 +1,6 @@
 import { Link } from "wouter";
 import { motion } from "framer-motion";
+import logoImage from "../../assets/Logo_solo.png";
 
 export function Hero() {
   return (
@@ -32,7 +33,7 @@ export function Hero() {
           }}
         >
           <img 
-            src="/images/Logo_solo.png" 
+            src={logoImage} 
             alt="FotoDS Logo" 
             className="w-full h-full" 
           />

@@ -6,6 +6,7 @@ import { Menu, X, ChevronDown } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Category } from "@shared/schema";
 import { motion } from "framer-motion";
+import logoImage from "../../assets/Logo_solo.png";
 
 type NavItemWithChildren = {
   name: string;
@@ -119,7 +120,7 @@ export function Header() {
           <Link href="/" className="flex items-center gap-2">
             <div className="h-9 w-9">
               <motion.img 
-                src="/images/Logo_solo.png" 
+                src={logoImage} 
                 alt="FotoDS Logo"
                 className="h-full w-full" 
                 initial={{ rotate: 0 }}
