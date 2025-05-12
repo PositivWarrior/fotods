@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import { motion } from "framer-motion";
-import logoImage from "../../assets/Logo_solo_no_bg.png";
+import logoImage from "../../assets/logo_no_bg.png";
 
 export function Hero() {
   return (

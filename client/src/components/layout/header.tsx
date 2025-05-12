@@ -6,7 +6,7 @@ import { Menu, X, ChevronDown } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Category } from "@shared/schema";
 import { motion } from "framer-motion";
-import logoImage from "../../assets/Logo_solo_no_bg.png";
+import logoImage from "../../assets/logo_no_bg.png";
 
 type NavItemWithChildren = {
   name: string;
