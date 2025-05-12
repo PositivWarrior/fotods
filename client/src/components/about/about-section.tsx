@@ -32,11 +32,11 @@ export function AboutSection() {
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
-            <div className="relative overflow-hidden rounded-lg shadow-xl max-w-md mx-auto border-2 border-accent/20">
+            <div className="relative overflow-hidden rounded-lg shadow-xl mx-auto border-2 border-accent/20 w-full max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl aspect-[3/4]">
               <motion.img 
                 src={dawidImage} 
                 alt="Dawid Siedlec - Interior Photographer" 
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover object-center"
                 loading="lazy"
                 whileHover={{ scale: 1.03 }}
                 transition={{ duration: 0.4 }}
