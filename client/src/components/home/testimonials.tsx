@@ -3,6 +3,7 @@ import { Testimonial } from "@shared/schema";
 import { motion } from "framer-motion";
 import { Star } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { TestimonialModal } from "@/components/home/testimonial-modal";
 
 export function Testimonials() {
   const { data: testimonials, isLoading } = useQuery<Testimonial[]>({
@@ -35,6 +36,11 @@ export function Testimonials() {
               <p className="text-secondary">No testimonials available yet.</p>
             </div>
           )}
+        </div>
+        
+        {/* Add testimonial submission button and modal */}
+        <div className="flex justify-center mt-8">
+          <TestimonialModal />
         </div>
       </div>
     </section>
