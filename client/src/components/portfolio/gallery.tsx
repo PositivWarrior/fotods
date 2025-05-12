@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Category, Photo } from "@shared/schema";
 import { EnhancedLightbox } from "@/components/ui/lightbox";
@@ -37,6 +37,12 @@ export function Gallery({ category }: GalleryProps) {
   const { data: photos, isLoading } = useQuery<Photo[]>({
     queryKey,
   });
+  
+  // Function to open the lightbox at a specific index
+  const openLightbox = (index: number) => {
+    setCurrentImageIndex(index);
+    setLightboxOpen(true);
+  };
   
   // Filter photos based on active category, but don't apply additional filtering if already filtered by URL
   // Then sort by displayOrder for proper ordering
@@ -88,11 +94,6 @@ export function Gallery({ category }: GalleryProps) {
     // Also reset visible count when category or filter changes
     setVisibleCount(IMAGES_PER_PAGE);
   }, [category, categories]);
-  
-  const openLightbox = (index: number) => {
-    setCurrentImageIndex(index);
-    setLightboxOpen(true);
-  };
 
   return (
     <div>
