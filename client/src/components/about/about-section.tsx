@@ -1,22 +1,23 @@
 import { Camera, Lightbulb, Edit } from "lucide-react";
 import { motion } from "framer-motion";
+import dawidImage from "../../assets/Dawid_hero.jpg";
 
 export function AboutSection() {
   const features = [
     {
       icon: <Camera className="text-primary" />,
       title: "Professional Equipment",
-      description: "Using top-of-the-line cameras and lenses",
+      description: "Canon professional cameras and premium lenses for exceptional image quality",
     },
     {
       icon: <Lightbulb className="text-primary" />,
-      title: "Lighting Expertise",
-      description: "Mastering natural and artificial lighting techniques",
+      title: "Lighting Mastery",
+      description: "Expert control of natural and artificial lighting to showcase spaces at their best",
     },
     {
       icon: <Edit className="text-primary" />,
-      title: "Post-Processing",
-      description: "Advanced editing for perfect final images",
+      title: "Precision Editing",
+      description: "Meticulous post-processing to achieve perfect color, contrast and composition",
     },
   ];
 
@@ -31,11 +32,17 @@ export function AboutSection() {
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
-            <img 
-              src="https://images.unsplash.com/photo-1580828343064-fde4fc206bc6?ixlib=rb-4.0.3&auto=format&fit=crop&q=80&w=800&h=1000" 
-              alt="Dawid Siedlec - Interior Photographer" 
-              className="w-full max-w-md mx-auto"
-            />
+            <div className="relative overflow-hidden rounded-lg shadow-xl max-w-md mx-auto border-2 border-accent/20">
+              <motion.img 
+                src={dawidImage} 
+                alt="Dawid Siedlec - Interior Photographer" 
+                className="w-full h-full object-cover"
+                loading="lazy"
+                whileHover={{ scale: 1.03 }}
+                transition={{ duration: 0.4 }}
+              />
+              <div className="absolute bottom-0 left-0 w-full h-1/6 bg-gradient-to-t from-black/50 to-transparent"></div>
+            </div>
           </motion.div>
           
           <motion.div 
@@ -47,14 +54,18 @@ export function AboutSection() {
           >
             <h2 className="text-3xl font-poppins font-semibold mb-6">About Me</h2>
             <p className="text-secondary mb-6 leading-relaxed">
-              Hello! I'm Dawid Siedlec, a professional interior and architectural photographer based in Norway. 
-              With over a decade of experience, I've developed a unique eye for capturing spaces in ways that 
-              highlight their best features and create emotional connections.
+              Hello! I'm <span className="font-semibold text-primary">Dawid Siedlec</span>, a passionate interior and architectural photographer based in Norway. 
+              With over a decade of experience capturing spaces, I've developed a keen eye for detail and composition that brings out the true character and beauty
+              of each environment I photograph.
+            </p>
+            <p className="text-secondary mb-6 leading-relaxed">
+              My approach combines technical precision with artistic vision, ensuring each image tells a 
+              compelling visual story. Every space has its own unique atmosphere and personality - my job is to capture
+              that essence in a way that resonates with viewers.
             </p>
             <p className="text-secondary mb-8 leading-relaxed">
-              My approach combines technical excellence with artistic vision, ensuring each image tells a 
-              compelling story. I work closely with real estate professionals, interior designers, architects, 
-              and homeowners to create photographs that make properties stand out.
+              I work closely with real estate professionals, interior designers, architects, business owners, and homeowners
+              to create photographs that not only showcase properties but also evoke emotion and create lasting impressions.
             </p>
             
             <div className="space-y-4 mb-8">
