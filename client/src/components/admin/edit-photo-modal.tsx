@@ -138,7 +138,7 @@ export function EditPhotoModal({ photo, isOpen, onClose }: EditPhotoModalProps) 
                 checked={isFeatured} 
                 onCheckedChange={setIsFeatured}
               />
-              <Label htmlFor="featured">Featured on Homepage</Label>
+              <Label htmlFor="featured">Featured on Homepage <span className="text-yellow-500">(marked with <Star className="h-4 w-4 inline fill-yellow-500" />)</span></Label>
             </div>
             
             {photo?.imageUrl && (

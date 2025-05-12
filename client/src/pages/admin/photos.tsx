@@ -205,6 +205,9 @@ export default function AdminPhotos() {
           <p className="text-muted-foreground">
             Add, edit, and delete photos in your portfolio. Drag photos to reorder them within a category.
           </p>
+          <p className="text-muted-foreground mt-1">
+            Use the <Star className="h-4 w-4 inline fill-yellow-500 text-yellow-500" /> icon to mark photos as featured on the homepage.
+          </p>
         </div>
         <div className="flex gap-2">
           {hasReordered && (
@@ -334,6 +337,7 @@ export default function AdminPhotos() {
                                   size="icon"
                                   className={photo.featured ? "text-yellow-500" : "text-muted-foreground"}
                                   onClick={() => toggleFeatured({ id: photo.id, featured: !photo.featured })}
+                                  title={photo.featured ? "Unmark as featured on homepage" : "Mark as featured on homepage"}
                                 >
                                   <Star className={`h-5 w-5 ${photo.featured ? "fill-yellow-500" : ""}`} />
                                 </Button>

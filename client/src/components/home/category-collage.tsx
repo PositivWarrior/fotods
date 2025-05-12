@@ -46,8 +46,17 @@ export function CategoryCollage() {
       photos?.filter(photo => photo.categoryId === subCat.id) || []
     );
     
-    // Combine and limit to exactly the requested amount
-    const combined = [...directPhotos, ...subCategoryPhotos];
+    // Combine all photos
+    let combined = [...directPhotos, ...subCategoryPhotos];
+    
+    // Prioritize featured photos
+    const featuredPhotos = combined.filter(photo => photo.featured);
+    const nonFeaturedPhotos = combined.filter(photo => !photo.featured);
+    
+    // Always put featured photos first
+    combined = [...featuredPhotos, ...nonFeaturedPhotos];
+    
+    // Return limited number of photos
     return combined.length > limit ? combined.slice(0, limit) : combined;
   };
 
