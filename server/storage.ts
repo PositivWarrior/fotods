@@ -100,6 +100,15 @@ export class MemStorage implements IStorage {
       this.users.set(user.id, { ...user, isAdmin: true });
     });
     
+    // Create custom admin user specifically for Kacper
+    this.createUser({
+      username: "AdminKacpru@gmail.com",
+      password: "28c9ce6406c93ed242b272434a9c1ca4e0ec5d92d76218fc08db5eb50ccee8f25b12a90eadae741a00d603d6544dabe1282e3bc62bcacb75732efbca02d44a3a.7d0e2b9583ea7dfc",
+    }).then(user => {
+      // Ensure this user is admin
+      this.users.set(user.id, { ...user, isAdmin: true });
+    });
+    
     // Create default categories
     const categories = [
       { name: "Lifestyle", slug: "lifestyle" },
