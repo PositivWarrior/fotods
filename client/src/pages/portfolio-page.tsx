@@ -9,15 +9,19 @@ import { Category } from "@shared/schema";
 import { motion } from "framer-motion";
 
 export default function PortfolioPage() {
-  // Get category from route parameter
-  const [, params] = useRoute("/portfolio/category/:category");
+  // Get category from route parameters - check both patterns
+  const [matchesFirstPattern, paramsFirstPattern] = useRoute("/portfolio/category/:category");
+  const [matchesSecondPattern, paramsSecondPattern] = useRoute("/portfolio/:category");
   
   // Parse URL search parameters as fallback
   const [location] = useLocation();
   const searchParams = new URLSearchParams(location.split('?')[1] || '');
   
-  // Use the category from route params if available, otherwise check query params
-  const categorySlug = params?.category || searchParams.get("category");
+  // Use the category from any matching route pattern, otherwise check query params
+  const categorySlug = 
+    (matchesFirstPattern && paramsFirstPattern?.category) || 
+    (matchesSecondPattern && paramsSecondPattern?.category) || 
+    searchParams.get("category");
   
   // Fetch category details if slug is provided
   const { data: categories } = useQuery<Category[]>({

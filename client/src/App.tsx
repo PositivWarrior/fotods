@@ -24,6 +24,7 @@ function Router() {
       <Route path="/" component={HomePage} />
       <Route path="/portfolio" component={PortfolioPage} />
       <Route path="/portfolio/category/:category" component={PortfolioPage} />
+      <Route path="/portfolio/:category" component={PortfolioPage} />
       <Route path="/about" component={AboutPage} />
       <Route path="/contact" component={ContactPage} />
       <Route path="/auth" component={AuthPage} />

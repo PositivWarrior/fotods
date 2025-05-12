@@ -39,12 +39,20 @@ export function Gallery({ category }: GalleryProps) {
   });
   
   // Filter photos based on active category, but don't apply additional filtering if already filtered by URL
-  const filteredPhotos = category
+  // Then sort by displayOrder for proper ordering
+  const filteredPhotos = (category
     ? photos || []
     : (photos?.filter(photo => {
         if (activeFilter === "all") return true;
         return photo.categoryId === parseInt(activeFilter);
-      }) || []);
+      }) || []))
+    .sort((a, b) => {
+      // Sort by displayOrder if available, or fallback to id
+      if (a.displayOrder !== undefined && b.displayOrder !== undefined) {
+        return a.displayOrder - b.displayOrder;
+      }
+      return a.id - b.id;
+    });
   
   // Visible photos subset for infinite loading
   const visiblePhotos = filteredPhotos.slice(0, visibleCount);
