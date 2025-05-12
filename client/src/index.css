@@ -5,16 +5,8 @@
 @tailwind utilities;
 
 /* Logo Styling */
-.logo-transparent {
-  mix-blend-mode: multiply;
-  filter: brightness(0);
-  background-color: transparent !important;
-}
-
-.logo-white {
-  filter: invert(1) brightness(100);
-  mix-blend-mode: overlay;
-  background-color: transparent !important;
+.hero-logo {
+  filter: brightness(0) invert(1);
 }
 
 :root {

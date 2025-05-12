@@ -6,7 +6,7 @@ import { Menu, X, ChevronDown } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Category } from "@shared/schema";
 import { motion } from "framer-motion";
-import logoImage from "../../assets/Logo_solo.png";
+import logoImage from "../../assets/Logo_solo_no_bg.png";
 
 type NavItemWithChildren = {
   name: string;
@@ -122,7 +122,7 @@ export function Header() {
               <motion.img 
                 src={logoImage} 
                 alt="FotoDS Logo"
-                className="h-full w-full logo-transparent" 
+                className="h-full w-full" 
                 initial={{ rotate: 0 }}
                 whileHover={{ rotate: 15 }}
                 transition={{ type: "spring", stiffness: 300 }}
