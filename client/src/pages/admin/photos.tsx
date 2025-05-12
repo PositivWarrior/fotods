@@ -8,6 +8,8 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
 import { Pencil, Trash2, Star, MoreHorizontal, GripVertical, Save } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -56,25 +58,38 @@ export default function AdminPhotos() {
   const [photoToDelete, setPhotoToDelete] = useState<Photo | null>(null);
   const [orderedPhotos, setOrderedPhotos] = useState<Photo[]>([]);
   const [hasReordered, setHasReordered] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
   
   // Fetch photos
   const { data: photos, isLoading } = useQuery<Photo[]>({
     queryKey: ["/api/photos"],
   });
   
-  // Initialize ordered photos when photos are loaded
+  // Initialize ordered photos when photos are loaded or category is changed
   useEffect(() => {
     if (photos) {
+      // Filter by selected category if needed
+      const filteredPhotos = selectedCategory === "all" 
+        ? photos 
+        : photos.filter(photo => {
+            // Convert to string for comparison with selectedCategory which is a string
+            return photo.categoryId?.toString() === selectedCategory;
+          });
+      
       // Sort by displayOrder if available, or fallback to id
-      const sorted = [...photos].sort((a, b) => {
+      const sorted = [...filteredPhotos].sort((a, b) => {
         if (a.displayOrder !== undefined && b.displayOrder !== undefined) {
           return a.displayOrder - b.displayOrder;
         }
         return a.id - b.id;
       });
+      
       setOrderedPhotos(sorted);
+      
+      // Reset reordering state when category changes
+      setHasReordered(false);
     }
-  }, [photos]);
+  }, [photos, selectedCategory]);
   
   // Fetch categories for display
   const { data: categories } = useQuery<Category[]>({
@@ -134,14 +149,22 @@ export default function AdminPhotos() {
         displayOrder: index
       }));
       
-      await apiRequest("POST", `/api/photos/reorder`, { photoOrders });
+      // If a category is selected, include it in the request
+      const payload = {
+        photoOrders,
+        categoryId: selectedCategory !== "all" ? parseInt(selectedCategory) : undefined 
+      };
+      
+      await apiRequest("POST", `/api/photos/reorder`, payload);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/photos"] });
       setHasReordered(false);
       toast({
         title: "Order updated",
-        description: "Photo display order has been saved",
+        description: selectedCategory === "all" 
+          ? "Photo display order has been saved" 
+          : `Photo order in ${getCategoryName(parseInt(selectedCategory))} has been saved`,
       });
     },
     onError: (error: Error) => {
@@ -178,7 +201,7 @@ export default function AdminPhotos() {
         <div>
           <h2 className="text-lg font-medium">Photo Gallery</h2>
           <p className="text-muted-foreground">
-            Add, edit, and delete photos in your portfolio. Drag photos to reorder them.
+            Add, edit, and delete photos in your portfolio. Drag photos to reorder them within a category.
           </p>
         </div>
         <div className="flex gap-2">
@@ -201,6 +224,31 @@ export default function AdminPhotos() {
           <Button onClick={() => setShowAddPhoto(true)}>
             Add New Photo
           </Button>
+        </div>
+      </div>
+      
+      {/* Category Filter */}
+      <div className="mb-6">
+        <div className="flex items-center space-x-2">
+          <Label htmlFor="category-filter" className="text-sm font-medium">
+            Filter by Category:
+          </Label>
+          <Select
+            value={selectedCategory}
+            onValueChange={setSelectedCategory}
+          >
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="Select category" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Categories</SelectItem>
+              {categories?.map((category) => (
+                <SelectItem key={category.id} value={category.id.toString()}>
+                  {category.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
       
@@ -227,7 +275,6 @@ export default function AdminPhotos() {
                     <TableCell><Skeleton className="h-12 w-20" /></TableCell>
                     <TableCell><Skeleton className="h-5 w-40" /></TableCell>
                     <TableCell><Skeleton className="h-5 w-32" /></TableCell>
-                    <TableCell><Skeleton className="h-5 w-36" /></TableCell>
                     <TableCell><Skeleton className="h-5 w-5 rounded-full" /></TableCell>
                     <TableCell><Skeleton className="h-8 w-20" /></TableCell>
                   </TableRow>
@@ -243,7 +290,6 @@ export default function AdminPhotos() {
                     <TableHead className="w-[100px]">Image</TableHead>
                     <TableHead>Title</TableHead>
                     <TableHead>Category</TableHead>
-                    <TableHead>Location</TableHead>
                     <TableHead className="w-[100px]">Featured</TableHead>
                     <TableHead className="w-[100px]">Actions</TableHead>
                   </TableRow>
@@ -280,7 +326,6 @@ export default function AdminPhotos() {
                               </TableCell>
                               <TableCell className="font-medium">{photo.title}</TableCell>
                               <TableCell>{getCategoryName(photo.categoryId)}</TableCell>
-                              <TableCell>{photo.location || "—"}</TableCell>
                               <TableCell>
                                 <Button
                                   variant="ghost"
