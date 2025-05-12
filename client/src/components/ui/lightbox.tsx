@@ -18,9 +18,12 @@ interface RenderButtonProps {
 }
 
 export function EnhancedLightbox({ isOpen, photos, currentIndex, onClose }: EnhancedLightboxProps) {
-  const slides = photos.map(photo => ({
+  // Filter out any photos without a valid imageUrl to prevent errors
+  const validPhotos = photos.filter(photo => photo && photo.imageUrl && typeof photo.imageUrl === 'string');
+  
+  const slides = validPhotos.map(photo => ({
     src: photo.imageUrl,
-    alt: photo.title,
+    alt: photo.title || 'Photo',
     width: 1600,
     height: 1200
   }));
@@ -71,12 +74,20 @@ export function EnhancedLightbox({ isOpen, photos, currentIndex, onClose }: Enha
     </button>
   );
 
+  // If there are no valid photos or slides, don't render the lightbox
+  if (slides.length === 0) {
+    return null;
+  }
+
+  // Make sure currentIndex is within bounds
+  const safeIndex = Math.min(Math.max(0, currentIndex), slides.length - 1);
+
   return (
     <YetAnotherLightbox
       open={isOpen}
       close={onClose}
       slides={slides}
-      index={currentIndex}
+      index={safeIndex}
       styles={{
         container: { backgroundColor: "rgba(0, 0, 0, 0.9)" },
         root: { "--yarl__slide_captions_display": "none" } as any
