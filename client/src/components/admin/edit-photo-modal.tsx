@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,18 +23,18 @@ export function EditPhotoModal({ photo, isOpen, onClose }: EditPhotoModalProps) 
 
   const [title, setTitle] = useState(photo?.title || "");
   const [description, setDescription] = useState(photo?.description || "");
-  const [categoryId, setCategoryId] = useState<string>(photo?.categoryId.toString() || "");
-  const [isFeatured, setIsFeatured] = useState(photo?.isFeatured || false);
+  const [categoryId, setCategoryId] = useState<string>(photo?.categoryId?.toString() || "");
+  const [isFeatured, setIsFeatured] = useState(photo?.featured || false);
 
   // Reset form values when photo changes
-  useState(() => {
+  useEffect(() => {
     if (photo) {
       setTitle(photo.title);
       setDescription(photo.description || "");
-      setCategoryId(photo.categoryId.toString());
-      setIsFeatured(photo.isFeatured || false);
+      setCategoryId(photo.categoryId?.toString() || "");
+      setIsFeatured(photo.featured || false);
     }
-  });
+  }, [photo]);
 
   // Fetch categories
   const { data: categories } = useQuery<Category[]>({
@@ -79,8 +79,8 @@ export function EditPhotoModal({ photo, isOpen, onClose }: EditPhotoModalProps) 
     updatePhotoMutation.mutate({
       title,
       description,
-      categoryId: parseInt(categoryId),
-      isFeatured
+      categoryId: categoryId ? parseInt(categoryId) : null,
+      featured: isFeatured
     });
   };
 

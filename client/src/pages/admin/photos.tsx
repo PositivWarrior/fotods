@@ -1,5 +1,6 @@
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { ImageUpload } from "@/components/admin/image-upload";
+import { EditPhotoModal } from "@/components/admin/edit-photo-modal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -56,6 +57,7 @@ export default function AdminPhotos() {
   const { toast } = useToast();
   const [showAddPhoto, setShowAddPhoto] = useState(false);
   const [photoToDelete, setPhotoToDelete] = useState<Photo | null>(null);
+  const [photoToEdit, setPhotoToEdit] = useState<Photo | null>(null);
   const [orderedPhotos, setOrderedPhotos] = useState<Photo[]>([]);
   const [hasReordered, setHasReordered] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
@@ -346,7 +348,7 @@ export default function AdminPhotos() {
                                   <DropdownMenuContent align="end">
                                     <DropdownMenuItem 
                                       className="cursor-pointer"
-                                      onClick={() => {/* Edit photo functionality */}}
+                                      onClick={() => setPhotoToEdit(photo)}
                                     >
                                       <Pencil className="mr-2 h-4 w-4" />Edit
                                     </DropdownMenuItem>
@@ -439,6 +441,13 @@ export default function AdminPhotos() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Edit Photo Modal */}
+      <EditPhotoModal 
+        photo={photoToEdit}
+        isOpen={photoToEdit !== null}
+        onClose={() => setPhotoToEdit(null)}
+      />
     </AdminLayout>
   );
 }
