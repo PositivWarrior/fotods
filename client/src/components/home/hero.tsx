@@ -14,11 +14,35 @@ export function Hero() {
       <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/50"></div>
       
       <div className="relative container mx-auto px-6 h-screen flex flex-col justify-center">
+        {/* Logo animation */}
+        <motion.div
+          className="mb-8 w-24 h-24 md:w-32 md:h-32"
+          initial={{ opacity: 0, scale: 0.5, rotate: -30 }}
+          animate={{ opacity: 1, scale: 1, rotate: 0 }}
+          transition={{
+            type: "spring",
+            stiffness: 100,
+            damping: 15,
+            delay: 0.2
+          }}
+          whileHover={{ 
+            scale: 1.1,
+            rotate: 5,
+            transition: { duration: 0.3 }
+          }}
+        >
+          <img 
+            src="/images/Logo_solo.png" 
+            alt="FotoDS Logo" 
+            className="w-full h-full" 
+          />
+        </motion.div>
+        
         <motion.div 
           className="max-w-3xl text-white"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.8, delay: 0.5 }}
         >
           <h1 className="text-4xl md:text-6xl font-poppins font-semibold leading-tight mb-6">
             Capturing the essence of interior spaces
@@ -32,11 +56,16 @@ export function Hero() {
         </motion.div>
       </div>
       
-      <div className="scroll-downs">
+      <motion.div 
+        className="scroll-downs"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.5, duration: 1 }}
+      >
         <div className="mousey">
           <div className="scroller"></div>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }

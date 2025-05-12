@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Category } from "@shared/schema";
+import { motion } from "framer-motion";
 
 type NavItemWithChildren = {
   name: string;
@@ -115,8 +116,18 @@ export function Header() {
     >
       <div className="container mx-auto px-6 py-4">
         <nav className="flex justify-between items-center">
-          <Link href="/" className="text-2xl font-poppins font-semibold tracking-wider">
-            FotoDS
+          <Link href="/" className="flex items-center gap-2">
+            <div className="h-9 w-9">
+              <motion.img 
+                src="/images/Logo_solo.png" 
+                alt="FotoDS Logo"
+                className="h-full w-full" 
+                initial={{ rotate: 0 }}
+                whileHover={{ rotate: 15 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              />
+            </div>
+            <span className="text-2xl font-poppins font-semibold tracking-wider">FotoDS</span>
           </Link>
           
           {/* Desktop Navigation */}
