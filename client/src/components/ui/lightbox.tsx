@@ -98,8 +98,11 @@ export function EnhancedLightbox({ isOpen, photos, currentIndex, onClose }: Enha
       }}
       animation={{ swipe: 250 }}
       render={{
+        // @ts-ignore - type compatibility issue with yet-another-react-lightbox API
         buttonPrev: renderButtonPrev,
+        // @ts-ignore - type compatibility issue with yet-another-react-lightbox API
         buttonNext: renderButtonNext,
+        // @ts-ignore - type compatibility issue with yet-another-react-lightbox API
         buttonClose: renderButtonClose
       }}
     />
