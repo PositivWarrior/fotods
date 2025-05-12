@@ -18,7 +18,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, Star } from "lucide-react";
 
 // Create form schema based on the database schema but only include what the user needs to fill out
 const testimonialFormSchema = z.object({
@@ -27,6 +27,7 @@ const testimonialFormSchema = z.object({
   content: z.string()
     .min(10, { message: "Testimonial must be at least 10 characters." })
     .max(500, { message: "Testimonial must not exceed 500 characters." }),
+  rating: z.number().min(1).max(5).default(5),
 });
 
 type TestimonialFormValues = z.infer<typeof testimonialFormSchema>;
@@ -42,16 +43,36 @@ export function TestimonialForm({ onSuccess }: { onSuccess?: () => void }) {
       name: "",
       role: "",
       content: "",
+      rating: 5,
     },
   });
+  
+  // Simple star rating component
+  const StarRating = ({ value, onChange }: { value: number, onChange: (value: number) => void }) => {
+    return (
+      <div className="flex space-x-1">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <button
+            key={star}
+            type="button"
+            onClick={() => onChange(star)}
+            className="focus:outline-none"
+          >
+            <Star
+              className={`w-6 h-6 ${star <= value ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
+            />
+          </button>
+        ))}
+      </div>
+    );
+  };
 
   // Handle testimonial submission
   const mutation = useMutation({
     mutationFn: async (data: TestimonialFormValues) => {
-      // Add the rating field and isActive false for moderation
+      // Set isActive false for moderation (rating is already in the form data)
       const testimonialData = {
         ...data,
-        rating: 5,
         isActive: false
       };
       
@@ -140,6 +161,26 @@ export function TestimonialForm({ onSuccess }: { onSuccess?: () => void }) {
               </FormControl>
               <FormDescription className="flex justify-end text-xs">
                 {charCount}/500 characters
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="rating"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Your Rating</FormLabel>
+              <FormControl>
+                <StarRating
+                  value={field.value}
+                  onChange={(rating) => field.onChange(rating)}
+                />
+              </FormControl>
+              <FormDescription>
+                Click on the stars to select your rating
               </FormDescription>
               <FormMessage />
             </FormItem>
