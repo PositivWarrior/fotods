@@ -157,6 +157,7 @@ export function Header() {
                         <Link 
                           href={item.href}
                           className="block px-4 py-2 text-secondary hover:text-primary hover:bg-gray-50"
+                          onClick={() => setActiveDropdown(null)}
                         >
                           All {item.name}
                         </Link>
@@ -165,6 +166,7 @@ export function Header() {
                             key={child.name}
                             href={child.href}
                             className="block px-4 py-2 text-secondary hover:text-primary hover:bg-gray-50"
+                            onClick={() => setActiveDropdown(null)}
                           >
                             {child.name}
                           </Link>
@@ -256,6 +258,10 @@ export function Header() {
                           <Link 
                             href={item.href}
                             className="block text-secondary hover:text-primary"
+                            onClick={() => {
+                              setActiveDropdown(null);
+                              setIsMobileMenuOpen(false);
+                            }}
                           >
                             All {item.name}
                           </Link>
@@ -265,6 +271,10 @@ export function Header() {
                             <Link 
                               href={child.href}
                               className="block text-secondary hover:text-primary"
+                              onClick={() => {
+                                setActiveDropdown(null);
+                                setIsMobileMenuOpen(false);
+                              }}
                             >
                               {child.name}
                             </Link>
