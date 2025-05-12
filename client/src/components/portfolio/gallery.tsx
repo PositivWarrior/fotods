@@ -38,7 +38,7 @@ export function Gallery({ category }: GalleryProps) {
     queryKey,
   });
   
-  // Function to open the lightbox at a specific index
+  // Function to handle lightbox
   const openLightbox = (index: number) => {
     setCurrentImageIndex(index);
     setLightboxOpen(true);
