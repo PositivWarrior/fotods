@@ -10,6 +10,7 @@ import { Category, Photo } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Switch } from "@/components/ui/switch";
+import { Star } from "lucide-react";
 
 interface EditPhotoModalProps {
   photo: Photo | null;

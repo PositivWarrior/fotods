@@ -76,7 +76,7 @@ export function TestimonialForm({ onSuccess }: { onSuccess?: () => void }) {
         isActive: false
       };
       
-      const res = await apiRequest("POST", "/api/testimonials", testimonialData);
+      const res = await apiRequest("POST", "/api/testimonials/submit", testimonialData);
       return await res.json();
     },
     onSuccess: () => {

@@ -356,6 +356,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Public testimonial submission route
+  app.post("/api/testimonials/submit", async (req, res) => {
+    try {
+      // Mark testimonials as not active by default
+      const validatedData = insertTestimonialSchema.parse({
+        ...req.body,
+        isActive: false
+      });
+      const testimonial = await dataStorage.createTestimonial(validatedData);
+      res.status(201).json(testimonial);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(400).json({ message: fromZodError(error).message });
+      }
+      res.status(500).json({ message: "Failed to submit testimonial" });
+    }
+  });
+
+  // Admin testimonial creation route
   app.post("/api/testimonials", isAdmin, async (req, res) => {
     try {
       const validatedData = insertTestimonialSchema.parse(req.body);
