@@ -14,22 +14,23 @@ export function Hero() {
       </div>
       <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/50"></div>
       
-      <div className="relative container mx-auto px-6 h-screen flex flex-col justify-center">
+      <div className="relative container mx-auto px-6 h-screen flex flex-col justify-center items-center">
         {/* Logo animation */}
         <motion.div
-          className="mb-8 w-24 h-24 md:w-32 md:h-32"
-          initial={{ opacity: 0, scale: 0.5, rotate: -30 }}
+          className="mb-8 w-32 h-32 md:w-40 md:h-40"
+          initial={{ opacity: 0, scale: 0.5, rotate: -180 }}
           animate={{ opacity: 1, scale: 1, rotate: 0 }}
           transition={{
             type: "spring",
-            stiffness: 100,
-            damping: 15,
-            delay: 0.2
+            stiffness: 60,
+            damping: 12,
+            delay: 0.3,
+            duration: 1.2
           }}
           whileHover={{ 
             scale: 1.1,
-            rotate: 5,
-            transition: { duration: 0.3 }
+            rotate: 15,
+            transition: { duration: 0.5 }
           }}
         >
           <img 
@@ -40,10 +41,10 @@ export function Hero() {
         </motion.div>
         
         <motion.div 
-          className="max-w-3xl text-white"
+          className="max-w-3xl text-white text-center"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.5 }}
+          transition={{ duration: 0.8, delay: 1.2 }}
         >
           <h1 className="text-4xl md:text-6xl font-poppins font-semibold leading-tight mb-6">
             Capturing the essence of interior spaces
