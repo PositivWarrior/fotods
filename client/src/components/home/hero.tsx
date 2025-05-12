@@ -36,7 +36,7 @@ export function Hero() {
           <img 
             src={logoImage} 
             alt="FotoDS Logo" 
-            className="w-full h-full" 
+            className="w-full h-full logo-white" 
           />
         </motion.div>
         

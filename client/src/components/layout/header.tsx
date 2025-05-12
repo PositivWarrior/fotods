@@ -122,7 +122,7 @@ export function Header() {
               <motion.img 
                 src={logoImage} 
                 alt="FotoDS Logo"
-                className="h-full w-full" 
+                className="h-full w-full logo-transparent" 
                 initial={{ rotate: 0 }}
                 whileHover={{ rotate: 15 }}
                 transition={{ type: "spring", stiffness: 300 }}
