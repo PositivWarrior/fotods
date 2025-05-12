@@ -3,8 +3,8 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
-import { InsertTestimonial } from "@shared/schema";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { insertTestimonialSchema } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -20,22 +20,16 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 
-// Testimonial submission schema - active defaults to false for moderation
-const testimonialSchema = z.object({
-  name: z.string().min(2, {
-    message: "Name must be at least 2 characters.",
-  }),
-  role: z.string().min(2, {
-    message: "Please provide your position or company.",
-  }),
-  content: z.string().min(10, {
-    message: "Testimonial must be at least 10 characters.",
-  }).max(500, {
-    message: "Testimonial must not exceed 500 characters."
-  }),
+// Create form schema based on the database schema but only include what the user needs to fill out
+const testimonialFormSchema = z.object({
+  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
+  role: z.string().min(2, { message: "Please provide your position or company." }),
+  content: z.string()
+    .min(10, { message: "Testimonial must be at least 10 characters." })
+    .max(500, { message: "Testimonial must not exceed 500 characters." }),
 });
 
-type TestimonialFormValues = z.infer<typeof testimonialSchema>;
+type TestimonialFormValues = z.infer<typeof testimonialFormSchema>;
 
 export function TestimonialForm({ onSuccess }: { onSuccess?: () => void }) {
   const { toast } = useToast();
@@ -43,19 +37,19 @@ export function TestimonialForm({ onSuccess }: { onSuccess?: () => void }) {
   
   // Define form
   const form = useForm<TestimonialFormValues>({
-    resolver: zodResolver(testimonialSchema),
+    resolver: zodResolver(testimonialFormSchema),
     defaultValues: {
       name: "",
       role: "",
-      content: ""
+      content: "",
     },
   });
 
   // Handle testimonial submission
   const mutation = useMutation({
     mutationFn: async (data: TestimonialFormValues) => {
-      // Set isActive to false for moderation and add a default rating of 5
-      const testimonialData: InsertTestimonial = {
+      // Add the rating field and isActive false for moderation
+      const testimonialData = {
         ...data,
         rating: 5,
         isActive: false
@@ -69,6 +63,9 @@ export function TestimonialForm({ onSuccess }: { onSuccess?: () => void }) {
         title: "Thank you for your testimonial!",
         description: "Your testimonial has been submitted for review.",
       });
+      
+      // Invalidate testimonials cache
+      queryClient.invalidateQueries({ queryKey: ["/api/testimonials"] });
       
       // Reset form
       form.reset();
