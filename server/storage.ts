@@ -32,6 +32,7 @@ export interface IStorage {
   updatePhoto(id: number, photo: Partial<InsertPhoto>): Promise<Photo | undefined>;
   deletePhoto(id: number): Promise<boolean>;
   updatePhotoOrder(photoOrders: {id: number, displayOrder: number}[]): Promise<boolean>;
+  updatePhotoCategoryOrder(photoOrders: {id: number, displayOrder: number}[], categoryId: number): Promise<boolean>;
   
   // Contact operations
   getContactMessages(): Promise<ContactMessage[]>;
@@ -403,6 +404,29 @@ export class MemStorage implements IStorage {
       return true;
     } catch (error) {
       console.error("Error updating photo order:", error);
+      return false;
+    }
+  }
+  
+  async updatePhotoCategoryOrder(photoOrders: { id: number, displayOrder: number }[], categoryId: number): Promise<boolean> {
+    try {
+      // First, get all photos in this category to ensure we're only updating photos from that category
+      const categoryPhotos = await this.getPhotosByCategory(categoryId);
+      const categoryPhotoIds = new Set(categoryPhotos.map(photo => photo.id));
+      
+      // Update display order only for photos that belong to the specified category
+      for (const { id, displayOrder } of photoOrders) {
+        // Only update photos from this category
+        if (categoryPhotoIds.has(id)) {
+          const photo = await this.getPhoto(id);
+          if (photo) {
+            await this.updatePhoto(id, { displayOrder });
+          }
+        }
+      }
+      return true;
+    } catch (error) {
+      console.error(`Error updating photo order for category ${categoryId}:`, error);
       return false;
     }
   }

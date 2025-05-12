@@ -231,7 +231,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Reorder photos endpoint
   app.post("/api/photos/reorder", isAdmin, async (req, res) => {
     try {
-      const { photoOrders } = req.body;
+      const { photoOrders, categoryId } = req.body;
       
       if (!Array.isArray(photoOrders)) {
         return res.status(400).json({ message: "photoOrders must be an array" });
@@ -246,13 +246,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      const success = await dataStorage.updatePhotoOrder(photoOrders);
+      // If categoryId is provided, we're reordering within a specific category
+      const success = categoryId 
+        ? await dataStorage.updatePhotoCategoryOrder(photoOrders, categoryId)
+        : await dataStorage.updatePhotoOrder(photoOrders);
       
       if (!success) {
         return res.status(500).json({ message: "Failed to update photo order" });
       }
       
-      res.status(200).json({ message: "Photo order updated successfully" });
+      res.status(200).json({ 
+        message: categoryId 
+          ? `Photo order in category ${categoryId} updated successfully` 
+          : "Photo order updated successfully" 
+      });
     } catch (error) {
       console.error("Error reordering photos:", error);
       res.status(500).json({ message: "Failed to reorder photos" });

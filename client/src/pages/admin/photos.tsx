@@ -263,7 +263,7 @@ export default function AdminPhotos() {
                   <TableHead className="w-[100px]">Image</TableHead>
                   <TableHead>Title</TableHead>
                   <TableHead>Category</TableHead>
-                  <TableHead>Location</TableHead>
+                  
                   <TableHead className="w-[100px]">Featured</TableHead>
                   <TableHead className="w-[100px]">Actions</TableHead>
                 </TableRow>
@@ -377,7 +377,7 @@ export default function AdminPhotos() {
                   <TableHead className="w-[100px]">Image</TableHead>
                   <TableHead>Title</TableHead>
                   <TableHead>Category</TableHead>
-                  <TableHead>Location</TableHead>
+                  
                   <TableHead className="w-[100px]">Featured</TableHead>
                   <TableHead className="w-[100px]">Actions</TableHead>
                 </TableRow>
