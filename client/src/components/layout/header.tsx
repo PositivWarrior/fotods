@@ -69,7 +69,19 @@ export function Header() {
     },
     { 
       name: "Business", 
-      href: "/portfolio/business" 
+      href: "/portfolio/business",
+      children: [
+        { 
+          name: "Portraits", 
+          href: "/portfolio/business-portraits" 
+        },
+        ...subcategories
+          .filter(sub => sub.parentCategory === "business")
+          .map(cat => ({
+            name: cat.name,
+            href: `/portfolio/${cat.slug}`
+          }))
+      ]
     },
     { 
       name: "Lifestyle", 
@@ -235,29 +247,29 @@ export function Header() {
         
         {/* Mobile Navigation Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden bg-white py-4 space-y-4 mt-4">
+          <div className="md:hidden bg-white py-4 space-y-3 mt-4 rounded-lg shadow-md">
             {navigation.map((item) => (
               <div key={item.name} className="text-center">
                 {item.children ? (
                   <>
                     <button
-                      className={`flex items-center space-x-1 mx-auto ${
+                      className={`flex items-center space-x-1 mx-auto py-2 px-4 ${
                         isActive(item.href) 
                           ? "text-primary" 
                           : "text-secondary hover:text-primary"
-                      } transition-colors duration-300`}
+                      } transition-colors duration-300 ${activeDropdown === item.name ? 'font-medium' : ''}`}
                       onClick={() => setActiveDropdown(activeDropdown === item.name ? null : item.name)}
                     >
                       <span>{item.name}</span>
-                      <ChevronDown className="h-4 w-4" />
+                      <ChevronDown className={`h-4 w-4 transition-transform ${activeDropdown === item.name ? 'rotate-180' : ''}`} />
                     </button>
                     
                     {activeDropdown === item.name && (
-                      <div className="bg-gray-50 py-2 mt-2 space-y-2">
+                      <div className="bg-gray-50 py-2 mt-2 rounded-md mx-6">
                         <div>
                           <Link 
                             href={item.href}
-                            className="block text-secondary hover:text-primary"
+                            className="block py-2 text-secondary hover:text-primary font-medium"
                             onClick={() => {
                               setActiveDropdown(null);
                               setIsMobileMenuOpen(false);
@@ -270,7 +282,7 @@ export function Header() {
                           <div key={child.name}>
                             <Link 
                               href={child.href}
-                              className="block text-secondary hover:text-primary"
+                              className="block py-2 text-secondary hover:text-primary"
                               onClick={() => {
                                 setActiveDropdown(null);
                                 setIsMobileMenuOpen(false);
@@ -286,7 +298,7 @@ export function Header() {
                 ) : (
                   <Link 
                     href={item.href}
-                    className={`${
+                    className={`block py-2 ${
                       isActive(item.href) 
                         ? "text-primary" 
                         : "text-secondary hover:text-primary"
