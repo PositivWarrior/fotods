@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Category, Photo } from "@shared/schema";
 import { EnhancedLightbox } from "@/components/ui/lightbox";
@@ -6,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { LazyLoadImage } from "react-lazy-load-image-component";
+import { ChevronDown } from "lucide-react";
 import 'react-lazy-load-image-component/src/effects/blur.css';
 
 interface GalleryProps {
@@ -20,6 +22,8 @@ export function Gallery({ category }: GalleryProps) {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [visibleCount, setVisibleCount] = useState(IMAGES_PER_PAGE);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const dropdownRefs = useRef<Record<string, HTMLDivElement | null>>({});
   
   // Ref for bottom loader element
   const { ref: bottomRef, inView } = useInView();
@@ -28,6 +32,10 @@ export function Gallery({ category }: GalleryProps) {
   const { data: categories } = useQuery<Category[]>({
     queryKey: ["/api/categories"],
   });
+
+  // Get main categories and subcategories
+  const mainCategories = categories?.filter(cat => !cat.parentCategory) || [];
+  const subcategories = categories?.filter(cat => cat.parentCategory) || [];
   
   // Fetch photos based on category or all photos
   const queryKey = category 
@@ -37,6 +45,20 @@ export function Gallery({ category }: GalleryProps) {
   const { data: photos, isLoading } = useQuery<Photo[]>({
     queryKey,
   });
+  
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (activeDropdown && 
+          dropdownRefs.current[activeDropdown] && 
+          !dropdownRefs.current[activeDropdown]?.contains(event.target as Node)) {
+        setActiveDropdown(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [activeDropdown]);
   
   // Function to handle lightbox
   const openLightbox = (index: number) => {
@@ -95,33 +117,120 @@ export function Gallery({ category }: GalleryProps) {
     setVisibleCount(IMAGES_PER_PAGE);
   }, [category, categories]);
 
+  // Define navigation structure with dropdowns
+  const navigation = [
+    { 
+      name: "All", 
+      href: "/portfolio", 
+    },
+    { 
+      name: "Housing", 
+      href: "/portfolio/category/housing",
+      children: subcategories
+        .filter(sub => sub.parentCategory === "housing")
+        .map(cat => ({
+          name: cat.name,
+          href: `/portfolio/category/${cat.slug}`
+        }))
+    },
+    { 
+      name: "Business", 
+      href: "/portfolio/category/business",
+      children: [
+        { 
+          name: "Portraits", 
+          href: "/portfolio/category/business-portraits" 
+        },
+        ...subcategories
+          .filter(sub => sub.parentCategory === "business")
+          .map(cat => ({
+            name: cat.name,
+            href: `/portfolio/category/${cat.slug}`
+          }))
+      ]
+    },
+    { 
+      name: "Lifestyle", 
+      href: "/portfolio/category/lifestyle",
+      children: subcategories
+        .filter(sub => sub.parentCategory === "lifestyle")
+        .map(cat => ({
+          name: cat.name,
+          href: `/portfolio/category/${cat.slug}`
+        }))
+    },
+  ];
+  
+  // Check if current path matches
+  const isPathActive = (path: string) => {
+    return window.location.pathname === path;
+  };
+
   return (
     <div>
-      {/* Category Filters */}
-      {!category && categories && (
-        <div className="flex flex-wrap justify-center mb-12 space-x-2 md:space-x-8">
-          <button
-            onClick={() => setActiveFilter("all")}
-            className={`filter-btn px-4 py-2 text-secondary hover:text-primary transition-colors duration-300 ${
-              activeFilter === "all" ? "filter-active" : ""
-            }`}
-          >
-            All
-          </button>
-          
-          {categories.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => setActiveFilter(cat.id.toString())}
-              className={`filter-btn px-4 py-2 text-secondary hover:text-primary transition-colors duration-300 ${
-                activeFilter === cat.id.toString() ? "filter-active" : ""
-              }`}
-            >
-              {cat.name}
-            </button>
-          ))}
-        </div>
-      )}
+      {/* Category Dropdown Navigation */}
+      <div className="flex flex-wrap justify-center mb-10 space-x-8">
+        {navigation.map((item) => (
+          <div key={item.name} className="relative">
+            {item.children ? (
+              <div 
+                ref={el => dropdownRefs.current[item.name] = el}
+                className="inline-block"
+              >
+                <button
+                  className={`flex items-center space-x-1 ${
+                    window.location.pathname.includes(item.name.toLowerCase()) 
+                      ? "text-primary font-medium" 
+                      : "text-secondary hover:text-primary"
+                  } transition-colors duration-300`}
+                  onClick={() => setActiveDropdown(activeDropdown === item.name ? null : item.name)}
+                >
+                  <span>{item.name}</span>
+                  <ChevronDown className={`h-4 w-4 transition-transform ${activeDropdown === item.name ? 'rotate-180' : ''}`} />
+                </button>
+                
+                {activeDropdown === item.name && (
+                  <motion.div 
+                    className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Link 
+                      href={item.href}
+                      className="block px-4 py-2 text-secondary hover:text-primary hover:bg-gray-50"
+                      onClick={() => setActiveDropdown(null)}
+                    >
+                      All {item.name}
+                    </Link>
+                    {item.children.map(child => (
+                      <Link 
+                        key={child.name}
+                        href={child.href}
+                        className="block px-4 py-2 text-secondary hover:text-primary hover:bg-gray-50"
+                        onClick={() => setActiveDropdown(null)}
+                      >
+                        {child.name}
+                      </Link>
+                    ))}
+                  </motion.div>
+                )}
+              </div>
+            ) : (
+              <Link 
+                href={item.href}
+                className={`${
+                  isPathActive(item.href) 
+                    ? "text-primary font-medium" 
+                    : "text-secondary hover:text-primary"
+                } transition-colors duration-300`}
+              >
+                {item.name}
+              </Link>
+            )}
+          </div>
+        ))}
+      </div>
       
       {/* Gallery Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

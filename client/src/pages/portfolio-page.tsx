@@ -77,9 +77,6 @@ export default function PortfolioPage() {
               </p>
             </motion.div>
             
-            {/* Category Filter */}
-            <CategoryFilter />
-            
             {/* Gallery Grid */}
             <Gallery category={categorySlug || undefined} />
           </div>
