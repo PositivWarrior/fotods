@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Link, useLocation, useNavigate } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Menu, X, ChevronDown } from "lucide-react";
@@ -15,7 +15,7 @@ type NavItemWithChildren = {
 };
 
 export function Header() {
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -267,12 +267,11 @@ export function Header() {
                     {activeDropdown === item.name && (
                       <div className="bg-gray-50 py-2 mt-2 rounded-md mx-6">
                         <div>
-                          {/* Use window.location.href for mobile navigation */}
+                          {/* "All Categories" button for mobile navigation */}
                           <button
                             className="block w-full py-2 text-left text-secondary hover:text-primary font-medium"
                             onClick={() => {
-                              window.location.href = item.href;
-                              // These won't matter since we're navigating away
+                              setLocation(item.href);
                               setActiveDropdown(null);
                               setIsMobileMenuOpen(false);
                             }}
@@ -282,12 +281,11 @@ export function Header() {
                         </div>
                         {item.children.map(child => (
                           <div key={child.name}>
-                            {/* Use window.location.href for mobile navigation */}
+                            {/* Subcategory button for mobile navigation */}
                             <button
                               className="block w-full py-2 text-left text-secondary hover:text-primary"
                               onClick={() => {
-                                window.location.href = child.href;
-                                // These won't matter since we're navigating away
+                                setLocation(child.href);
                                 setActiveDropdown(null);
                                 setIsMobileMenuOpen(false);
                               }}
@@ -308,7 +306,7 @@ export function Header() {
                         : "text-secondary hover:text-primary"
                     } transition-colors duration-300`}
                     onClick={() => {
-                      window.location.href = item.href;
+                      setLocation(item.href);
                       setIsMobileMenuOpen(false);
                     }}
                   >
