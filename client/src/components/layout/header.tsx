@@ -15,7 +15,7 @@ type NavItemWithChildren = {
 };
 
 export function Header() {
-  const [location, setLocation] = useLocation();
+  const [location] = useLocation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -266,52 +266,45 @@ export function Header() {
                     
                     {activeDropdown === item.name && (
                       <div className="bg-gray-50 py-2 mt-2 rounded-md mx-6">
-                        <div>
-                          {/* "All Categories" button for mobile navigation */}
-                          <button
-                            className="block w-full py-2 text-left text-secondary hover:text-primary font-medium"
+                        <Link 
+                          href={item.href}
+                          className="block py-2 text-secondary hover:text-primary font-medium"
+                          onClick={() => {
+                            setActiveDropdown(null);
+                            setIsMobileMenuOpen(false);
+                          }}
+                        >
+                          All {item.name}
+                        </Link>
+                        
+                        {item.children.map(child => (
+                          <Link 
+                            key={child.name}
+                            href={child.href}
+                            className="block py-2 text-secondary hover:text-primary"
                             onClick={() => {
-                              setLocation(item.href);
                               setActiveDropdown(null);
                               setIsMobileMenuOpen(false);
                             }}
                           >
-                            All {item.name}
-                          </button>
-                        </div>
-                        {item.children.map(child => (
-                          <div key={child.name}>
-                            {/* Subcategory button for mobile navigation */}
-                            <button
-                              className="block w-full py-2 text-left text-secondary hover:text-primary"
-                              onClick={() => {
-                                setLocation(child.href);
-                                setActiveDropdown(null);
-                                setIsMobileMenuOpen(false);
-                              }}
-                            >
-                              {child.name}
-                            </button>
-                          </div>
+                            {child.name}
+                          </Link>
                         ))}
                       </div>
                     )}
                   </>
                 ) : (
-                  /* Use window.location.href for mobile navigation */
-                  <button
-                    className={`block w-full py-2 text-left ${
+                  <Link 
+                    href={item.href}
+                    className={`block py-2 ${
                       isActive(item.href) 
                         ? "text-primary" 
                         : "text-secondary hover:text-primary"
                     } transition-colors duration-300`}
-                    onClick={() => {
-                      setLocation(item.href);
-                      setIsMobileMenuOpen(false);
-                    }}
+                    onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {item.name}
-                  </button>
+                  </Link>
                 )}
               </div>
             ))}
