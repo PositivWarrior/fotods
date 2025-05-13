@@ -3,6 +3,7 @@ import { Helmet } from "react-helmet";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Gallery } from "@/components/portfolio/gallery";
+import { CategoryFilter } from "@/components/portfolio/category-filter";
 import { useLocation, useRoute } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Category } from "@shared/schema";
@@ -69,12 +70,15 @@ export default function PortfolioPage() {
                   ? `${activeCategory.name} Photography` 
                   : "Portfolio"}
               </h1>
-              <p className="text-secondary text-lg mb-12">
+              <p className="text-secondary text-lg mb-8">
                 {activeCategory 
                   ? `Browse my collection of professional ${activeCategory.name.toLowerCase()} photography showcasing beautiful interiors and architectural details.`
                   : "Explore my diverse collection of interior and architectural photography, showcasing the beauty and functionality of various spaces."}
               </p>
             </motion.div>
+            
+            {/* Category Filter */}
+            <CategoryFilter />
             
             {/* Gallery Grid */}
             <Gallery category={categorySlug || undefined} />
