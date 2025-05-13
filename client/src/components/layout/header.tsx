@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Link, useLocation } from "wouter";
+import { Link, useLocation, useNavigate } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Menu, X, ChevronDown } from "lucide-react";
@@ -267,46 +267,53 @@ export function Header() {
                     {activeDropdown === item.name && (
                       <div className="bg-gray-50 py-2 mt-2 rounded-md mx-6">
                         <div>
-                          <Link 
-                            href={item.href}
-                            className="block py-2 text-secondary hover:text-primary font-medium"
+                          {/* Use window.location.href for mobile navigation */}
+                          <button
+                            className="block w-full py-2 text-left text-secondary hover:text-primary font-medium"
                             onClick={() => {
+                              window.location.href = item.href;
+                              // These won't matter since we're navigating away
                               setActiveDropdown(null);
                               setIsMobileMenuOpen(false);
                             }}
                           >
                             All {item.name}
-                          </Link>
+                          </button>
                         </div>
                         {item.children.map(child => (
                           <div key={child.name}>
-                            <Link 
-                              href={child.href}
-                              className="block py-2 text-secondary hover:text-primary"
+                            {/* Use window.location.href for mobile navigation */}
+                            <button
+                              className="block w-full py-2 text-left text-secondary hover:text-primary"
                               onClick={() => {
+                                window.location.href = child.href;
+                                // These won't matter since we're navigating away
                                 setActiveDropdown(null);
                                 setIsMobileMenuOpen(false);
                               }}
                             >
                               {child.name}
-                            </Link>
+                            </button>
                           </div>
                         ))}
                       </div>
                     )}
                   </>
                 ) : (
-                  <Link 
-                    href={item.href}
-                    className={`block py-2 ${
+                  /* Use window.location.href for mobile navigation */
+                  <button
+                    className={`block w-full py-2 text-left ${
                       isActive(item.href) 
                         ? "text-primary" 
                         : "text-secondary hover:text-primary"
                     } transition-colors duration-300`}
-                    onClick={() => setIsMobileMenuOpen(false)}
+                    onClick={() => {
+                      window.location.href = item.href;
+                      setIsMobileMenuOpen(false);
+                    }}
                   >
                     {item.name}
-                  </Link>
+                  </button>
                 )}
               </div>
             ))}
