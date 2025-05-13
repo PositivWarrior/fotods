@@ -59,38 +59,38 @@ export function Header() {
     { name: "Portfolio", href: "/portfolio" },
     { 
       name: "Housing", 
-      href: "/portfolio/housing",
+      href: "/portfolio/category/housing",
       children: subcategories
         .filter(sub => sub.parentCategory === "housing")
         .map(cat => ({
           name: cat.name,
-          href: `/portfolio/${cat.slug}`
+          href: `/portfolio/category/${cat.slug}`
         }))
     },
     { 
       name: "Business", 
-      href: "/portfolio/business",
+      href: "/portfolio/category/business",
       children: [
         { 
           name: "Portraits", 
-          href: "/portfolio/business-portraits" 
+          href: "/portfolio/category/business-portraits" 
         },
         ...subcategories
           .filter(sub => sub.parentCategory === "business")
           .map(cat => ({
             name: cat.name,
-            href: `/portfolio/${cat.slug}`
+            href: `/portfolio/category/${cat.slug}`
           }))
       ]
     },
     { 
       name: "Lifestyle", 
-      href: "/portfolio/lifestyle",
+      href: "/portfolio/category/lifestyle",
       children: subcategories
         .filter(sub => sub.parentCategory === "lifestyle")
         .map(cat => ({
           name: cat.name,
-          href: `/portfolio/${cat.slug}`
+          href: `/portfolio/category/${cat.slug}`
         }))
     },
     { name: "About", href: "/about" },
