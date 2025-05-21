@@ -1,15 +1,22 @@
-import { Pool, neonConfig } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-serverless';
-import ws from "ws";
-import * as schema from "@shared/schema";
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { Pool } from 'pg';
+// import dotenv from 'dotenv'; // dotenv should be initialized in the main server entry point
+import * as schema from '../shared/schema'; // Adjust path if your schema is elsewhere
 
-neonConfig.webSocketConstructor = ws;
+// dotenv.config(); // Assuming .env is loaded at application startup
 
-if (!process.env.DATABASE_URL) {
-  throw new Error(
-    "DATABASE_URL must be set. Did you forget to provision a database?",
-  );
+const databaseUrl = process.env.DATABASE_URL;
+
+if (!databaseUrl) {
+	throw new Error(
+		'DATABASE_URL not found. Make sure it is set in your .env file and loaded at server startup.',
+	);
 }
 
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-export const db = drizzle({ client: pool, schema });
+const pool = new Pool({
+	connectionString: databaseUrl,
+	// ssl: { rejectUnauthorized: false }, // Add this if you encounter SSL issues with Supabase, but usually not needed with their direct connection string.
+});
+
+// Export the Drizzle instance with the schema
+export const db = drizzle(pool, { schema });
