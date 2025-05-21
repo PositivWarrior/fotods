@@ -34,7 +34,10 @@ async function comparePasswords(supplied: string, stored: string) {
 }
 
 export function setupAuth(app: Express) {
-	// Initialize admin user with hashed password
+	// Initialize admin user with hashed password - This section might be redundant now or can be removed
+	// if the LocalStrategy handles the creation and admin status of the two specific users.
+	// For now, I will comment it out to avoid potential conflicts with the LocalStrategy's user creation.
+	/*
 	(async () => {
 		const existingAdmin = await storage.getUserByUsername('admin');
 		if (
@@ -46,9 +49,14 @@ export function setupAuth(app: Express) {
 				const hashedPassword = await hashPassword('admin123');
 				user.password = hashedPassword;
 				user.isAdmin = true;
+				await storage.updateUser(user.id, {
+					password: user.password,
+					isAdmin: user.isAdmin,
+				});
 			}
 		}
 	})();
+	*/
 
 	const sessionSettings: session.SessionOptions = {
 		secret: process.env.SESSION_SECRET || 'fotods-secret-key',
@@ -69,72 +77,79 @@ export function setupAuth(app: Express) {
 		new LocalStrategy(async (usernameInput, password, done) => {
 			const username = usernameInput.toLowerCase();
 			try {
-				// Special case for adminkacpru@gmail.com with password "Niepokonani8"
-				if (
-					username === 'adminkacpru@gmail.com' &&
-					password === 'Niepokonani8'
-				) {
-					let user = await storage.getUserByUsername(username);
-
-					// If user doesn't exist, create it
-					if (!user) {
-						user = await storage.createUser({
-							username: username,
-							password: await hashPassword('Niepokonani8'),
-						});
-
-						// Ensure admin privileges
-						await storage.updateUser(user.id, { isAdmin: true });
-						user.isAdmin = true;
-					} else {
-						// Ensure admin privileges for existing user
-						if (!user.isAdmin) {
+				// Handle AdminKacpru@gmail.com
+				if (username === 'adminkacpru@gmail.com') {
+					if (password === 'AdminKacpru8') {
+						// Check new password
+						let user = await storage.getUserByUsername(username);
+						if (!user) {
+							user = await storage.createUser({
+								username: username,
+								password: await hashPassword('AdminKacpru8'), // Use new password for hashing
+							});
+						}
+						// Ensure admin privileges & correct password if user exists but password was different
+						if (
+							!user.isAdmin ||
+							!(await comparePasswords(
+								'AdminKacpru8',
+								user.password,
+							))
+						) {
 							await storage.updateUser(user.id, {
 								isAdmin: true,
+								password: await hashPassword('AdminKacpru8'),
 							});
 							user.isAdmin = true;
+							// Reload user to get updated password for session
+							user = (await storage.getUserByUsername(
+								username,
+							)) as User;
 						}
-					}
-
-					return done(null, user);
-				} else if (
-					username === 'admindawid@gmail.com' &&
-					password === 'AdminDawid8'
-				) {
-					let user = await storage.getUserByUsername(username);
-
-					// If user doesn't exist, create it
-					if (!user) {
-						user = await storage.createUser({
-							username: username,
-							password: await hashPassword('AdminDawid8'),
-						});
-
-						// Ensure admin privileges
-						await storage.updateUser(user.id, { isAdmin: true });
-						user.isAdmin = true;
+						return done(null, user);
 					} else {
-						// Ensure admin privileges for existing user
-						if (!user.isAdmin) {
+						return done(null, false, {
+							message: 'Invalid credentials for AdminKacpru',
+						});
+					}
+					// Handle AdminDawid@gmail.com
+				} else if (username === 'admindawid@gmail.com') {
+					if (password === 'AdminDawid8') {
+						// Check new password
+						let user = await storage.getUserByUsername(username);
+						if (!user) {
+							user = await storage.createUser({
+								username: username,
+								password: await hashPassword('AdminDawid8'), // Use new password for hashing
+							});
+						}
+						// Ensure admin privileges & correct password if user exists but password was different
+						if (
+							!user.isAdmin ||
+							!(await comparePasswords(
+								'AdminDawid8',
+								user.password,
+							))
+						) {
 							await storage.updateUser(user.id, {
 								isAdmin: true,
+								password: await hashPassword('AdminDawid8'),
 							});
 							user.isAdmin = true;
+							// Reload user to get updated password for session
+							user = (await storage.getUserByUsername(
+								username,
+							)) as User;
 						}
+						return done(null, user);
+					} else {
+						return done(null, false, {
+							message: 'Invalid credentials for AdminDawid',
+						});
 					}
-
-					return done(null, user);
-				}
-
-				// Standard password check for other users
-				const user = await storage.getUserByUsername(username);
-				if (
-					!user ||
-					!(await comparePasswords(password, user.password))
-				) {
-					return done(null, false);
+					// For any other username, authentication fails
 				} else {
-					return done(null, user);
+					return done(null, false, { message: 'Invalid username.' });
 				}
 			} catch (err) {
 				return done(err);
@@ -152,30 +167,30 @@ export function setupAuth(app: Express) {
 		}
 	});
 
-	app.post('/api/register', async (req, res, next) => {
-		try {
-			const existingUser = await storage.getUserByUsername(
-				req.body.username,
-			);
-			if (existingUser) {
-				return res
-					.status(400)
-					.json({ message: 'Username already exists' });
-			}
-
-			const user = await storage.createUser({
-				...req.body,
-				password: await hashPassword(req.body.password),
-			});
-
-			req.login(user, (err) => {
-				if (err) return next(err);
-				return res.status(201).json(user);
-			});
-		} catch (err) {
-			next(err);
-		}
-	});
+	// app.post('/api/register', async (req, res, next) => { // Commenting out the register endpoint
+	// 	try {
+	// 		const existingUser = await storage.getUserByUsername(
+	// 			req.body.username,
+	// 		);
+	// 		if (existingUser) {
+	// 			return res
+	// 				.status(400)
+	// 				.json({ message: 'Username already exists' });
+	// 		}
+	//
+	// 		const user = await storage.createUser({
+	// 			...req.body,
+	// 			password: await hashPassword(req.body.password),
+	// 		});
+	//
+	// 		req.login(user, (err) => {
+	// 			if (err) return next(err);
+	// 			return res.status(201).json(user);
+	// 		});
+	// 	} catch (err) {
+	// 		next(err);
+	// 	}
+	// });
 
 	app.post(
 		'/api/login',
