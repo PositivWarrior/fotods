@@ -37,36 +37,90 @@ export function CategoryCollage() {
 
 	// Returns photos for a given category and its subcategories
 	const getCategoryPhotos = (categoryId: number, limit = 4) => {
+		const mainCatForLog = categories?.find((c) => c.id === categoryId);
+		if (mainCatForLog?.name === 'Livsstil')
+			console.log(
+				`[Collage] Getting photos for MAIN category: ${mainCatForLog?.name} (ID: ${categoryId})`,
+			);
+
 		// Get direct photos of this category
 		const directPhotos =
 			photos?.filter((photo) => photo.categoryId === categoryId) || [];
+		if (mainCatForLog?.name === 'Livsstil')
+			console.log(
+				`[Collage] Direct photos for ${mainCatForLog?.name}:`,
+				directPhotos.map((p) => p.title),
+			);
 
 		// Find subcategories
+		const parentSlug = categories?.find((c) => c.id === categoryId)?.slug;
 		const subCategories =
-			categories?.filter(
-				(cat) =>
-					cat.parentCategory ===
-					categories.find((c) => c.id === categoryId)?.slug,
-			) || [];
+			categories?.filter((cat) => cat.parentCategory === parentSlug) ||
+			[];
+		if (mainCatForLog?.name === 'Livsstil' && parentSlug)
+			console.log(
+				`[Collage] Subcategories for ${mainCatForLog?.name} (parentSlug: ${parentSlug}):`,
+				subCategories.map((s) => ({
+					name: s.name,
+					slug: s.slug,
+					parentSlug: s.parentCategory,
+				})),
+			);
 
 		// Get photos from subcategories
-		const subCategoryPhotos = subCategories.flatMap(
-			(subCat) =>
-				photos?.filter((photo) => photo.categoryId === subCat.id) || [],
-		);
+		const subCategoryPhotos =
+			subCategories.flatMap((subCat) => {
+				const subCatPhotos =
+					photos?.filter((photo) => photo.categoryId === subCat.id) ||
+					[];
+				if (mainCatForLog?.name === 'Livsstil')
+					console.log(
+						`[Collage] Photos for subcategory ${subCat.name}:`,
+						subCatPhotos.map((p) => p.title),
+					);
+				return subCatPhotos;
+			}) || [];
 
 		// Combine all photos
 		let combined = [...directPhotos, ...subCategoryPhotos];
+		if (mainCatForLog?.name === 'Livsstil')
+			console.log(
+				`[Collage] Combined photos for ${mainCatForLog?.name} (before featured sort):`,
+				combined.map((p) => ({ title: p.title, featured: p.featured })),
+			);
 
 		// Prioritize featured photos
 		const featuredPhotos = combined.filter((photo) => photo.featured);
 		const nonFeaturedPhotos = combined.filter((photo) => !photo.featured);
+		if (mainCatForLog?.name === 'Livsstil') {
+			console.log(
+				`[Collage] Featured photos for ${mainCatForLog?.name}:`,
+				featuredPhotos.map((p) => p.title),
+			);
+			console.log(
+				`[Collage] Non-featured photos for ${mainCatForLog?.name}:`,
+				nonFeaturedPhotos.map((p) => p.title),
+			);
+		}
 
 		// Always put featured photos first
 		combined = [...featuredPhotos, ...nonFeaturedPhotos];
+		if (mainCatForLog?.name === 'Livsstil')
+			console.log(
+				`[Collage] Combined photos for ${mainCatForLog?.name} (AFTER featured sort, before limit):`,
+				combined.map((p) => p.title),
+			);
 
 		// Return limited number of photos
-		return combined.length > limit ? combined.slice(0, limit) : combined;
+		const finalPhotos =
+			combined.length > limit ? combined.slice(0, limit) : combined;
+		if (mainCatForLog?.name === 'Livsstil')
+			console.log(
+				`[Collage] Final photos for ${mainCatForLog?.name} (limited to ${limit}):`,
+				finalPhotos.map((p) => p.title),
+			);
+
+		return finalPhotos;
 	};
 
 	return (

@@ -83,6 +83,7 @@ export function Header() {
 	let navigation: NavItemWithChildren[] = [
 		{ name: 'Hjem', href: '/' },
 		{ name: 'Portefølje', href: '/portfolio' },
+		{ name: 'Priser', href: '/priser' },
 		{
 			name: 'Bolig',
 			href: '/portfolio/category/housing',
@@ -125,12 +126,12 @@ export function Header() {
 				},
 			],
 		},
-		{ name: 'Om Oss', href: '/about' },
+		{ name: 'Om Meg', href: '/about' },
 		{ name: 'Kontakt', href: '/contact' },
 	];
 
-	// Add admin panel link for logged-in users
-	if (user) {
+	// Add admin panel link to navigation array only if user is an admin
+	if (user && user.isAdmin) {
 		navigation = [
 			...navigation,
 			{
@@ -262,19 +263,6 @@ export function Header() {
 							</div>
 						))}
 
-						{user?.isAdmin && (
-							<Link
-								href="/admin"
-								className={`${
-									location.startsWith('/admin')
-										? 'text-primary'
-										: 'text-secondary hover:text-primary'
-								} transition-colors duration-300`}
-							>
-								Admin
-							</Link>
-						)}
-
 						{user ? (
 							<Button
 								variant="ghost"
@@ -297,7 +285,7 @@ export function Header() {
 					<div className="hidden md:flex lg:hidden items-center space-x-6">
 						{navigation
 							.filter((item) =>
-								['Portefølje', 'Kontakt', 'Om Oss'].includes(
+								['Portefølje', 'Kontakt', 'Om Meg'].includes(
 									item.name,
 								),
 							)
@@ -428,7 +416,6 @@ export function Header() {
 								key={item.name + '-mobile'}
 								className="text-center"
 							>
-								{/* Always render a direct link for mobile, no dropdowns */}
 								<Link
 									href={item.href}
 									className={`block py-2 ${
@@ -445,25 +432,6 @@ export function Header() {
 								</Link>
 							</div>
 						))}
-
-						{user?.isAdmin && (
-							<div className="text-center">
-								<Link
-									href="/admin"
-									className={`block py-2 ${
-										location.startsWith('/admin')
-											? 'text-primary font-semibold'
-											: 'text-secondary hover:text-primary'
-									} transition-colors duration-300`}
-									onClick={(e) => {
-										e.preventDefault();
-										handleMobileLinkClick('/admin');
-									}}
-								>
-									Admin
-								</Link>
-							</div>
-						)}
 
 						{user ? (
 							<div className="text-center">

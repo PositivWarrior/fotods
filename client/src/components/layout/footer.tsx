@@ -88,7 +88,7 @@ export function Footer() {
 									href="/about"
 									className="text-white/80 hover:text-white transition-colors"
 								>
-									Om Oss
+									Om Meg
 								</Link>
 							</li>
 							<li>
