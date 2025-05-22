@@ -61,46 +61,49 @@ export function Header() {
 
 	// Organize navigation with dropdowns
 	let navigation: NavItemWithChildren[] = [
-		{ name: 'Home', href: '/' },
-		{ name: 'Portfolio', href: '/portfolio' },
+		{ name: 'Hjem', href: '/' },
+		{ name: 'Portefølje', href: '/portfolio' },
 		{
-			name: 'Housing',
+			name: 'Bolig',
 			href: '/portfolio/category/housing',
-			children: subcategories
-				.filter((sub) => sub.parentCategory === 'housing')
-				.map((cat) => ({
-					name: cat.name,
-					href: `/portfolio/category/${cat.slug}`,
-				})),
-		},
-		{
-			name: 'Business',
-			href: '/portfolio/category/business',
 			children: [
 				{
-					name: 'Portraits',
-					href: '/portfolio/category/business-portraits',
+					name: 'Detaljer',
+					href: '/portfolio/category/housing-details',
 				},
-				...subcategories
-					.filter((sub) => sub.parentCategory === 'business')
-					.map((cat) => ({
-						name: cat.name,
-						href: `/portfolio/category/${cat.slug}`,
-					})),
+				{ name: 'Drone', href: '/portfolio/category/housing-drone' },
+				{
+					name: 'Kveldsbilder',
+					href: '/portfolio/category/housing-evening',
+				},
 			],
 		},
 		{
-			name: 'Lifestyle',
-			href: '/portfolio/category/lifestyle',
-			children: subcategories
-				.filter((sub) => sub.parentCategory === 'lifestyle')
-				.map((cat) => ({
-					name: cat.name,
-					href: `/portfolio/category/${cat.slug}`,
-				})),
+			name: 'Næring',
+			href: '/portfolio/category/business',
+			children: [
+				{
+					name: 'Portretter',
+					href: '/portfolio/category/business-portraits',
+				},
+			],
 		},
-		{ name: 'About', href: '/about' },
-		{ name: 'Contact', href: '/contact' },
+		{
+			name: 'Livsstil',
+			href: '/portfolio/category/lifestyle',
+			children: [
+				{
+					name: 'Portretter',
+					href: '/portfolio/category/lifestyle-portraits',
+				},
+				{
+					name: 'Bryllup',
+					href: '/portfolio/category/lifestyle-wedding',
+				},
+			],
+		},
+		{ name: 'Om Oss', href: '/about' },
+		{ name: 'Kontakt', href: '/contact' },
 	];
 
 	// Add admin panel link for logged-in users
@@ -195,7 +198,7 @@ export function Header() {
 														setActiveDropdown(null)
 													}
 												>
-													All {item.name}
+													Alle {item.name}
 												</Link>
 												{item.children?.map((child) => (
 													<Link
@@ -248,14 +251,14 @@ export function Header() {
 								className="text-secondary hover:text-primary hover:bg-transparent p-0"
 								onClick={() => logoutMutation.mutate()}
 							>
-								Logout
+								Logg Ut
 							</Button>
 						) : (
 							<Link
 								href="/auth"
 								className="text-secondary hover:text-primary transition-colors duration-300"
 							>
-								Login
+								Logg Inn
 							</Link>
 						)}
 					</div>
@@ -264,7 +267,7 @@ export function Header() {
 					<div className="hidden md:flex lg:hidden items-center space-x-6">
 						{navigation
 							.filter((item) =>
-								['Portfolio', 'Contact', 'About'].includes(
+								['Portefølje', 'Kontakt', 'Om Oss'].includes(
 									item.name,
 								),
 							)
@@ -315,7 +318,7 @@ export function Header() {
 															)
 														}
 													>
-														All {item.name}
+														Alle {item.name}
 													</Link>
 													{item.children?.map(
 														(child) => (
@@ -358,14 +361,14 @@ export function Header() {
 								className="text-secondary hover:text-primary hover:bg-transparent p-0"
 								onClick={() => logoutMutation.mutate()}
 							>
-								Logout
+								Logg Ut
 							</Button>
 						) : (
 							<Link
 								href="/auth"
 								className="text-secondary hover:text-primary transition-colors duration-300"
 							>
-								Login
+								Logg Inn
 							</Link>
 						)}
 					</div>
@@ -433,7 +436,7 @@ export function Header() {
 														);
 													}}
 												>
-													All {item.name}
+													Alle {item.name}
 												</Link>
 
 												{item.children?.map((child) => (
@@ -500,7 +503,7 @@ export function Header() {
 										setIsMobileMenuOpen(false);
 									}}
 								>
-									Logout
+									Logg Ut
 								</Button>
 							</div>
 						) : (
@@ -510,7 +513,7 @@ export function Header() {
 									className="text-secondary hover:text-primary transition-colors duration-300"
 									onClick={() => setIsMobileMenuOpen(false)}
 								>
-									Login
+									Logg Inn
 								</Link>
 							</div>
 						)}

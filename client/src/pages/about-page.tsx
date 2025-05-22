@@ -1,89 +1,114 @@
-import { useEffect } from "react";
-import { Helmet } from "react-helmet";
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import { AboutSection } from "@/components/about/about-section";
-import { Testimonials } from "@/components/home/testimonials";
-import { motion } from "framer-motion";
+import { useEffect } from 'react';
+import { Helmet } from 'react-helmet';
+import { Header } from '@/components/layout/header';
+import { Footer } from '@/components/layout/footer';
+import { AboutSection } from '@/components/about/about-section';
+import { Testimonials } from '@/components/home/testimonials';
+import { motion } from 'framer-motion';
 
 export default function AboutPage() {
-  // Scroll to top on page load
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+	// Scroll to top on page load
+	useEffect(() => {
+		window.scrollTo(0, 0);
+	}, []);
 
-  return (
-    <>
-      <Helmet>
-        <title>About | FotoDS - Dawid Siedlec Photography</title>
-        <meta 
-          name="description" 
-          content="Learn about Dawid Siedlec, professional interior and architectural photographer based in Norway. With over a decade of experience capturing beautiful spaces."
-        />
-        <meta property="og:title" content="About | FotoDS - Dawid Siedlec Photography" />
-        <meta property="og:description" content="Learn about Dawid Siedlec, professional interior and architectural photographer based in Norway. With over a decade of experience capturing beautiful spaces." />
-        <meta property="og:type" content="website" />
-      </Helmet>
+	return (
+		<>
+			<Helmet>
+				<title>Om Meg | FotoDS - Dawid Siedlec Fotografi</title>
+				<meta
+					name="description"
+					content="Lær om Dawid Siedlec, profesjonell interiør- og arkitekturfotograf basert i Norge. Med over et tiår med erfaring i å fange vakre rom."
+				/>
+				<meta
+					property="og:title"
+					content="Om Meg | FotoDS - Dawid Siedlec Fotografi"
+				/>
+				<meta
+					property="og:description"
+					content="Lær om Dawid Siedlec, profesjonell interiør- og arkitekturfotograf basert i Norge. Med over et tiår med erfaring i å fange vakre rom."
+				/>
+				<meta property="og:type" content="website" />
+			</Helmet>
 
-      <Header />
-      
-      <main>
-        {/* About Hero */}
-        <section className="pt-32 pb-12 bg-muted">
-          <div className="container mx-auto px-6">
-            <motion.div 
-              className="text-center max-w-3xl mx-auto"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              <h1 className="text-4xl md:text-5xl font-poppins font-semibold mb-6">About Me</h1>
-              <p className="text-secondary text-lg">
-                Get to know the person behind the lens and my approach to interior photography.
-              </p>
-            </motion.div>
-          </div>
-        </section>
+			<Header />
 
-        {/* About Content */}
-        <AboutSection />
+			<main>
+				{/* About Hero */}
+				<section className="pt-32 pb-12 bg-muted">
+					<div className="container mx-auto px-6">
+						<motion.div
+							className="text-center max-w-3xl mx-auto"
+							initial={{ opacity: 0, y: 20 }}
+							animate={{ opacity: 1, y: 0 }}
+							transition={{ duration: 0.6 }}
+						>
+							<h1 className="text-4xl md:text-5xl font-poppins font-semibold mb-6">
+								Om Meg
+							</h1>
+							<p className="text-secondary text-lg">
+								Bli kjent med personen bak linsen og min
+								tilnærming til interiørfotografering.
+							</p>
+						</motion.div>
+					</div>
+				</section>
 
-        {/* Additional About Section */}
-        <section className="py-20 bg-muted">
-          <div className="container mx-auto px-6">
-            <div className="max-w-3xl mx-auto">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                viewport={{ once: true }}
-              >
-                <h2 className="text-3xl font-poppins font-semibold mb-6">My Philosophy</h2>
-                <p className="text-secondary mb-6 leading-relaxed">
-                  I believe that great interior photography is about more than just documenting a space—it's about 
-                  capturing its essence, character, and the feeling it evokes. Every room tells a story, and my 
-                  mission is to convey that narrative through carefully composed, beautifully lit images.
-                </p>
-                <p className="text-secondary mb-6 leading-relaxed">
-                  With each project, I strive to highlight the unique features and design elements that make a space 
-                  special. Whether it's the way natural light streams through windows, the texture of materials, or 
-                  the thoughtful details of interior design, I ensure these aspects shine in my photography.
-                </p>
-                <p className="text-secondary leading-relaxed">
-                  My technical approach combines traditional photography skills with modern digital techniques, 
-                  allowing me to deliver images that are both authentic to the space and optimized for their intended use, 
-                  whether for real estate listings, design portfolios, or architectural publications.
-                </p>
-              </motion.div>
-            </div>
-          </div>
-        </section>
+				{/* About Content */}
+				<AboutSection />
 
-        {/* Testimonials */}
-        <Testimonials />
-      </main>
-      
-      <Footer />
-    </>
-  );
+				{/* Additional About Section */}
+				<section className="py-20 bg-muted">
+					<div className="container mx-auto px-6">
+						<div className="max-w-3xl mx-auto">
+							<motion.div
+								initial={{ opacity: 0, y: 20 }}
+								whileInView={{ opacity: 1, y: 0 }}
+								transition={{ duration: 0.6 }}
+								viewport={{ once: true }}
+							>
+								<h2 className="text-3xl font-poppins font-semibold mb-6">
+									Min Filosofi
+								</h2>
+								<p className="text-secondary mb-6 leading-relaxed">
+									Jeg tror at flott interiørfotografering
+									handler om mer enn bare å dokumentere et
+									rom—det handler om å fange dets essens,
+									karakter og følelsen det vekker. Hvert rom
+									forteller en historie, og mitt oppdrag er å
+									formidle den fortellingen gjennom nøye
+									komponerte, vakkert belyste bilder.
+								</p>
+								<p className="text-secondary mb-6 leading-relaxed">
+									Med hvert prosjekt streber jeg etter å
+									fremheve de unike egenskapene og
+									designelementene som gjør et rom spesielt.
+									Enten det er måten naturlig lys strømmer
+									gjennom vinduer, teksturen til materialer,
+									eller de gjennomtenkte detaljene i
+									interiørdesign, sørger jeg for at disse
+									aspektene skinner i fotografiene mine.
+								</p>
+								<p className="text-secondary leading-relaxed">
+									Min tekniske tilnærming kombinerer
+									tradisjonelle fotograferingsferdigheter med
+									moderne digitale teknikker, noe som gjør at
+									jeg kan levere bilder som er både autentiske
+									for rommet og optimalisert for deres
+									tiltenkte bruk, enten det er for
+									eiendomsoppføringer, designporteføljer eller
+									arkitekturpublikasjoner.
+								</p>
+							</motion.div>
+						</div>
+					</div>
+				</section>
+
+				{/* Testimonials */}
+				<Testimonials />
+			</main>
+
+			<Footer />
+		</>
+	);
 }
