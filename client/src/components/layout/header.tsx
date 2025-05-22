@@ -15,11 +15,13 @@ type NavItemWithChildren = {
 };
 
 export function Header() {
-	const [location] = useLocation();
+	const [location, navigate] = useLocation();
 	const [isScrolled, setIsScrolled] = useState(false);
 	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 	const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 	const dropdownRefs = useRef<Record<string, HTMLDivElement | null>>({});
+	const mobileMenuRef = useRef<HTMLDivElement | null>(null);
+	const mobileButtonRef = useRef<HTMLButtonElement | null>(null);
 	const { user, logoutMutation } = useAuth();
 
 	// Fetch all categories
@@ -59,6 +61,24 @@ export function Header() {
 			document.removeEventListener('mousedown', handleClickOutside);
 	}, [activeDropdown]);
 
+	// Close mobile menu when clicking outside
+	useEffect(() => {
+		const handleClickOutsideMobile = (event: MouseEvent) => {
+			if (
+				isMobileMenuOpen &&
+				mobileMenuRef.current &&
+				!mobileMenuRef.current.contains(event.target as Node) &&
+				!mobileButtonRef.current?.contains(event.target as Node)
+			) {
+				setIsMobileMenuOpen(false);
+			}
+		};
+
+		document.addEventListener('mousedown', handleClickOutsideMobile);
+		return () =>
+			document.removeEventListener('mousedown', handleClickOutsideMobile);
+	}, [isMobileMenuOpen]);
+
 	// Organize navigation with dropdowns
 	let navigation: NavItemWithChildren[] = [
 		{ name: 'Hjem', href: '/' },
@@ -71,7 +91,10 @@ export function Header() {
 					name: 'Detaljer',
 					href: '/portfolio/category/housing-details',
 				},
-				{ name: 'Drone', href: '/portfolio/category/housing-drone' },
+				{
+					name: 'Drone',
+					href: '/portfolio/category/housing-drone',
+				},
 				{
 					name: 'Kveldsbilder',
 					href: '/portfolio/category/housing-evening',
@@ -98,7 +121,7 @@ export function Header() {
 				},
 				{
 					name: 'Bryllup',
-					href: '/portfolio/category/lifestyle-wedding',
+					href: '/portfolio/category/lifestyle-weddings',
 				},
 			],
 		},
@@ -128,6 +151,13 @@ export function Header() {
 		if (path === '/' && location === '/') return true;
 		if (path !== '/' && location.startsWith(path)) return true;
 		return false;
+	};
+
+	// Function to handle mobile link clicks
+	const handleMobileLinkClick = (href: string) => {
+		navigate(href);
+		setActiveDropdown(null);
+		setIsMobileMenuOpen(false);
 	};
 
 	return (
@@ -375,6 +405,7 @@ export function Header() {
 
 					{/* Mobile Navigation Toggle */}
 					<button
+						ref={mobileButtonRef}
 						className="lg:hidden text-primary"
 						onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
 					>
@@ -388,92 +419,30 @@ export function Header() {
 
 				{/* Mobile Navigation Menu */}
 				{isMobileMenuOpen && (
-					<div className="lg:hidden bg-white py-4 space-y-3 mt-4 rounded-lg shadow-md">
+					<div
+						ref={mobileMenuRef}
+						className="lg:hidden bg-white py-4 space-y-3 mt-4 rounded-lg shadow-md"
+					>
 						{navigation.map((item) => (
 							<div
 								key={item.name + '-mobile'}
 								className="text-center"
 							>
-								{item.children ? (
-									<>
-										<button
-											className={`flex items-center space-x-1 mx-auto py-2 px-4 ${
-												isActive(item.href)
-													? 'text-primary'
-													: 'text-secondary hover:text-primary'
-											} transition-colors duration-300 ${
-												activeDropdown === item.name
-													? 'font-medium'
-													: ''
-											}`}
-											onClick={() =>
-												setActiveDropdown(
-													activeDropdown === item.name
-														? null
-														: item.name,
-												)
-											}
-										>
-											<span>{item.name}</span>
-											<ChevronDown
-												className={`h-4 w-4 transition-transform ${
-													activeDropdown === item.name
-														? 'rotate-180'
-														: ''
-												}`}
-											/>
-										</button>
-
-										{activeDropdown === item.name && (
-											<div className="bg-gray-50 py-2 mt-2 rounded-md mx-6">
-												<Link
-													href={item.href}
-													className="block py-2 text-secondary hover:text-primary font-medium"
-													onClick={() => {
-														setActiveDropdown(null);
-														setIsMobileMenuOpen(
-															false,
-														);
-													}}
-												>
-													Alle {item.name}
-												</Link>
-
-												{item.children?.map((child) => (
-													<Link
-														key={child.name}
-														href={child.href}
-														className="block py-2 text-secondary hover:text-primary"
-														onClick={() => {
-															setActiveDropdown(
-																null,
-															);
-															setIsMobileMenuOpen(
-																false,
-															);
-														}}
-													>
-														{child.name}
-													</Link>
-												))}
-											</div>
-										)}
-									</>
-								) : (
-									<Link
-										href={item.href}
-										className={`block py-2 ${
-											isActive(item.href)
-												? 'text-primary'
-												: 'text-secondary hover:text-primary'
-										} transition-colors duration-300`}
-										onClick={() =>
-											setIsMobileMenuOpen(false)
-										}
-									>
-										{item.name}
-									</Link>
-								)}
+								{/* Always render a direct link for mobile, no dropdowns */}
+								<Link
+									href={item.href}
+									className={`block py-2 ${
+										isActive(item.href)
+											? 'text-primary font-semibold'
+											: 'text-secondary hover:text-primary'
+									} transition-colors duration-300`}
+									onClick={(e) => {
+										e.preventDefault();
+										handleMobileLinkClick(item.href);
+									}}
+								>
+									{item.name}
+								</Link>
 							</div>
 						))}
 
@@ -481,12 +450,15 @@ export function Header() {
 							<div className="text-center">
 								<Link
 									href="/admin"
-									className={`${
+									className={`block py-2 ${
 										location.startsWith('/admin')
-											? 'text-primary'
+											? 'text-primary font-semibold'
 											: 'text-secondary hover:text-primary'
 									} transition-colors duration-300`}
-									onClick={() => setIsMobileMenuOpen(false)}
+									onClick={(e) => {
+										e.preventDefault();
+										handleMobileLinkClick('/admin');
+									}}
 								>
 									Admin
 								</Link>
@@ -510,8 +482,11 @@ export function Header() {
 							<div className="text-center">
 								<Link
 									href="/auth"
-									className="text-secondary hover:text-primary transition-colors duration-300"
-									onClick={() => setIsMobileMenuOpen(false)}
+									className={`block py-2 text-secondary hover:text-primary transition-colors duration-300`}
+									onClick={(e) => {
+										e.preventDefault();
+										handleMobileLinkClick('/auth');
+									}}
 								>
 									Logg Inn
 								</Link>

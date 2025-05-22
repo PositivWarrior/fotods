@@ -142,7 +142,10 @@ export function Gallery({ category: categorySlugProp }: GalleryProps) {
 					name: 'Detaljer',
 					href: '/portfolio/category/housing-details',
 				},
-				{ name: 'Drone', href: '/portfolio/category/housing-drone' },
+				{
+					name: 'Drone',
+					href: '/portfolio/category/housing-drone',
+				},
 				{
 					name: 'Kveldsbilder',
 					href: '/portfolio/category/housing-evening',
@@ -169,7 +172,7 @@ export function Gallery({ category: categorySlugProp }: GalleryProps) {
 				},
 				{
 					name: 'Bryllup',
-					href: '/portfolio/category/lifestyle-wedding',
+					href: '/portfolio/category/lifestyle-weddings',
 				},
 			],
 		},

@@ -29,9 +29,63 @@ export default function PortfolioPage() {
 		searchParams.get('category');
 
 	// Fetch category details if slug is provided
-	const { data: categories } = useQuery<Category[]>({
+	const { data: categories, isLoading: categoriesLoading } = useQuery<
+		Category[]
+	>({
 		queryKey: ['/api/categories'],
 	});
+
+	useEffect(() => {
+		if (categorySlug && categories) {
+			console.clear(); // Clear console for fresh logs on each navigation
+			console.log(
+				`PortfolioPage: Current URL Slug: '${categorySlug}' (Type: ${typeof categorySlug})`,
+			);
+
+			let foundMatch = false;
+			categories.forEach((cat, index) => {
+				console.log(
+					`PortfolioPage: Checking DB Category ${index + 1}: Name: '${
+						cat.name
+					}', Slug: '${cat.slug}' (Type: ${typeof cat.slug})`,
+				);
+				if (cat.slug === categorySlug) {
+					console.log(
+						`%cPortfolioPage: EXACT MATCH FOUND! Name: ${cat.name}, Slug: ${cat.slug}`,
+						'color: green; font-weight: bold;',
+					);
+					foundMatch = true;
+				} else if (
+					cat.slug &&
+					categorySlug &&
+					cat.slug.toLowerCase() === categorySlug.toLowerCase() &&
+					cat.slug !== categorySlug
+				) {
+					console.warn(
+						`PortfolioPage: Potential case mismatch: DB slug '${cat.slug}' vs URL slug '${categorySlug}'`,
+					);
+				}
+			});
+
+			if (!foundMatch) {
+				console.error(
+					`PortfolioPage: NO MATCH FOUND for URL Slug: '${categorySlug}' in the fetched categories.`,
+				);
+				console.log(
+					'PortfolioPage: All fetched category slugs:',
+					categories.map((c) => c.slug),
+				);
+			}
+		} else if (categorySlug && categoriesLoading) {
+			console.log(
+				'PortfolioPage: Have URL slug, but categories are still loading...',
+			);
+		} else if (categorySlug && !categories) {
+			console.warn(
+				'PortfolioPage: Have URL slug, but categories data is null/undefined post-loading.',
+			);
+		}
+	}, [categorySlug, categories, categoriesLoading]);
 
 	const activeCategory = categories?.find((cat) => cat.slug === categorySlug);
 
