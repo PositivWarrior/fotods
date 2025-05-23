@@ -177,16 +177,54 @@ export class DrizzleStorage implements IStorage {
 			.orderBy(asc(photos.displayOrder));
 	}
 	async getPhotosByCategorySlug(slug: string): Promise<Photo[]> {
-		console.warn(
-			'getPhotosByCategorySlug not yet implemented in DrizzleStorage',
+		// 1. Find the main category by its slug
+		const mainCategory = await this.getCategoryBySlug(slug);
+		console.log(
+			`[API /api/photos/category/${slug}] Main category found:`,
+			mainCategory,
 		);
-		const category = await this.getCategoryBySlug(slug);
-		if (!category || typeof category.id !== 'number') return [];
-		return db
+		if (!mainCategory || typeof mainCategory.id !== 'number') return [];
+
+		// 2. Find all direct subcategories of this main category
+		const subCategories = await db
+			.select()
+			.from(categories)
+			.where(eq(categories.parentCategory, mainCategory.slug)); // Match parentCategory with main category's slug
+		console.log(
+			`[API /api/photos/category/${slug}] Subcategories found:`,
+			subCategories,
+		);
+
+		// 3. Collect all relevant category IDs
+		const categoryIdsToFetch = [mainCategory.id];
+		subCategories.forEach((subCat) => {
+			if (typeof subCat.id === 'number') {
+				// Ensure subCat.id is a number
+				categoryIdsToFetch.push(subCat.id);
+			}
+		});
+		console.log(
+			`[API /api/photos/category/${slug}] Category IDs to fetch photos from:`,
+			categoryIdsToFetch,
+		);
+
+		// 4. Fetch photos where categoryId is in the list of IDs
+		if (categoryIdsToFetch.length === 0) return []; // Should not happen if mainCategory was found
+
+		const resultPhotos = await db
 			.select()
 			.from(photos)
-			.where(eq(photos.categoryId, category.id))
+			.where(inArray(photos.categoryId, categoryIdsToFetch))
 			.orderBy(asc(photos.displayOrder));
+		console.log(
+			`[API /api/photos/category/${slug}] Photos fetched:`,
+			resultPhotos.map((p) => ({
+				id: p.id,
+				title: p.title,
+				categoryId: p.categoryId,
+			})),
+		);
+		return resultPhotos;
 	}
 	async getFeaturedPhotos(): Promise<Photo[]> {
 		console.warn('getFeaturedPhotos not yet implemented in DrizzleStorage');

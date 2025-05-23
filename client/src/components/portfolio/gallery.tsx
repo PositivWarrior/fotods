@@ -163,7 +163,7 @@ export function Gallery({ category: categorySlugProp }: GalleryProps) {
 			],
 		},
 		{
-			name: 'Livsstil',
+			name: 'Livstil',
 			href: '/portfolio/category/lifestyle',
 			children: [
 				{
