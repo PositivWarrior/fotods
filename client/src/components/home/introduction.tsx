@@ -42,12 +42,12 @@ export function Introduction() {
 								}}
 								viewport={{ once: true }}
 							>
-								<span className="block text-4xl font-semibold mb-2">
+								{/* <span className="block text-4xl font-semibold mb-2">
 									{stat.value}
 								</span>
 								<span className="text-secondary">
 									{stat.label}
-								</span>
+								</span> */}
 							</motion.div>
 						))}
 					</div>
