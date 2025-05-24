@@ -58,7 +58,7 @@ export default function ContactPage() {
 				<ContactForm />
 
 				{/* Map Section */}
-				<section className="py-12 bg-muted">
+				{/* <section className="py-12 bg-muted">
 					<div className="container mx-auto px-6">
 						<div className="max-w-4xl mx-auto">
 							<h2 className="text-2xl font-poppins font-semibold text-center mb-8">
@@ -78,7 +78,7 @@ export default function ContactPage() {
 							</div>
 						</div>
 					</div>
-				</section>
+				</section> */}
 			</main>
 
 			<Footer />

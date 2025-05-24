@@ -435,9 +435,6 @@ export class DrizzleStorage implements IStorage {
 	async createContactMessage(
 		message: InsertContact,
 	): Promise<ContactMessage> {
-		console.warn(
-			'createContactMessage not yet implemented in DrizzleStorage',
-		);
 		const result = await db
 			.insert(contactMessages)
 			.values(message)

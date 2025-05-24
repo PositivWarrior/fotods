@@ -14,6 +14,7 @@ import { fromZodError } from 'zod-validation-error';
 import multer from 'multer';
 import path from 'path';
 import { randomUUID } from 'crypto';
+import { sendContactEmail } from './emailService'; // Import the email sending function
 
 export async function registerRoutes(app: Express): Promise<Server> {
 	// Set up authentication
@@ -370,6 +371,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
 			const contactMessage = await dataStorage.createContactMessage(
 				validatedData,
 			);
+
+			// Send email notification
+			// We do this after successfully saving to DB.
+			// Not awaiting this, so email sending failure doesn't block the HTTP response.
+			sendContactEmail(validatedData).catch((emailError) => {
+				// Log email sending errors separately, but don't fail the request if DB save was successful
+				console.error(
+					'Failed to send contact notification email:',
+					emailError,
+				);
+			});
+
 			res.status(201).json({
 				message:
 					"Your message has been sent successfully! We'll get back to you soon.",
