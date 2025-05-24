@@ -206,11 +206,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 						'Supabase main image upload error:',
 						mainImageError,
 					);
-					return res
-						.status(500)
-						.json({
-							message: `Failed to upload main image: ${mainImageError.message}`,
-						});
+					return res.status(500).json({
+						message: `Failed to upload main image: ${mainImageError.message}`,
+					});
 				}
 				// Construct the public URL for the main image
 				const { data: mainImagePublicUrlData } = supabase.storage
