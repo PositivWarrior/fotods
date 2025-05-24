@@ -20,6 +20,7 @@ import { IStorage } from './storage';
 import { eq, and, or, asc, desc, like, not, inArray, sql } from 'drizzle-orm';
 import createMemoryStore from 'memorystore';
 import session from 'express-session';
+import { supabase, getPathFromSupabaseUrl } from './supabaseClient';
 
 const MemoryStore = createMemoryStore(session);
 
@@ -260,7 +261,58 @@ export class DrizzleStorage implements IStorage {
 		id: number,
 		photoUpdate: Partial<InsertPhoto>,
 	): Promise<Photo | undefined> {
-		console.warn('updatePhoto not yet implemented in DrizzleStorage');
+		console.warn('updatePhoto with Supabase storage considerations');
+
+		// If imageUrl or thumbnailUrl is being updated, delete the old file(s) from Supabase
+		if (photoUpdate.imageUrl || photoUpdate.thumbnailUrl) {
+			const currentPhoto = await this.getPhoto(id);
+			if (currentPhoto) {
+				const filesToDelete: string[] = [];
+				if (
+					photoUpdate.imageUrl &&
+					currentPhoto.imageUrl &&
+					photoUpdate.imageUrl !== currentPhoto.imageUrl
+				) {
+					const oldPath = getPathFromSupabaseUrl(
+						currentPhoto.imageUrl,
+					);
+					if (oldPath) filesToDelete.push(oldPath);
+				}
+				if (
+					photoUpdate.thumbnailUrl &&
+					currentPhoto.thumbnailUrl &&
+					photoUpdate.thumbnailUrl !== currentPhoto.thumbnailUrl
+				) {
+					// Avoid double-deleting if thumbnail was same as main image and main image is also changing
+					const oldThumbPath = getPathFromSupabaseUrl(
+						currentPhoto.thumbnailUrl,
+					);
+					if (
+						oldThumbPath &&
+						(!photoUpdate.imageUrl ||
+							oldThumbPath !==
+								getPathFromSupabaseUrl(currentPhoto.imageUrl))
+					) {
+						filesToDelete.push(oldThumbPath);
+					}
+				}
+
+				if (filesToDelete.length > 0) {
+					// Use the bucket name you configured in routes.ts (e.g., "photos")
+					const { error: deleteError } = await supabase.storage
+						.from('photos') // Replace "photos" with your actual bucket name
+						.remove(filesToDelete);
+					if (deleteError) {
+						console.error(
+							'Error deleting old photo(s) from Supabase during update:',
+							deleteError,
+						);
+						// Decide if this should block the update or just log
+					}
+				}
+			}
+		}
+
 		const result = await db
 			.update(photos)
 			.set(photoUpdate)
@@ -269,7 +321,46 @@ export class DrizzleStorage implements IStorage {
 		return result[0];
 	}
 	async deletePhoto(id: number): Promise<boolean> {
-		console.warn('deletePhoto not yet implemented in DrizzleStorage');
+		console.warn('deletePhoto with Supabase storage considerations');
+
+		// First, get the photo details to find the image URLs
+		const photoToDelete = await this.getPhoto(id);
+		if (!photoToDelete) {
+			console.log(`Photo with id ${id} not found for deletion.`);
+			return false;
+		}
+
+		const filesToDelete: string[] = [];
+		if (photoToDelete.imageUrl) {
+			const imagePath = getPathFromSupabaseUrl(photoToDelete.imageUrl);
+			if (imagePath) filesToDelete.push(imagePath);
+		}
+		if (
+			photoToDelete.thumbnailUrl &&
+			photoToDelete.thumbnailUrl !== photoToDelete.imageUrl
+		) {
+			// Only add thumbnail if it's different from the main image to avoid double delete attempts
+			const thumbPath = getPathFromSupabaseUrl(
+				photoToDelete.thumbnailUrl,
+			);
+			if (thumbPath) filesToDelete.push(thumbPath);
+		}
+
+		if (filesToDelete.length > 0) {
+			// Use the bucket name you configured in routes.ts (e.g., "photos")
+			const { error: deleteError } = await supabase.storage
+				.from('photos') // Replace "photos" with your actual bucket name
+				.remove(filesToDelete);
+			if (deleteError) {
+				console.error(
+					'Error deleting photo(s) from Supabase:',
+					deleteError,
+				);
+				// Decide if this should prevent DB deletion or just log. For now, we log and proceed.
+			}
+		}
+
+		// Then, delete the photo record from the database
 		const result = await db
 			.delete(photos)
 			.where(eq(photos.id, id))
