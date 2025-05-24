@@ -23,9 +23,7 @@ import { Loader2, Star } from 'lucide-react';
 // Create form schema based on the database schema but only include what the user needs to fill out
 const testimonialFormSchema = z.object({
 	name: z.string().min(2, { message: 'Navn må være minst 2 tegn.' }),
-	role: z
-		.string()
-		.min(2, { message: 'Vennligst oppgi din stilling eller bedrift.' }),
+	role: z.string().optional(),
 	content: z
 		.string()
 		.min(10, { message: 'Anmeldelse må være minst 10 tegn.' })

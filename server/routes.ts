@@ -14,7 +14,6 @@ import { fromZodError } from 'zod-validation-error';
 import multer from 'multer';
 import path from 'path';
 import { randomUUID } from 'crypto';
-import { addMissingPhotos } from './reset-data';
 
 export async function registerRoutes(app: Express): Promise<Server> {
 	// Set up authentication
@@ -538,24 +537,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 			res.sendStatus(204);
 		} catch (error) {
 			res.status(500).json({ message: 'Failed to delete testimonial' });
-		}
-	});
-
-	// Development Helpers
-	app.post('/api/reset-data', isAdmin, async (req, res) => {
-		try {
-			await addMissingPhotos();
-			res.status(200).json({
-				message: 'Successfully added missing photos',
-			});
-		} catch (error) {
-			console.error('Reset data error:', error);
-			res.status(500).json({
-				message:
-					error instanceof Error
-						? error.message
-						: 'Failed to reset data',
-			});
 		}
 	});
 
