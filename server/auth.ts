@@ -77,80 +77,36 @@ export function setupAuth(app: Express) {
 		new LocalStrategy(async (usernameInput, password, done) => {
 			const username = usernameInput.toLowerCase();
 			try {
-				// Handle AdminKacpru@gmail.com
-				if (username === 'adminkacpru@gmail.com') {
-					if (password === 'AdminKacpru8') {
-						// Check new password
-						let user = await storage.getUserByUsername(username);
-						if (!user) {
-							user = await storage.createUser({
-								username: username,
-								password: await hashPassword('AdminKacpru8'), // Use new password for hashing
-							});
-						}
-						// Ensure admin privileges & correct password if user exists but password was different
-						if (
-							!user.isAdmin ||
-							!(await comparePasswords(
-								'AdminKacpru8',
-								user.password,
-							))
-						) {
-							await storage.updateUser(user.id, {
-								isAdmin: true,
-								password: await hashPassword('AdminKacpru8'),
-							});
-							user.isAdmin = true;
-							// Reload user to get updated password for session
-							user = (await storage.getUserByUsername(
-								username,
-							)) as User;
-						}
-						return done(null, user);
-					} else {
-						return done(null, false, {
-							message: 'Invalid credentials for AdminKacpru',
-						});
-					}
-					// Handle AdminDawid@gmail.com
-				} else if (username === 'admindawid@gmail.com') {
-					if (password === 'AdminDawid8') {
-						// Check new password
-						let user = await storage.getUserByUsername(username);
-						if (!user) {
-							user = await storage.createUser({
-								username: username,
-								password: await hashPassword('AdminDawid8'), // Use new password for hashing
-							});
-						}
-						// Ensure admin privileges & correct password if user exists but password was different
-						if (
-							!user.isAdmin ||
-							!(await comparePasswords(
-								'AdminDawid8',
-								user.password,
-							))
-						) {
-							await storage.updateUser(user.id, {
-								isAdmin: true,
-								password: await hashPassword('AdminDawid8'),
-							});
-							user.isAdmin = true;
-							// Reload user to get updated password for session
-							user = (await storage.getUserByUsername(
-								username,
-							)) as User;
-						}
-						return done(null, user);
-					} else {
-						return done(null, false, {
-							message: 'Invalid credentials for AdminDawid',
-						});
-					}
-					// For any other username, authentication fails
-				} else {
-					return done(null, false, { message: 'Invalid username.' });
+				const user = await storage.getUserByUsername(username);
+
+				if (!user) {
+					// User not found
+					return done(null, false, {
+						message: 'Invalid credentials.',
+					});
 				}
+
+				const passwordMatch = await comparePasswords(
+					password,
+					user.password,
+				);
+
+				if (!passwordMatch) {
+					// Password does not match
+					return done(null, false, {
+						message: 'Invalid credentials.',
+					});
+				}
+
+				if (!user.isAdmin) {
+					// User is not an admin
+					return done(null, false, {
+						message: 'Access denied. User is not an administrator.',
+					});
+				}
+
+				// User found, password matches, and user is an admin
+				return done(null, user);
 			} catch (err) {
 				return done(err);
 			}
@@ -206,8 +162,11 @@ export function setupAuth(app: Express) {
 					if (!user)
 						return res
 							.status(400)
-							.json({ message: 'Invalid credentials' });
+							.json(info || { message: 'Invalid credentials' }); // Use info.message if available
 
+					// The LocalStrategy now ensures that 'user' is an admin if authentication succeeds.
+					// The following block for special admin checks is no longer needed.
+					/*
 					// Special case for adminkacpru@gmail.com - always ensure admin access
 					if (
 						user.username === 'adminkacpru@gmail.com' &&
@@ -224,6 +183,7 @@ export function setupAuth(app: Express) {
 						// Update the user in storage
 						await storage.updateUser(user.id, { isAdmin: true });
 					}
+					*/
 
 					req.login(user, (err) => {
 						if (err) return next(err);
