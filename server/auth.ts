@@ -79,15 +79,19 @@ export function setupAuth(app: Express) {
 	passport.use(
 		new LocalStrategy(async (usernameInput, password, done) => {
 			const username = usernameInput.toLowerCase();
+			console.log(`[Auth] Attempting login for username: ${username}`);
 			try {
 				const user = await storage.getUserByUsername(username);
 
 				if (!user) {
-					// User not found
+					console.log(`[Auth] User not found: ${username}`);
 					return done(null, false, {
 						message: 'Invalid credentials.',
 					});
 				}
+				console.log(
+					`[Auth] User found: ${username}, isAdmin: ${user.isAdmin}`,
+				);
 
 				const passwordMatch = await comparePasswords(
 					password,
@@ -95,20 +99,23 @@ export function setupAuth(app: Express) {
 				);
 
 				if (!passwordMatch) {
-					// Password does not match
+					console.log(
+						`[Auth] Password mismatch for user: ${username}`,
+					);
 					return done(null, false, {
 						message: 'Invalid credentials.',
 					});
 				}
+				console.log(`[Auth] Password matched for user: ${username}`);
 
 				if (!user.isAdmin) {
-					// User is not an admin
+					console.log(`[Auth] User is not admin: ${username}`);
 					return done(null, false, {
 						message: 'Access denied. User is not an administrator.',
 					});
 				}
 
-				// User found, password matches, and user is an admin
+				console.log(`[Auth] Admin login successful for: ${username}`);
 				return done(null, user);
 			} catch (err) {
 				return done(err);
