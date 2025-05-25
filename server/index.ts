@@ -5,6 +5,9 @@ import express, { type Request, Response, NextFunction } from 'express';
 import cors from 'cors'; // Import the cors package
 import { registerRoutes } from './routes';
 import path from 'path';
+import { createServer } from 'http';
+import { fileURLToPath } from 'url';
+import fs from 'fs';
 
 const app = express();
 
@@ -63,8 +66,20 @@ app.use((req, _res, next) => {
 });
 
 (async () => {
-	const server = await registerRoutes(app);
+	const server = createServer(app); // Create server instance early for ws
 
+	if (process.env.NODE_ENV === 'development') {
+		const { setupVite } = await import('./vite.dev.js');
+		await setupVite(app, server);
+	} else {
+		const { serveStatic } = await import('./static.js');
+		serveStatic(app); // 1. Serve static files (CSS, JS, images)
+	}
+
+	// 2. Register API routes AFTER static file serving is set up
+	await registerRoutes(app);
+
+	// 3. Error handling middleware (should be after API routes)
 	app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
 		const status = err.status || err.statusCode || 500;
 		const message = err.message || 'Internal Server Error';
@@ -73,12 +88,23 @@ app.use((req, _res, next) => {
 		throw err;
 	});
 
-	if (process.env.NODE_ENV === 'development') {
-		const { setupVite } = await import('./vite.dev.js'); // Import from vite.dev.js
-		await setupVite(app, server);
-	} else {
-		const { serveStatic } = await import('./static.js'); // Import from static.js
-		serveStatic(app);
+	// AFTER other routes, including API routes, add the catch-all for SPA index.html
+	if (process.env.NODE_ENV !== 'development') {
+		const distPublicPath = path.resolve(
+			path.dirname(fileURLToPath(import.meta.url)),
+			'public',
+		);
+		app.get('*', (_req, res) => {
+			// Check if distPublicPath and index.html exist to avoid errors if build is incomplete
+			const indexPath = path.resolve(distPublicPath, 'index.html');
+			if (fs.existsSync(indexPath)) {
+				res.sendFile(indexPath);
+			} else {
+				res.status(404).send(
+					'Frontend entry point (index.html) not found.',
+				);
+			}
+		});
 	}
 
 	const port = process.env.PORT || 5000;
