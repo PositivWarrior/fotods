@@ -110,7 +110,7 @@ export function ContactForm() {
 										<div className="flex items-start">
 											<MapPin className="text-primary mt-1 mr-3 h-5 w-5" />
 											<p className="text-secondary">
-												Ila Alle 34, 0154 Fredrikstad,
+												Ila Alle 76, 1605 Fredrikstad,
 												Norge
 											</p>
 										</div>

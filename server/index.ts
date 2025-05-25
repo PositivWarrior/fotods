@@ -2,50 +2,38 @@ import dotenv from 'dotenv';
 dotenv.config(); // Load environment variables
 
 import express, { type Request, Response, NextFunction } from 'express';
+import cors from 'cors'; // Import the cors package
 import { registerRoutes } from './routes';
 import { setupVite, serveStatic, log } from './vite';
 import path from 'path';
 
 const app = express();
 
-// CORS configuration for production
-app.use((req, res, next) => {
-	const allowedOrigins = [
-		'http://localhost:5173', // Vite dev server
-		'http://localhost:5000', // Local production
-		'https://fotods.no', // Your production domain
-		'https://www.fotods.no', // Your production domain with www
-	];
+// CORS configuration using the cors package
+const allowedOrigins = [
+	'http://localhost:5173', // Vite dev server
+	'http://localhost:5000', // Local production
+	'https://fotods.no', // Your production domain
+	'https://www.fotods.no', // Your production domain with www
+];
 
-	const origin = req.headers.origin;
-
-	// Always set CORS headers
-	res.setHeader(
-		'Access-Control-Allow-Methods',
-		'GET, POST, PUT, DELETE, OPTIONS',
-	);
-	res.setHeader(
-		'Access-Control-Allow-Headers',
-		'Content-Type, Authorization, X-Requested-With',
-	);
-	res.setHeader('Access-Control-Allow-Credentials', 'true');
-
-	// Set origin if it's in allowed list, otherwise allow fotods.no as fallback
-	if (allowedOrigins.includes(origin as string)) {
-		res.setHeader('Access-Control-Allow-Origin', origin as string);
-	} else if (origin && origin.includes('fotods.no')) {
-		res.setHeader('Access-Control-Allow-Origin', origin as string);
-	} else {
-		res.setHeader('Access-Control-Allow-Origin', 'https://fotods.no');
-	}
-
-	if (req.method === 'OPTIONS') {
-		res.sendStatus(200);
-		return;
-	}
-
-	next();
-});
+app.use(
+	cors({
+		origin: function (origin, callback) {
+			// allow requests with no origin (like mobile apps or curl requests)
+			if (!origin) return callback(null, true);
+			if (allowedOrigins.indexOf(origin) === -1) {
+				const msg =
+					'The CORS policy for this site does not allow access from the specified Origin.';
+				return callback(new Error(msg), false);
+			}
+			return callback(null, true);
+		},
+		credentials: true,
+		methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+		allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+	}),
+);
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
