@@ -73,7 +73,7 @@ export interface IStorage {
 	deleteTestimonial(id: number): Promise<boolean>;
 
 	// Session store for authentication
-	sessionStore: InstanceType<typeof MemoryStore>;
+	sessionStore: session.Store;
 }
 
 export const storage = new DrizzleStorage();

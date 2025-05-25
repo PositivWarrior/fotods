@@ -20,18 +20,26 @@ import { IStorage } from './storage';
 import { eq, and, or, asc, desc, like, not, inArray, sql } from 'drizzle-orm';
 import createMemoryStore from 'memorystore';
 import session from 'express-session';
+import ConnectPgSimple from 'connect-pg-simple';
 import { supabase, getPathFromSupabaseUrl } from './supabaseClient';
 
-const MemoryStore = createMemoryStore(session);
+const PgStore = ConnectPgSimple(session);
 
 export class DrizzleStorage implements IStorage {
-	sessionStore: InstanceType<typeof MemoryStore>;
+	sessionStore: ConnectPgSimple.PGStore;
 
 	constructor() {
-		// Session store remains in-memory for now.
-		// Migrating session storage to PostgreSQL/Redis is a separate task.
-		this.sessionStore = new MemoryStore({
-			checkPeriod: 86400000, // 24 hours
+		if (!process.env.DATABASE_URL) {
+			throw new Error(
+				'DATABASE_URL environment variable is not set for session store.',
+			);
+		}
+		this.sessionStore = new PgStore({
+			conString: process.env.DATABASE_URL,
+			createTableIfMissing: true,
+			// You might want to customize the table name or pruneInterval
+			// tableName: 'user_sessions',
+			// pruneSessionInterval: 60 * 60, // Prune expired sessions every hour
 		});
 	}
 
