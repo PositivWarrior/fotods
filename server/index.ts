@@ -11,6 +11,11 @@ import fs from 'fs';
 
 const app = express();
 
+// Explicit health check endpoint
+app.get('/health', (_req, res) => {
+	res.status(200).send('OK');
+});
+
 // CORS configuration using the cors package
 const allowedOrigins = [
 	'http://localhost:5173', // Vite dev server
