@@ -1,41 +1,30 @@
-import express, { type Express } from 'express';
+import type { Express } from 'express';
 import fs from 'fs';
 import path from 'path';
 import { createServer as createViteServer, createLogger } from 'vite';
-import { type Server } from 'http';
-import viteConfig from '../vite.config';
+import type { Server } from 'http';
+import viteConfig from '../vite.config'; // Path relative to server/ directory
 import { nanoid } from 'nanoid';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const viteLogger = createLogger();
 
-export function log(message: string, source = 'express') {
-	const formattedTime = new Date().toLocaleTimeString('en-US', {
-		hour: 'numeric',
-		minute: '2-digit',
-		second: '2-digit',
-		hour12: true,
-	});
-
-	console.log(`${formattedTime} [${source}] ${message}`);
-}
-
 export async function setupVite(app: Express, server: Server) {
 	const serverOptions = {
 		middlewareMode: true,
 		hmr: { server },
-		allowedHosts: true as true,
+		// allowedHosts: true as true, // This might not be needed or correct for vite.config.js
 	};
 
 	const vite = await createViteServer({
-		...viteConfig,
-		configFile: false,
+		...viteConfig, // Spread your existing vite.config.ts content
+		configFile: false, // We are passing the config directly
 		customLogger: {
 			...viteLogger,
 			error: (msg, options) => {
 				viteLogger.error(msg, options);
-				process.exit(1);
+				// process.exit(1); // Exiting on error might be too aggressive for dev
 			},
 		},
 		server: serverOptions,
@@ -47,6 +36,8 @@ export async function setupVite(app: Express, server: Server) {
 		const url = req.originalUrl;
 
 		try {
+			// Path relative to the project root for client/index.html
+			// Assuming this vite.dev.ts is in server/, client/ is ../client/
 			const clientTemplate = path.resolve(
 				__dirname,
 				'..',
@@ -54,8 +45,8 @@ export async function setupVite(app: Express, server: Server) {
 				'index.html',
 			);
 
-			// always reload the index.html file from disk incase it changes
 			let template = await fs.promises.readFile(clientTemplate, 'utf-8');
+			// Invalidate cache for main.tsx - useful for HMR
 			template = template.replace(
 				`src="/src/main.tsx"`,
 				`src="/src/main.tsx?v=${nanoid()}"`,
@@ -66,22 +57,5 @@ export async function setupVite(app: Express, server: Server) {
 			vite.ssrFixStacktrace(e as Error);
 			next(e);
 		}
-	});
-}
-
-export function serveStatic(app: Express) {
-	const distPath = path.resolve(__dirname, 'public');
-
-	if (!fs.existsSync(distPath)) {
-		throw new Error(
-			`Could not find the build directory: ${distPath}, make sure to build the client first`,
-		);
-	}
-
-	app.use(express.static(distPath));
-
-	// fall through to index.html if the file doesn't exist
-	app.use('*', (_req, res) => {
-		res.sendFile(path.resolve(distPath, 'index.html'));
 	});
 }

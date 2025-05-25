@@ -4,8 +4,6 @@ dotenv.config(); // Load environment variables
 import express, { type Request, Response, NextFunction } from 'express';
 import cors from 'cors'; // Import the cors package
 import { registerRoutes } from './routes';
-// Conditionally import Vite-related functions
-// import { setupVite, serveStatic, log } from './vite';
 import path from 'path';
 
 const app = express();
@@ -39,10 +37,17 @@ app.use(
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// Generic log function (can be moved or redefined if it was from './vite')
-function log(message: string) {
-	console.log(`[server] ${message}`);
-}
+// Dynamic import for the log function from static.ts (or define it locally if preferred)
+let log = (message: string) => console.log(`[server] ${message}`);
+import('./static.js')
+	.then((staticModule) => {
+		if (staticModule.log) {
+			log = staticModule.log;
+		}
+	})
+	.catch((err) =>
+		console.error('Failed to load static.js for log function', err),
+	);
 
 app.use((req, _res, next) => {
 	const start = Date.now();
@@ -68,21 +73,14 @@ app.use((req, _res, next) => {
 		throw err;
 	});
 
-	// importantly only setup vite in development and after
-	// setting up all the other routes so the catch-all route
-	// doesn't interfere with the other routes
 	if (process.env.NODE_ENV === 'development') {
-		// Use process.env.NODE_ENV directly
-		const { setupVite } = await import('./vite.js'); // Dynamic import with .js extension
+		const { setupVite } = await import('./vite.dev.js'); // Import from vite.dev.js
 		await setupVite(app, server);
 	} else {
-		const { serveStatic } = await import('./vite.js'); // Dynamic import with .js extension
+		const { serveStatic } = await import('./static.js'); // Import from static.js
 		serveStatic(app);
 	}
 
-	// ALWAYS serve the app on port 5000
-	// this serves both the API and the client.
-	// It is the only port that is not firewalled.
 	const port = process.env.PORT || 5000;
 	server.listen(
 		{
