@@ -53,22 +53,6 @@ export function Footer() {
 						<ul className="space-y-2">
 							<li>
 								<Link
-									href="/"
-									className="text-white/80 hover:text-white transition-colors"
-								>
-									Hjem
-								</Link>
-							</li>
-							<li>
-								<Link
-									href="/portfolio"
-									className="text-white/80 hover:text-white transition-colors"
-								>
-									Portefølje
-								</Link>
-							</li>
-							<li>
-								<Link
 									href="/portfolio/housing"
 									className="text-white/80 hover:text-white transition-colors"
 								>
@@ -77,10 +61,18 @@ export function Footer() {
 							</li>
 							<li>
 								<Link
-									href="/portfolio/business"
+									href="/portfolio/housing-evening"
 									className="text-white/80 hover:text-white transition-colors"
 								>
-									Næring
+									Kveldsbilder
+								</Link>
+							</li>
+							<li>
+								<Link
+									href="/portfolio/housing-drone"
+									className="text-white/80 hover:text-white transition-colors"
+								>
+									Drone
 								</Link>
 							</li>
 							<li>
@@ -89,6 +81,14 @@ export function Footer() {
 									className="text-white/80 hover:text-white transition-colors"
 								>
 									Om Meg
+								</Link>
+							</li>
+							<li>
+								<Link
+									href="/priser"
+									className="text-white/80 hover:text-white transition-colors"
+								>
+									Priser
 								</Link>
 							</li>
 							<li>

@@ -8,6 +8,7 @@ import path from 'path';
 import { createServer } from 'http';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
+import multer from 'multer';
 
 const app = express();
 
@@ -144,3 +145,7 @@ app.use((req, _res, next) => {
 		},
 	);
 })();
+
+// Get the API base URL from environment or default to Railway backend
+const API_BASE_URL =
+	import.meta.env.VITE_API_URL || 'https://fotods-production.up.railway.app';

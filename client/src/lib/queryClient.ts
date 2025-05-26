@@ -14,13 +14,26 @@ async function throwIfResNotOk(res: Response) {
 export async function apiRequest(
 	method: string,
 	url: string,
-	data?: unknown | undefined,
+	data?: unknown | FormData | undefined,
 ): Promise<Response> {
 	const fullUrl = `${API_BASE_URL}${url}`;
+
+	let headers: HeadersInit = {};
+	let body: BodyInit | undefined = undefined;
+
+	if (data instanceof FormData) {
+		// For FormData, do not set Content-Type; browser will do it with boundary.
+		headers = {}; // Reset to empty or only include other necessary headers like Authorization
+		body = data;
+	} else if (data) {
+		headers = { 'Content-Type': 'application/json' };
+		body = JSON.stringify(data);
+	}
+
 	const res = await fetch(fullUrl, {
 		method,
-		headers: data ? { 'Content-Type': 'application/json' } : {},
-		body: data ? JSON.stringify(data) : undefined,
+		headers, // Use the dynamically set headers
+		body, // Use the dynamically set body
 		credentials: 'include',
 	});
 
