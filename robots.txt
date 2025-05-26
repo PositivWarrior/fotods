@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://fotods.no/sitemap.xml
+Sitemap: https://fotods.no/sitemap2.xml
+
+# Disallow crawling of specific paths if needed in the future
+# Example: Disallow: /admin/
+# Example: Disallow: /temp-staging-area/ 

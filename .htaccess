@@ -1,0 +1,23 @@
+RewriteEngine On
+RewriteCond %{HTTPS} off
+RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Standard WordPress anular rules (if your frontend is not WordPress, these might not be needed or different)
+# BEGIN WordPress
+# RewriteRule ^index\.php$ - [L]
+# RewriteCond %{REQUEST_FILENAME} !-f
+# RewriteCond %{REQUEST_FILENAME} !-d
+# RewriteRule . /index.html [L]
+# END WordPress
+
+# Proxy API requests to Railway backend
+RewriteRule ^api/(.*)$ https://fotods-production.up.railway.app/api/$1 [P,L,E=PROXY_REQUEST:true]
+
+# It's good practice to enable SSLProxyEngine for HTTPS proxying
+SSLProxyEngine On
+
+# Optional: Set headers to be forwarded to the backend to ensure it knows the original host and scheme
+<IfModule mod_headers.c>
+    RequestHeader set X-Forwarded-Proto "https"
+    RequestHeader set X-Forwarded-Host "%{HTTP_HOST}s" env=PROXY_REQUEST
+</IfModule> 
