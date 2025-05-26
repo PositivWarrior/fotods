@@ -5,7 +5,7 @@
     # --- Test Rule (Uncomment to test if mod_rewrite is working) ---
     # If you uncomment the next line, accessing https://fotods.no/test-rewrite.html 
     # should redirect you to Google. Remove or re-comment after testing.
-    RewriteRule ^test-rewrite\.html$ https://www.google.com [R=301,L]
+    # RewriteRule ^test-rewrite\.html$ https://www.google.com [R=301,L]
     # --- End Test Rule ---
 
     # Force HTTPS
