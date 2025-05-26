@@ -289,7 +289,7 @@ export function ImageUpload() {
 	};
 
 	return (
-		<Card>
+		<Card className="my-6">
 			<CardHeader>
 				<CardTitle>Add New Photo</CardTitle>
 				<CardDescription>

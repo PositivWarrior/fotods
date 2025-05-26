@@ -24,7 +24,7 @@
     # Requires mod_proxy and mod_proxy_http. mod_ssl is needed for SSLProxyEngine.
     <IfModule mod_proxy.c>
         <IfModule mod_proxy_http.c>
-            ProxyPreserveHost On
+            # ProxyPreserveHost Off # Or remove the ProxyPreserveHost On line if present
 
             # Proxy API requests to Railway backend
             RewriteRule ^api/(.*)$ https://fotods-production.up.railway.app/api/$1 [P,L,E=PROXY_REQUEST:true]
@@ -37,8 +37,9 @@
             # Set headers to inform the backend about the original request details
             <IfModule mod_headers.c>
                 RequestHeader set X-Forwarded-Proto "https" env=PROXY_REQUEST
-                # If ProxyPreserveHost On doesn't work as expected, you might try:
-                # RequestHeader set Host "fotods-production.up.railway.app" env=PROXY_REQUEST 
+                RequestHeader set Host "fotods-production.up.railway.app" env=PROXY_REQUEST 
+                # If your backend needs the true client IP, you might add:
+                # RequestHeader set X-Forwarded-For "%{REMOTE_ADDR}" env=PROXY_REQUEST
             </IfModule>
         </IfModule>
     </IfModule>

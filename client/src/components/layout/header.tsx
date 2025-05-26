@@ -195,7 +195,13 @@ export function Header() {
 										</button>
 
 										{activeDropdown === item.name && (
-											<div className="absolute left-0 mt-2 w-40 bg-white rounded-md shadow-lg py-1 z-50">
+											<div
+												className={`absolute ${
+													item.name === 'Admin'
+														? 'right-0'
+														: 'left-0'
+												} mt-2 w-40 bg-white rounded-md shadow-lg py-1 z-50`}
+											>
 												<Link
 													href={item.href}
 													className="block px-4 py-2 text-secondary hover:text-primary hover:bg-gray-50"

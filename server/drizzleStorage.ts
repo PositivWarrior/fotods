@@ -170,15 +170,11 @@ export class DrizzleStorage implements IStorage {
 		return result.length > 0;
 	}
 
-	// Photo operations - TO BE IMPLEMENTED
+	// Photo operations
 	async getPhotos(): Promise<Photo[]> {
-		console.warn('getPhotos not yet implemented in DrizzleStorage');
 		return db.select().from(photos).orderBy(desc(photos.createdAt));
 	}
 	async getPhotosByCategory(categoryId: number): Promise<Photo[]> {
-		console.warn(
-			'getPhotosByCategory not yet implemented in DrizzleStorage',
-		);
 		return db
 			.select()
 			.from(photos)
@@ -236,7 +232,6 @@ export class DrizzleStorage implements IStorage {
 		return resultPhotos;
 	}
 	async getFeaturedPhotos(): Promise<Photo[]> {
-		console.warn('getFeaturedPhotos not yet implemented in DrizzleStorage');
 		return db
 			.select()
 			.from(photos)
@@ -244,7 +239,6 @@ export class DrizzleStorage implements IStorage {
 			.orderBy(asc(photos.displayOrder));
 	}
 	async getPhoto(id: number): Promise<Photo | undefined> {
-		console.warn('getPhoto not yet implemented in DrizzleStorage');
 		const result = await db
 			.select()
 			.from(photos)
@@ -253,7 +247,6 @@ export class DrizzleStorage implements IStorage {
 		return result[0];
 	}
 	async createPhoto(photoData: InsertPhoto): Promise<Photo> {
-		console.warn('createPhoto not yet implemented in DrizzleStorage');
 		const photosInDb = await db
 			.select({ count: sql<number>`count(*)` })
 			.from(photos);
@@ -269,8 +262,6 @@ export class DrizzleStorage implements IStorage {
 		id: number,
 		photoUpdate: Partial<InsertPhoto>,
 	): Promise<Photo | undefined> {
-		console.warn('updatePhoto with Supabase storage considerations');
-
 		// If imageUrl or thumbnailUrl is being updated, delete the old file(s) from Supabase
 		if (photoUpdate.imageUrl || photoUpdate.thumbnailUrl) {
 			const currentPhoto = await this.getPhoto(id);
@@ -329,8 +320,6 @@ export class DrizzleStorage implements IStorage {
 		return result[0];
 	}
 	async deletePhoto(id: number): Promise<boolean> {
-		console.warn('deletePhoto with Supabase storage considerations');
-
 		// First, get the photo details to find the image URLs
 		const photoToDelete = await this.getPhoto(id);
 		if (!photoToDelete) {
@@ -378,7 +367,6 @@ export class DrizzleStorage implements IStorage {
 	async updatePhotoOrder(
 		photoOrders: { id: number; displayOrder: number }[],
 	): Promise<boolean> {
-		console.warn('updatePhotoOrder not yet implemented in DrizzleStorage');
 		try {
 			for (const order of photoOrders) {
 				await db
@@ -396,9 +384,6 @@ export class DrizzleStorage implements IStorage {
 		photoOrders: { id: number; displayOrder: number }[],
 		categoryId: number,
 	): Promise<boolean> {
-		console.warn(
-			'updatePhotoCategoryOrder not yet implemented in DrizzleStorage',
-		);
 		try {
 			for (const order of photoOrders) {
 				await db
@@ -421,18 +406,14 @@ export class DrizzleStorage implements IStorage {
 		}
 	}
 
-	// Contact operations - TO BE IMPLEMENTED
+	// Contact operations
 	async getContactMessages(): Promise<ContactMessage[]> {
-		console.warn(
-			'getContactMessages not yet implemented in DrizzleStorage',
-		);
 		return db
 			.select()
 			.from(contactMessages)
 			.orderBy(desc(contactMessages.createdAt));
 	}
 	async getContactMessage(id: number): Promise<ContactMessage | undefined> {
-		console.warn('getContactMessage not yet implemented in DrizzleStorage');
 		const result = await db
 			.select()
 			.from(contactMessages)
@@ -452,9 +433,6 @@ export class DrizzleStorage implements IStorage {
 	async markContactMessageAsRead(
 		id: number,
 	): Promise<ContactMessage | undefined> {
-		console.warn(
-			'markContactMessageAsRead not yet implemented in DrizzleStorage',
-		);
 		const result = await db
 			.update(contactMessages)
 			.set({ read: true })
@@ -463,9 +441,6 @@ export class DrizzleStorage implements IStorage {
 		return result[0];
 	}
 	async deleteContactMessage(id: number): Promise<boolean> {
-		console.warn(
-			'deleteContactMessage not yet implemented in DrizzleStorage',
-		);
 		const result = await db
 			.delete(contactMessages)
 			.where(eq(contactMessages.id, id))
@@ -473,15 +448,11 @@ export class DrizzleStorage implements IStorage {
 		return result.length > 0;
 	}
 
-	// Testimonial operations - TO BE IMPLEMENTED
+	// Testimonial operations
 	async getTestimonials(): Promise<Testimonial[]> {
-		console.warn('getTestimonials not yet implemented in DrizzleStorage');
 		return db.select().from(testimonials).orderBy(asc(testimonials.name));
 	}
 	async getActiveTestimonials(): Promise<Testimonial[]> {
-		console.warn(
-			'getActiveTestimonials not yet implemented in DrizzleStorage',
-		);
 		return db
 			.select()
 			.from(testimonials)
@@ -489,7 +460,6 @@ export class DrizzleStorage implements IStorage {
 			.orderBy(asc(testimonials.name));
 	}
 	async getTestimonial(id: number): Promise<Testimonial | undefined> {
-		console.warn('getTestimonial not yet implemented in DrizzleStorage');
 		const result = await db
 			.select()
 			.from(testimonials)
@@ -500,7 +470,6 @@ export class DrizzleStorage implements IStorage {
 	async createTestimonial(
 		testimonialData: InsertTestimonial,
 	): Promise<Testimonial> {
-		console.warn('createTestimonial not yet implemented in DrizzleStorage');
 		const result = await db
 			.insert(testimonials)
 			.values(testimonialData)
@@ -511,7 +480,6 @@ export class DrizzleStorage implements IStorage {
 		id: number,
 		testimonialUpdate: Partial<InsertTestimonial>,
 	): Promise<Testimonial | undefined> {
-		console.warn('updateTestimonial not yet implemented in DrizzleStorage');
 		const result = await db
 			.update(testimonials)
 			.set(testimonialUpdate)
@@ -520,7 +488,6 @@ export class DrizzleStorage implements IStorage {
 		return result[0];
 	}
 	async deleteTestimonial(id: number): Promise<boolean> {
-		console.warn('deleteTestimonial not yet implemented in DrizzleStorage');
 		const result = await db
 			.delete(testimonials)
 			.where(eq(testimonials.id, id))
