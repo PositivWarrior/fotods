@@ -145,7 +145,3 @@ app.use((req, _res, next) => {
 		},
 	);
 })();
-
-// Get the API base URL from environment or default to Railway backend
-const API_BASE_URL =
-	import.meta.env.VITE_API_URL || 'https://fotods-production.up.railway.app';
