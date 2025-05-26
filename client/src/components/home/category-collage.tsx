@@ -16,7 +16,7 @@ export function CategoryCollage() {
 	});
 
 	// Specifically use only the main categories in this order: Bolig, Næring, Livsstil
-	const mainCategoryNames = ['Bolig', 'Næring', 'Livsstil'];
+	const mainCategoryNames = ['Bolig', 'Kveldsbilder', 'Drone'];
 	const mainCategories = categories
 		? (mainCategoryNames
 				.map((name) => categories.find((cat) => cat.name === name))

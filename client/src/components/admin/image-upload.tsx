@@ -134,12 +134,28 @@ export function ImageUpload() {
 			});
 
 			if (!response.ok) {
-				const errorData = await response.json();
-				throw new Error(errorData.message || 'Upload failed');
+				const errorText = await response.text(); // Try to get text content for more info
+				throw new Error(
+					`Upload failed with status ${
+						response.status
+					}. Server response: ${errorText.substring(0, 200)}...`, // Limit length
+				);
 			}
 
 			// Get URLs from server response
-			const { imageUrl, thumbnailUrl } = await response.json();
+			const contentType = response.headers.get('content-type');
+			if (contentType && contentType.indexOf('application/json') === -1) {
+				const errorText = await response.text();
+				throw new Error(
+					`Expected JSON response but received ${contentType}. Server response: ${errorText.substring(
+						0,
+						200,
+					)}...`,
+				);
+			}
+
+			const jsonData = await response.json();
+			const { imageUrl, thumbnailUrl } = jsonData;
 
 			setUploading(false);
 			return {
@@ -233,9 +249,20 @@ export function ImageUpload() {
 
 			// If using file upload method, process the files first
 			if (uploadMethod === 'file') {
-				const { fullImageUrl, thumbUrl } = await uploadFiles();
-				finalImageUrl = fullImageUrl!;
-				finalThumbnailUrl = thumbUrl!;
+				const uploadResult = await uploadFiles();
+				// Ensure we have URLs from the upload
+				if (!uploadResult?.fullImageUrl) {
+					toast({
+						title: 'Upload Error',
+						description:
+							'Main image URL was not returned after upload.',
+						variant: 'destructive',
+					});
+					return;
+				}
+				finalImageUrl = uploadResult.fullImageUrl;
+				finalThumbnailUrl =
+					uploadResult.thumbUrl || uploadResult.fullImageUrl; // Use full image if thumb is missing
 			}
 
 			// Converting categoryId to number
@@ -244,16 +271,18 @@ export function ImageUpload() {
 				description,
 				imageUrl: finalImageUrl,
 				thumbnailUrl: finalThumbnailUrl,
-				categoryId: parseInt(categoryId),
+				categoryId: parseInt(categoryId, 10),
 				featured,
 			});
-		} catch (error) {
+		} catch (error: any) {
 			toast({
 				title: 'Upload error',
 				description:
 					error instanceof Error
 						? error.message
-						: 'Unknown error occurred',
+						: typeof error === 'string'
+						? error
+						: 'Unknown error occurred during file processing or photo creation.',
 				variant: 'destructive',
 			});
 		}

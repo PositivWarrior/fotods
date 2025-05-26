@@ -81,52 +81,25 @@ export function Header() {
 
 	// Organize navigation with dropdowns
 	let navigation: NavItemWithChildren[] = [
-		{ name: 'Hjem', href: '/' },
-		{ name: 'Portefølje', href: '/portfolio' },
-		{ name: 'Priser', href: '/priser' },
 		{
 			name: 'Bolig',
 			href: '/portfolio/category/housing',
-			children: [
-				{
-					name: 'Detaljer',
-					href: '/portfolio/category/housing-details',
-				},
-				{
-					name: 'Drone',
-					href: '/portfolio/category/housing-drone',
-				},
-				{
-					name: 'Kveldsbilder',
-					href: '/portfolio/category/housing-evening',
-				},
-			],
 		},
 		{
-			name: 'Næring',
-			href: '/portfolio/category/business',
-			children: [
-				{
-					name: 'Portretter',
-					href: '/portfolio/category/business-portraits',
-				},
-			],
+			name: 'Kveldsbilder',
+			href: '/portfolio/category/housing-evening',
 		},
 		{
-			name: 'Livsstil',
-			href: '/portfolio/category/lifestyle',
-			children: [
-				{
-					name: 'Portretter',
-					href: '/portfolio/category/lifestyle-portraits',
-				},
-				{
-					name: 'Bryllup',
-					href: '/portfolio/category/lifestyle-weddings',
-				},
-			],
+			name: 'Drone',
+			href: '/portfolio/category/housing-drone',
+		},
+		{ name: 'Video', href: '/portfolio/category/video' },
+		{
+			name: 'Portretter',
+			href: '/portfolio/category/business-portraits',
 		},
 		{ name: 'Om Meg', href: '/about' },
+		{ name: 'Priser', href: '/priser' },
 		{ name: 'Kontakt', href: '/contact' },
 	];
 
@@ -143,6 +116,7 @@ export function Header() {
 					{ name: 'Categories', href: '/admin/categories' },
 					{ name: 'Testimonials', href: '/admin/testimonials' },
 					{ name: 'Messages', href: '/admin/messages' },
+					{ name: 'Logg Ut', href: '#admin-logout' },
 				],
 			},
 		];
@@ -231,20 +205,36 @@ export function Header() {
 												>
 													Alle {item.name}
 												</Link>
-												{item.children?.map((child) => (
-													<Link
-														key={child.name}
-														href={child.href}
-														className="block px-4 py-2 text-secondary hover:text-primary hover:bg-gray-50"
-														onClick={() =>
-															setActiveDropdown(
-																null,
-															)
-														}
-													>
-														{child.name}
-													</Link>
-												))}
+												{item.children?.map((child) =>
+													child.href ===
+													'#admin-logout' ? (
+														<button
+															key={child.name}
+															className="block w-full text-left px-4 py-2 text-secondary hover:text-primary hover:bg-gray-50"
+															onClick={() => {
+																logoutMutation.mutate();
+																setActiveDropdown(
+																	null,
+																);
+															}}
+														>
+															{child.name}
+														</button>
+													) : (
+														<Link
+															key={child.name}
+															href={child.href}
+															className="block px-4 py-2 text-secondary hover:text-primary hover:bg-gray-50"
+															onClick={() =>
+																setActiveDropdown(
+																	null,
+																)
+															}
+														>
+															{child.name}
+														</Link>
+													),
+												)}
 											</div>
 										)}
 									</div>
@@ -263,21 +253,24 @@ export function Header() {
 							</div>
 						))}
 
-						{user ? (
-							<Button
-								variant="ghost"
-								className="text-secondary hover:text-primary hover:bg-transparent p-0"
-								onClick={() => logoutMutation.mutate()}
-							>
-								Logg Ut
-							</Button>
-						) : (
+						{!user ? (
 							<Link
 								href="/auth"
 								className="text-secondary hover:text-primary transition-colors duration-300"
 							>
 								Logg Inn
 							</Link>
+						) : (
+							user &&
+							!user.isAdmin && (
+								<Button
+									variant="ghost"
+									className="text-secondary hover:text-primary hover:bg-transparent p-0"
+									onClick={() => logoutMutation.mutate()}
+								>
+									Logg Ut
+								</Button>
+							)
 						)}
 					</div>
 
@@ -285,9 +278,12 @@ export function Header() {
 					<div className="hidden md:flex lg:hidden items-center space-x-6">
 						{navigation
 							.filter((item) =>
-								['Portefølje', 'Kontakt', 'Om Meg'].includes(
-									item.name,
-								),
+								[
+									'Bolig',
+									'Kveldsbilder',
+									'Drone',
+									'Kontakt',
+								].includes(item.name),
 							)
 							.map((item) => (
 								<div
@@ -373,21 +369,24 @@ export function Header() {
 									)}
 								</div>
 							))}
-						{user ? (
-							<Button
-								variant="ghost"
-								className="text-secondary hover:text-primary hover:bg-transparent p-0"
-								onClick={() => logoutMutation.mutate()}
-							>
-								Logg Ut
-							</Button>
-						) : (
+						{!user ? (
 							<Link
 								href="/auth"
 								className="text-secondary hover:text-primary transition-colors duration-300"
 							>
 								Logg Inn
 							</Link>
+						) : (
+							user &&
+							!user.isAdmin && (
+								<Button
+									variant="ghost"
+									className="text-secondary hover:text-primary hover:bg-transparent p-0"
+									onClick={() => logoutMutation.mutate()}
+								>
+									Logg Ut
+								</Button>
+							)
 						)}
 					</div>
 
@@ -433,20 +432,7 @@ export function Header() {
 							</div>
 						))}
 
-						{user ? (
-							<div className="text-center">
-								<Button
-									variant="ghost"
-									className="text-secondary hover:text-primary hover:bg-transparent p-0"
-									onClick={() => {
-										logoutMutation.mutate();
-										setIsMobileMenuOpen(false);
-									}}
-								>
-									Logg Ut
-								</Button>
-							</div>
-						) : (
+						{!user ? (
 							<div className="text-center">
 								<Link
 									href="/auth"
@@ -459,6 +445,22 @@ export function Header() {
 									Logg Inn
 								</Link>
 							</div>
+						) : (
+							user &&
+							!user.isAdmin && (
+								<div className="text-center">
+									<Button
+										variant="ghost"
+										className="text-secondary hover:text-primary hover:bg-transparent p-0"
+										onClick={() => {
+											logoutMutation.mutate();
+											setIsMobileMenuOpen(false);
+										}}
+									>
+										Logg Ut
+									</Button>
+								</div>
+							)
 						)}
 					</div>
 				)}
