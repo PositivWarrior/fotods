@@ -1,6 +1,52 @@
-RewriteEngine On
-RewriteCond %{HTTPS} off
-RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# Enable the rewrite engine
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # --- Test Rule (Uncomment to test if mod_rewrite is working) ---
+    # If you uncomment the next line, accessing https://fotods.no/test-rewrite.html 
+    # should redirect you to Google. Remove or re-comment after testing.
+    # RewriteRule ^test-rewrite\.html$ https://www.google.com [R=301,L]
+    # --- End Test Rule ---
+
+    # Force HTTPS
+    RewriteCond %{HTTPS} off
+    RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+    # Standard SPA front controller (if your frontend is Vite/React & uses client-side routing)
+    # This rule ensures that direct loads of sub-paths still serve your index.html
+    # Adjust if your main HTML file is named differently or in a different location.
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} !^/api/
+    RewriteRule . /index.html [L]
+
+    # --- API Proxy Section --- 
+    # Requires mod_proxy and mod_proxy_http. mod_ssl is needed for SSLProxyEngine.
+    <IfModule mod_proxy.c>
+        <IfModule mod_proxy_http.c>
+            # Proxy API requests to Railway backend
+            RewriteRule ^api/(.*)$ https://fotods-production.up.railway.app/api/$1 [P,L,E=PROXY_REQUEST:true]
+
+            # Enable SSL for the proxy's outgoing connection if the target is HTTPS
+            <IfModule mod_ssl.c>
+                SSLProxyEngine On
+            </IfModule>
+
+            # Set headers to inform the backend about the original request details
+            <IfModule mod_headers.c>
+                RequestHeader set X-Forwarded-Proto "https" env=PROXY_REQUEST
+                RequestHeader set X-Forwarded-Host "%{HTTP_HOST}" env=PROXY_REQUEST
+                # If your backend needs the true client IP, you might add:
+                # RequestHeader set X-Forwarded-For "%{REMOTE_ADDR}" env=PROXY_REQUEST
+            </IfModule>
+        </IfModule>
+    </IfModule>
+</IfModule>
+
+# Fallback if mod_rewrite is not available (optional, consider removing if causing issues)
+<IfModule !mod_rewrite.c>
+    ErrorDocument 404 "mod_rewrite is not enabled. Contact hosting support."
+</IfModule>
 
 # Standard WordPress anular rules (if your frontend is not WordPress, these might not be needed or different)
 # BEGIN WordPress
@@ -8,16 +54,4 @@ RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 # RewriteCond %{REQUEST_FILENAME} !-f
 # RewriteCond %{REQUEST_FILENAME} !-d
 # RewriteRule . /index.html [L]
-# END WordPress
-
-# Proxy API requests to Railway backend
-RewriteRule ^api/(.*)$ https://fotods-production.up.railway.app/api/$1 [P,L,E=PROXY_REQUEST:true]
-
-# It's good practice to enable SSLProxyEngine for HTTPS proxying
-SSLProxyEngine On
-
-# Optional: Set headers to be forwarded to the backend to ensure it knows the original host and scheme
-<IfModule mod_headers.c>
-    RequestHeader set X-Forwarded-Proto "https"
-    RequestHeader set X-Forwarded-Host "%{HTTP_HOST}s" env=PROXY_REQUEST
-</IfModule> 
+# END WordPress 
