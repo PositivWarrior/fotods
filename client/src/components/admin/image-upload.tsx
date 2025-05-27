@@ -27,14 +27,14 @@ import { Loader2, UploadCloud, Link as LinkIcon, Image } from 'lucide-react';
 
 // Upload function that uses backend endpoint
 async function uploadFileViaBackend(form: FormData) {
-	const res = await fetch(
-		`${import.meta.env.VITE_API_URL || ''}/api/upload`,
-		{
-			method: 'POST',
-			credentials: 'include', // Include cookies for authorization
-			body: form,
-		},
-	);
+	// Always use Railway backend URL directly
+	const railwayUrl = 'https://fotods-production.up.railway.app';
+
+	const res = await fetch(`${railwayUrl}/api/upload`, {
+		method: 'POST',
+		credentials: 'include', // Include cookies for authorization
+		body: form,
+	});
 	if (!res.ok) {
 		const err = await res.json();
 		throw new Error(err.message || 'Upload failed');

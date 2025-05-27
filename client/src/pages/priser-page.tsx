@@ -3,79 +3,122 @@ import { Helmet } from 'react-helmet';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { motion } from 'framer-motion';
-import { CheckCircle, Camera, Users, Gift, Sun, Info } from 'lucide-react';
+import {
+	CheckCircle,
+	Camera,
+	Users,
+	Gift,
+	Sun,
+	Info,
+	Home,
+	Plane,
+	Video,
+	Settings,
+} from 'lucide-react';
 import { Link } from 'wouter';
 
 const pricingPackages = [
 	{
-		category: 'Bryllup',
-		name: 'Pakke 1',
-		price: '10 000 NOK',
+		category: 'Eiendomsfotografering',
+		name: 'Liten pakke',
+		price: '4000 NOK',
 		features: [
-			'Planleggingsmøte',
-			'Vielsen og portrett sammen med forlovere',
-			'Galleri med redigerte bilder i høy oppløsning (digitalt)',
+			'15-20 bilder',
+			'Høy oppløsning (digitalt)',
+			'Profesjonell redigering',
 		],
-		icon: Gift,
+		icon: Home,
 	},
 	{
-		category: 'Bryllup',
-		name: 'Pakke 2',
-		price: '15 000 NOK',
+		category: 'Eiendomsfotografering',
+		name: 'Mellom pakke',
+		price: '6000 NOK',
 		features: [
-			'Planleggingsmøte',
-			'Pyntebilder (forberedelse)',
-			'Vielsen og portrett',
-			'Halvdagsfotografering (ca. 5 timer)',
-			'Galleri med redigerte bilder i høy oppløsning (digitalt)',
+			'20-30 bilder',
+			'Plus 2 matskifte foto',
+			'Høy oppløsning (digitalt)',
+			'Profesjonell redigering',
 		],
-		icon: Gift,
+		icon: Home,
 	},
 	{
-		category: 'Bryllup',
-		name: 'Pakke 3',
-		price: '20 000 NOK',
+		category: 'Eiendomsfotografering',
+		name: 'Stor pakke',
+		price: '8000 NOK',
 		features: [
-			'Planleggingsmøte',
-			'Pyntebilder, vielsen, portrett',
-			'Fest, første dans, taler',
-			'Heldagsfotografering (ca. 10 timer)',
-			'Galleri med redigerte bilder i høy oppløsning (digitalt)',
+			'30-40 bilder',
+			'Plus 2 matmoto',
+			'Høy oppløsning (digitalt)',
+			'Profesjonell redigering',
 		],
-		icon: Gift,
+		icon: Home,
 	},
 	{
-		category: 'Portrettfotografering',
-		name: 'Portrett',
-		price: '2 500 NOK',
+		category: 'Eiendomsfotografering',
+		name: 'Premium',
+		price: '10000 NOK',
 		features: [
-			'45 minutter fotografering (utendørs/hjemmestudio)',
-			'5 portrettbilder (digitalt)',
-			'Mulighet for kjøp av ekstra bilder (200 NOK/stk)',
+			'45-60 bilder',
+			'Plus 2 matskifte foto',
+			'Plus 5 drone bilder',
+			'Høy oppløsning (digitalt)',
+			'Profesjonell redigering',
 		],
-		icon: Camera,
+		icon: Home,
+		popular: true,
 	},
 	{
-		category: 'Portrettfotografering',
-		name: 'Familie',
-		price: '2 500 NOK',
+		category: 'Tilleggstjenester',
+		name: 'Planlegging 2.0',
+		price: '500 NOK',
 		features: [
-			'45 minutter fotografering (utendørs/hjemmestudio)',
-			'5 familiebilder (digitalt)',
-			'Mulighet for kjøp av ekstra bilder (200 NOK/stk)',
+			'Planlegging av fotografering',
+			'Konsultasjon og veiledning',
 		],
-		icon: Users,
+		icon: Settings,
 	},
 	{
-		category: 'Portrettfotografering',
-		name: 'Gravid',
-		price: '2 500 NOK',
+		category: 'Tilleggstjenester',
+		name: 'Planlegging 3D',
+		price: '1000 NOK',
 		features: [
-			'45 minutter fotografering (utendørs/hjemmestudio)',
-			'5 gravidbilder (digitalt)',
-			'Mulighet for kjøp av ekstra bilder (200 NOK/stk)',
+			'3D planlegging av fotografering',
+			'Avansert konsultasjon',
+			'Detaljert gjennomgang',
 		],
-		icon: Camera, // Could use a specific icon for pregnancy if available
+		icon: Settings,
+	},
+];
+
+const extraServices = [
+	{
+		name: 'Kviteis bilder',
+		items: [
+			{ description: 'Sommerhaksted', price: '4500 NOK' },
+			{ description: 'Vinterhaksted', price: '3000 NOK' },
+		],
+	},
+	{
+		name: 'Drone Bilder',
+		items: [{ description: '5 bilder', price: '3000 NOK' }],
+	},
+	{
+		name: 'Video tjenester',
+		items: [
+			{
+				description: '30 sekunders video presentasjon av bolig',
+				price: '2500 NOK',
+			},
+			{
+				description:
+					'30 sekunders video presentasjon av bolig med drone video inkludert',
+				price: '4000 NOK',
+			},
+		],
+	},
+	{
+		name: 'Andre tjenester',
+		items: [{ description: 'Nettsal renting', price: '300 NOK' }],
 	},
 ];
 
@@ -128,9 +171,9 @@ export default function PriserPage() {
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ duration: 0.6, delay: 0.4 }}
 						>
-							Velg en pakke som passer til dine behov. Jeg tilbyr
-							fleksible løsninger for å fange dine spesielle
-							øyeblikk.
+							Profesjonell eiendomsfotografering med fleksible
+							pakker tilpasset dine behov. Alle priser inkluderer
+							mva.
 						</motion.p>
 					</div>
 				</motion.section>
@@ -138,18 +181,26 @@ export default function PriserPage() {
 				{/* Pricing Packages Section */}
 				<section className="py-16 lg:py-24 bg-background">
 					<div className="container mx-auto px-6">
-						{/* Bryllup Packages */}
+						{/* Eiendomsfotografering Packages */}
 						<div className="mb-16">
 							<h2 className="text-3xl font-poppins font-semibold text-center mb-12 text-primary">
-								Bryllupsfotografering
+								Eiendomsfotografering
 							</h2>
-							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
+							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
 								{pricingPackages
-									.filter((pkg) => pkg.category === 'Bryllup')
+									.filter(
+										(pkg) =>
+											pkg.category ===
+											'Eiendomsfotografering',
+									)
 									.map((pkg, index) => (
 										<motion.div
 											key={index}
-											className="bg-white rounded-lg shadow-xl p-8 flex flex-col border border-border hover:shadow-2xl transition-shadow duration-300"
+											className={`bg-white rounded-lg shadow-xl p-6 flex flex-col border hover:shadow-2xl transition-shadow duration-300 ${
+												pkg.popular
+													? 'border-primary border-2 relative'
+													: 'border-border'
+											}`}
 											initial={{ opacity: 0, y: 50 }}
 											whileInView={{ opacity: 1, y: 0 }}
 											transition={{
@@ -158,22 +209,29 @@ export default function PriserPage() {
 											}}
 											viewport={{ once: true }}
 										>
+											{pkg.popular && (
+												<div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+													<span className="bg-primary text-white px-4 py-1 rounded-full text-sm font-semibold">
+														Populær
+													</span>
+												</div>
+											)}
 											<div className="flex-grow">
-												<pkg.icon className="w-12 h-12 text-primary mb-6 mx-auto" />
-												<h3 className="text-2xl font-poppins font-semibold text-center mb-3 text-primary">
+												<pkg.icon className="w-10 h-10 text-primary mb-4 mx-auto" />
+												<h3 className="text-xl font-poppins font-semibold text-center mb-2 text-primary">
 													{pkg.name}
 												</h3>
-												<p className="text-4xl font-poppins font-bold text-center text-secondary mb-6">
+												<p className="text-3xl font-poppins font-bold text-center text-secondary mb-4">
 													{pkg.price}
 												</p>
-												<ul className="space-y-3 mb-8 text-secondary">
+												<ul className="space-y-2 mb-6 text-secondary text-sm">
 													{pkg.features.map(
 														(feature, fIndex) => (
 															<li
 																key={fIndex}
 																className="flex items-start"
 															>
-																<CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
+																<CheckCircle className="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
 																<span>
 																	{feature}
 																</span>
@@ -184,7 +242,7 @@ export default function PriserPage() {
 											</div>
 											<Link
 												href="/contact"
-												className="block w-full mt-auto text-center bg-primary text-white font-semibold py-3 px-6 rounded-md hover:bg-primary/90 transition-colors duration-300"
+												className="block w-full mt-auto text-center bg-primary text-white font-semibold py-2 px-4 rounded-md hover:bg-primary/90 transition-colors duration-300 text-sm"
 											>
 												Kontakt for booking
 											</Link>
@@ -193,22 +251,22 @@ export default function PriserPage() {
 							</div>
 						</div>
 
-						{/* Portrettfotografering Packages */}
-						<div>
+						{/* Tilleggstjenester */}
+						<div className="mb-16">
 							<h2 className="text-3xl font-poppins font-semibold text-center mb-12 text-primary">
-								Portrett & Familie
+								Tilleggstjenester
 							</h2>
-							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
+							<div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
 								{pricingPackages
 									.filter(
 										(pkg) =>
 											pkg.category ===
-											'Portrettfotografering',
+											'Tilleggstjenester',
 									)
 									.map((pkg, index) => (
 										<motion.div
 											key={index}
-											className="bg-white rounded-lg shadow-xl p-8 flex flex-col border border-border hover:shadow-2xl transition-shadow duration-300"
+											className="bg-white rounded-lg shadow-xl p-6 flex flex-col border border-border hover:shadow-2xl transition-shadow duration-300"
 											initial={{ opacity: 0, y: 50 }}
 											whileInView={{ opacity: 1, y: 0 }}
 											transition={{
@@ -218,21 +276,21 @@ export default function PriserPage() {
 											viewport={{ once: true }}
 										>
 											<div className="flex-grow">
-												<pkg.icon className="w-12 h-12 text-primary mb-6 mx-auto" />
-												<h3 className="text-2xl font-poppins font-semibold text-center mb-3 text-primary">
+												<pkg.icon className="w-10 h-10 text-primary mb-4 mx-auto" />
+												<h3 className="text-xl font-poppins font-semibold text-center mb-2 text-primary">
 													{pkg.name}
 												</h3>
-												<p className="text-4xl font-poppins font-bold text-center text-secondary mb-6">
+												<p className="text-3xl font-poppins font-bold text-center text-secondary mb-4">
 													{pkg.price}
 												</p>
-												<ul className="space-y-3 mb-8 text-secondary">
+												<ul className="space-y-2 mb-6 text-secondary text-sm">
 													{pkg.features.map(
 														(feature, fIndex) => (
 															<li
 																key={fIndex}
 																className="flex items-start"
 															>
-																<CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
+																<CheckCircle className="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
 																<span>
 																	{feature}
 																</span>
@@ -243,12 +301,55 @@ export default function PriserPage() {
 											</div>
 											<Link
 												href="/contact"
-												className="block w-full mt-auto text-center bg-primary text-white font-semibold py-3 px-6 rounded-md hover:bg-primary/90 transition-colors duration-300"
+												className="block w-full mt-auto text-center bg-primary text-white font-semibold py-2 px-4 rounded-md hover:bg-primary/90 transition-colors duration-300 text-sm"
 											>
 												Kontakt for booking
 											</Link>
 										</motion.div>
 									))}
+							</div>
+						</div>
+
+						{/* Extra Services */}
+						<div>
+							<h2 className="text-3xl font-poppins font-semibold text-center mb-12 text-primary">
+								Ekstra Tjenester
+							</h2>
+							<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+								{extraServices.map((service, index) => (
+									<motion.div
+										key={index}
+										className="bg-white rounded-lg shadow-lg p-6 border border-border"
+										initial={{ opacity: 0, y: 30 }}
+										whileInView={{ opacity: 1, y: 0 }}
+										transition={{
+											duration: 0.5,
+											delay: index * 0.1,
+										}}
+										viewport={{ once: true }}
+									>
+										<h3 className="text-xl font-poppins font-semibold mb-4 text-primary">
+											{service.name}
+										</h3>
+										<div className="space-y-3">
+											{service.items.map(
+												(item, itemIndex) => (
+													<div
+														key={itemIndex}
+														className="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0"
+													>
+														<span className="text-secondary">
+															{item.description}
+														</span>
+														<span className="font-semibold text-primary">
+															{item.price}
+														</span>
+													</div>
+												),
+											)}
+										</div>
+									</motion.div>
+								))}
 							</div>
 						</div>
 					</div>
@@ -265,20 +366,19 @@ export default function PriserPage() {
 							viewport={{ once: true }}
 						>
 							<div className="flex items-center text-primary mb-4">
-								<Sun className="w-8 h-8 mr-3" />
+								<Home className="w-8 h-8 mr-3" />
 								<h3 className="text-2xl font-poppins font-semibold">
-									Min Fotograferingsfilosofi
+									Eiendomsfotografering
 								</h3>
 							</div>
 							<p className="text-secondary leading-relaxed">
-								"Bildene forteller en historie - av alle unike
-								små og store øyeblikkene. Lys er noe, som
-								påvirker stemningen på bildene mest. Jo lavere
-								sola er, desto finere og mykere fargene blir.
-								Derfor unngår jeg fotografering midt på dagen.
-								Jeg pleier å bli bedre kjent både med dere og
-								området for å velge beste omgivelsene til deres
-								ønsker og behov."
+								"Profesjonell eiendomsfotografering som
+								fremhever eiendommens beste egenskaper. Jeg
+								fokuserer på optimal lysbruk og komposisjon for
+								å skape innbydende bilder som fanger kjøpernes
+								oppmerksomhet. Hver eiendom fotograferes med
+								omhu for å vise frem rommenes potensial og
+								atmosfære."
 							</p>
 						</motion.div>
 
@@ -292,20 +392,51 @@ export default function PriserPage() {
 							<div className="flex items-center text-primary mb-4">
 								<Info className="w-8 h-8 mr-3" />
 								<h3 className="text-2xl font-poppins font-semibold">
+									Transportkostnader
+								</h3>
+							</div>
+							<p className="text-secondary leading-relaxed mb-4">
+								Fotografering fastnes kjøring med 5 kr per
+								kilometer fra retur til Fredrikstad.
+							</p>
+							<p className="text-secondary leading-relaxed text-sm">
+								Alle omkostninger og parkering kommer i tillegg
+								eller kortteng.
+							</p>
+						</motion.div>
+
+						<motion.div
+							className="bg-white p-8 rounded-lg shadow-lg border border-border"
+							initial={{ opacity: 0, x: -50 }}
+							whileInView={{ opacity: 1, x: 0 }}
+							transition={{ duration: 0.6, delay: 0.2 }}
+							viewport={{ once: true }}
+						>
+							<div className="flex items-center text-primary mb-4">
+								<Info className="w-8 h-8 mr-3" />
+								<h3 className="text-2xl font-poppins font-semibold">
 									Viktig Informasjon
 								</h3>
 							</div>
-							<p className="text-secondary leading-relaxed">
-								"Ventetid for redigerte bilder er opptil 3 uker.
-								Jeg får 8 NOK per kilometer hvis fotografering
-								er utendørs eller i et spesielt bestemt sted.
-								Jeg reserverer retten til å bruke bildene som en
-								del av min markedsføring. Jeg tar 50%
-								forskuddsbetaling som ikke blir returnert om
-								kunden ombestemmer seg. Det er mulig å kjøpe mer
-								enn 5 bilder fra basis tilbud - 200 NOK per
-								hvert ekstra bilde."
-							</p>
+							<div className="text-secondary leading-relaxed space-y-2 text-sm">
+								<p>• Alle priser inkluderer mva</p>
+								<p>
+									• Fotografering fastnes kjøring med 5 kr per
+									kilometer fra retur til Fredrikstad
+								</p>
+								<p>
+									• Alle omkostninger og parkering kommer i
+									tillegg
+								</p>
+								<p>
+									• Ventetid for redigerte bilder er opptil 3
+									uker
+								</p>
+								<p>
+									• 50% forskuddsbetaling som ikke blir
+									returnert om kunden ombestemmer seg
+								</p>
+							</div>
 						</motion.div>
 					</div>
 				</section>
