@@ -5,6 +5,17 @@ import * as schema from '../shared/schema'; // Adjust path if your schema is els
 
 // dotenv.config(); // Assuming .env is loaded at application startup
 
+// Debug: Check what environment variables are available when db.ts is loaded
+console.log('[DEBUG db.ts] Environment variables when db.ts is loaded:');
+console.log(
+	'[DEBUG db.ts] DATABASE_URL:',
+	process.env.DATABASE_URL ? 'SET' : 'NOT SET',
+);
+console.log(
+	'[DEBUG db.ts] SUPABASE_URL:',
+	process.env.SUPABASE_URL ? 'SET' : 'NOT SET',
+);
+
 const databaseUrl = process.env.DATABASE_URL;
 
 if (!databaseUrl) {

@@ -1,12 +1,30 @@
 import dotenv from 'dotenv';
-dotenv.config(); // Load environment variables
+import path from 'path';
+import { fileURLToPath } from 'url';
 
+// Environment variables are now loaded by dotenv-cli before this script runs
+// So we can remove the manual dotenv.config() call
+
+// Debug: Check if environment variables are loaded
+console.log('[DEBUG index.ts] Environment variables at startup:');
+console.log(
+	'[DEBUG index.ts] SUPABASE_URL:',
+	process.env.SUPABASE_URL ? 'SET' : 'NOT SET',
+);
+console.log(
+	'[DEBUG index.ts] SUPABASE_SERVICE_ROLE_KEY:',
+	process.env.SUPABASE_SERVICE_ROLE_KEY ? 'SET' : 'NOT SET',
+);
+console.log(
+	'[DEBUG index.ts] DATABASE_URL:',
+	process.env.DATABASE_URL ? 'SET' : 'NOT SET',
+);
+
+// Now import everything else
 import express, { type Request, Response, NextFunction } from 'express';
 import cors from 'cors'; // Import the cors package
 import { registerRoutes } from './routes';
-import path from 'path';
 import { createServer } from 'http';
-import { fileURLToPath } from 'url';
 import fs from 'fs';
 import multer from 'multer';
 
@@ -20,7 +38,11 @@ app.get('/health', (_req, res) => {
 // CORS configuration using the cors package
 const allowedOrigins = [
 	'http://localhost:5173', // Vite dev server
-	'http://localhost:5000', // For any direct access if needed, though Vite proxy is preferred
+	'http://localhost:5174', // Vite dev server (backup port)
+	'http://localhost:5175', // Vite dev server (backup port)
+	'http://localhost:5176', // Vite dev server (backup port)
+	'http://localhost:5177', // Vite dev server (backup port)
+	'http://localhost:3001', // Backend server port for fotods
 	'https://fotods.no', // Your production domain
 	'https://www.fotods.no', // Your production domain with www
 	'https://fotods-production.up.railway.app', // Your Railway production domain
@@ -133,7 +155,7 @@ app.use((req, _res, next) => {
 		// Removed throw err; as it might terminate the process. Logging is usually sufficient.
 	});
 
-	const port = process.env.PORT || 5000;
+	const port = process.env.PORT || 3001;
 	server.listen(
 		{
 			port: Number(port),

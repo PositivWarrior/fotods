@@ -67,7 +67,7 @@ export function setupAuth(app: Express) {
 			maxAge: 24 * 60 * 60 * 1000, // 24 hours
 			secure: process.env.NODE_ENV === 'production',
 			httpOnly: true,
-			sameSite: 'none', // Changed to 'none' for cross-site requests. Requires secure: true.
+			sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // Use 'lax' in development, 'none' in production
 		},
 	};
 

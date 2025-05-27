@@ -1,8 +1,9 @@
 import { QueryClient, QueryFunction } from '@tanstack/react-query';
 
-// Get the API base URL from environment or default to Railway backend
+// Get the API base URL from environment or use proxy in dev mode
 const API_BASE_URL =
-	import.meta.env.VITE_API_URL || 'https://fotods-production.up.railway.app';
+	import.meta.env.VITE_API_URL ||
+	(import.meta.env.DEV ? '' : 'https://fotods-production.up.railway.app');
 
 async function throwIfResNotOk(res: Response) {
 	if (!res.ok) {

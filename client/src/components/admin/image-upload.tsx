@@ -33,8 +33,8 @@ export function ImageUpload() {
 	const [uploadMethod, setUploadMethod] = useState<'url' | 'file'>('file');
 	const [title, setTitle] = useState('');
 	const [description, setDescription] = useState('');
-	const [imageUrl, setImageUrl] = useState('');
-	const [thumbnailUrl, setThumbnailUrl] = useState('');
+	const [imageUrl, setImageUrl] = useState(''); // For URL input method
+	const [thumbnailUrl, setThumbnailUrl] = useState(''); // For URL input method
 	const [categoryId, setCategoryId] = useState<string>('');
 	const [featured, setFeatured] = useState(false);
 
@@ -47,7 +47,7 @@ export function ImageUpload() {
 	const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(
 		null,
 	);
-	const [uploading, setUploading] = useState(false);
+	const [uploading, setUploading] = useState(false); // For backend upload status
 
 	// Fetch categories for the dropdown
 	const { data: categories, isLoading: categoriesLoading } = useQuery<
@@ -60,9 +60,8 @@ export function ImageUpload() {
 	const handleMainImageChange = (e: ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files && e.target.files[0]) {
 			const file = e.target.files[0];
-
-			// Check file size (max 10MB)
 			if (file.size > 10 * 1024 * 1024) {
+				// Max 10MB
 				toast({
 					title: 'File too large',
 					description: 'Maximum file size is 10MB',
@@ -70,14 +69,9 @@ export function ImageUpload() {
 				});
 				return;
 			}
-
 			setMainImageFile(file);
-
-			// Create preview
 			const reader = new FileReader();
-			reader.onload = () => {
-				setMainImagePreview(reader.result as string);
-			};
+			reader.onload = () => setMainImagePreview(reader.result as string);
 			reader.readAsDataURL(file);
 		}
 	};
@@ -86,9 +80,8 @@ export function ImageUpload() {
 	const handleThumbnailChange = (e: ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files && e.target.files[0]) {
 			const file = e.target.files[0];
-
-			// Check file size (max 5MB for thumbnails)
 			if (file.size > 5 * 1024 * 1024) {
+				// Max 5MB for thumbnails
 				toast({
 					title: 'File too large',
 					description: 'Maximum thumbnail file size is 5MB',
@@ -96,92 +89,25 @@ export function ImageUpload() {
 				});
 				return;
 			}
-
 			setThumbnailFile(file);
-
-			// Create preview
 			const reader = new FileReader();
-			reader.onload = () => {
-				setThumbnailPreview(reader.result as string);
-			};
+			reader.onload = () => setThumbnailPreview(reader.result as string);
 			reader.readAsDataURL(file);
 		}
 	};
 
-	// Upload files to server using our file upload API
-	const uploadFiles = async () => {
-		setUploading(true);
-
-		try {
-			// Create form data for file upload
-			const formData = new FormData();
-
-			// Add main image file
-			if (mainImageFile) {
-				formData.append('mainImage', mainImageFile);
-			}
-
-			// Add thumbnail image file if available
-			if (thumbnailFile) {
-				formData.append('thumbnailImage', thumbnailFile);
-			}
-
-			// Send files to server
-			const response = await fetch('/api/upload', {
-				method: 'POST',
-				body: formData,
-				credentials: 'include', // Include cookies for auth
-			});
-
-			if (!response.ok) {
-				const errorText = await response.text(); // Try to get text content for more info
-				throw new Error(
-					`Upload failed with status ${
-						response.status
-					}. Server response: ${errorText.substring(0, 200)}...`, // Limit length
-				);
-			}
-
-			// Get URLs from server response
-			const contentType = response.headers.get('content-type');
-			if (contentType && contentType.indexOf('application/json') === -1) {
-				const errorText = await response.text();
-				throw new Error(
-					`Expected JSON response but received ${contentType}. Server response: ${errorText.substring(
-						0,
-						200,
-					)}...`,
-				);
-			}
-
-			const jsonData = await response.json();
-			const { imageUrl, thumbnailUrl } = jsonData;
-
-			setUploading(false);
-			return {
-				fullImageUrl: imageUrl,
-				thumbUrl: thumbnailUrl,
-			};
-		} catch (error) {
-			setUploading(false);
-			throw error;
-		}
-	};
-
-	// Create a new photo
-	const { mutate: createPhoto, isPending } = useMutation({
+	// Create a new photo (metadata goes to our backend)
+	const { mutate: createPhoto, isPending: isCreatingPhoto } = useMutation({
 		mutationFn: async (photoData: InsertPhoto) => {
 			const res = await apiRequest('POST', '/api/photos', photoData);
 			return res.json();
 		},
 		onSuccess: () => {
-			// Reset form and invalidate photos query
 			resetForm();
 			queryClient.invalidateQueries({ queryKey: ['/api/photos'] });
 			queryClient.invalidateQueries({
 				queryKey: ['/api/photos/featured'],
 			});
-
 			toast({
 				title: 'Success',
 				description: 'Photo has been added to the portfolio',
@@ -189,8 +115,8 @@ export function ImageUpload() {
 		},
 		onError: (error: Error) => {
 			toast({
-				title: 'Error',
-				description: `Failed to upload photo: ${error.message}`,
+				title: 'Error Adding Photo Metadata',
+				description: `Failed to save photo details: ${error.message}`,
 				variant: 'destructive',
 			});
 		},
@@ -207,93 +133,129 @@ export function ImageUpload() {
 		setThumbnailFile(null);
 		setMainImagePreview(null);
 		setThumbnailPreview(null);
-
-		// Reset file inputs
+		setUploading(false);
 		if (fileInputRef.current) fileInputRef.current.value = '';
 		if (thumbnailInputRef.current) thumbnailInputRef.current.value = '';
 	};
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-
-		// Basic validation
 		if (!title || !categoryId) {
-			return toast({
+			toast({
 				title: 'Missing information',
-				description: 'Please fill in all required fields',
+				description: 'Please fill in title and category',
 				variant: 'destructive',
 			});
+			return;
 		}
 
-		// URL method validation
-		if (uploadMethod === 'url' && (!imageUrl || !thumbnailUrl)) {
-			return toast({
-				title: 'Missing URLs',
-				description: 'Please provide both full size and thumbnail URLs',
-				variant: 'destructive',
-			});
-		}
+		let finalImageUrl = imageUrl; // Use URL input if provided
+		let finalThumbnailUrl = thumbnailUrl; // Use URL input if provided
 
-		// File method validation
-		if (uploadMethod === 'file' && !mainImageFile) {
-			return toast({
-				title: 'Missing image',
-				description: 'Please upload a full size image',
-				variant: 'destructive',
-			});
-		}
-
-		try {
-			let finalImageUrl = imageUrl;
-			let finalThumbnailUrl = thumbnailUrl;
-
-			// If using file upload method, process the files first
-			if (uploadMethod === 'file') {
-				const uploadResult = await uploadFiles();
-				// Ensure we have URLs from the upload
-				if (!uploadResult?.fullImageUrl) {
-					toast({
-						title: 'Upload Error',
-						description:
-							'Main image URL was not returned after upload.',
-						variant: 'destructive',
-					});
-					return;
-				}
-				finalImageUrl = uploadResult.fullImageUrl;
-				finalThumbnailUrl =
-					uploadResult.thumbUrl || uploadResult.fullImageUrl; // Use full image if thumb is missing
+		if (uploadMethod === 'file') {
+			if (!mainImageFile) {
+				toast({
+					title: 'Missing image file',
+					description: 'Please upload a full size image',
+					variant: 'destructive',
+				});
+				return;
 			}
 
-			// Converting categoryId to number
-			createPhoto({
-				title,
-				description,
-				imageUrl: finalImageUrl,
-				thumbnailUrl: finalThumbnailUrl,
-				categoryId: parseInt(categoryId, 10),
-				featured,
-			});
-		} catch (error: any) {
+			setUploading(true);
+			try {
+				// 1. Prepare FormData
+				const form = new FormData();
+				form.append('mainImage', mainImageFile);
+				if (thumbnailFile) {
+					form.append('thumbnailImage', thumbnailFile);
+				}
+
+				// 2. Send to your backend
+				const apiBaseUrl =
+					import.meta.env.VITE_API_URL ||
+					(import.meta.env.DEV
+						? ''
+						: 'https://fotods-production.up.railway.app');
+				const uploadRes = await fetch(`${apiBaseUrl}/api/upload`, {
+					method: 'POST',
+					credentials: 'include', // Include cookies for auth
+					body: form,
+				});
+
+				if (!uploadRes.ok) {
+					const err = await uploadRes.json();
+					throw new Error(err.message || 'Upload failed');
+				}
+
+				const {
+					imageUrl: uploadedImageUrl,
+					thumbnailUrl: uploadedThumbnailUrl,
+				} = await uploadRes.json();
+
+				// 3. Use the URLs returned from backend
+				finalImageUrl = uploadedImageUrl;
+				finalThumbnailUrl = uploadedThumbnailUrl;
+			} catch (error: any) {
+				toast({
+					title: 'File Upload Error',
+					description:
+						error.message ||
+						'An unknown error occurred during file upload.',
+					variant: 'destructive',
+				});
+				setUploading(false);
+				return;
+			}
+			setUploading(false);
+		} else {
+			// URL method
+			if (!imageUrl || !thumbnailUrl) {
+				toast({
+					title: 'Missing URLs',
+					description:
+						'Please provide both full size and thumbnail URLs for the URL method.',
+					variant: 'destructive',
+				});
+				return;
+			}
+			finalImageUrl = imageUrl;
+			finalThumbnailUrl = thumbnailUrl;
+		}
+
+		// Safety check for final URLs
+		if (!finalImageUrl || !finalThumbnailUrl) {
 			toast({
-				title: 'Upload error',
+				title: 'Image URLs missing',
 				description:
-					error instanceof Error
-						? error.message
-						: typeof error === 'string'
-						? error
-						: 'Unknown error occurred during file processing or photo creation.',
+					'Could not determine image URLs after processing. Please try again.',
 				variant: 'destructive',
 			});
+			return;
 		}
+
+		createPhoto({
+			title,
+			description,
+			imageUrl: finalImageUrl,
+			thumbnailUrl: finalThumbnailUrl,
+			categoryId: parseInt(categoryId, 10),
+			featured,
+		});
 	};
+
+	// State for URL input method
+	const [imageUrlFromUrlInput, setImageUrlFromUrlInput] = useState('');
+	const [thumbnailUrlFromUrlInput, setThumbnailUrlFromUrlInput] =
+		useState('');
 
 	return (
 		<Card className="my-6">
 			<CardHeader>
 				<CardTitle>Add New Photo</CardTitle>
 				<CardDescription>
-					Add new photos to your portfolio
+					Add new photos to your portfolio. Use file upload or provide
+					direct URLs.
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
@@ -323,7 +285,6 @@ export function ImageUpload() {
 									<Label htmlFor="mainImage">
 										Full Size Image *
 									</Label>
-
 									{mainImagePreview ? (
 										<div className="relative group">
 											<img
@@ -368,7 +329,6 @@ export function ImageUpload() {
 											</p>
 										</div>
 									)}
-
 									<Input
 										ref={fileInputRef}
 										id="mainImage"
@@ -376,7 +336,6 @@ export function ImageUpload() {
 										accept="image/png, image/jpeg, image/webp"
 										className="hidden"
 										onChange={handleMainImageChange}
-										required={uploadMethod === 'file'}
 									/>
 								</div>
 
@@ -387,7 +346,6 @@ export function ImageUpload() {
 											(Optional)
 										</span>
 									</Label>
-
 									{thumbnailPreview ? (
 										<div className="relative group">
 											<img
@@ -433,7 +391,6 @@ export function ImageUpload() {
 											</p>
 										</div>
 									)}
-
 									<Input
 										ref={thumbnailInputRef}
 										id="thumbnailImage"
@@ -449,36 +406,34 @@ export function ImageUpload() {
 
 					<TabsContent value="url">
 						<div className="space-y-4 mt-4">
-							<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-								<div className="space-y-2">
-									<Label htmlFor="imageUrl">
-										Full Size Image URL *
-									</Label>
-									<Input
-										id="imageUrl"
-										value={imageUrl}
-										onChange={(e) =>
-											setImageUrl(e.target.value)
-										}
-										placeholder="https://example.com/full-image.jpg"
-										required={uploadMethod === 'url'}
-									/>
-								</div>
+							<div className="space-y-2">
+								<Label htmlFor="imageUrlInput">
+									Full Size Image URL *
+								</Label>
+								<Input
+									id="imageUrlInput"
+									type="url"
+									value={imageUrl}
+									onChange={(e) =>
+										setImageUrl(e.target.value)
+									}
+									placeholder="https://example.com/image.jpg"
+								/>
+							</div>
 
-								<div className="space-y-2">
-									<Label htmlFor="thumbnailUrl">
-										Thumbnail Image URL *
-									</Label>
-									<Input
-										id="thumbnailUrl"
-										value={thumbnailUrl}
-										onChange={(e) =>
-											setThumbnailUrl(e.target.value)
-										}
-										placeholder="https://example.com/thumbnail.jpg"
-										required={uploadMethod === 'url'}
-									/>
-								</div>
+							<div className="space-y-2">
+								<Label htmlFor="thumbnailUrlInput">
+									Thumbnail Image URL *
+								</Label>
+								<Input
+									id="thumbnailUrlInput"
+									type="url"
+									value={thumbnailUrl}
+									onChange={(e) =>
+										setThumbnailUrl(e.target.value)
+									}
+									placeholder="https://example.com/thumbnail.jpg"
+								/>
 							</div>
 						</div>
 					</TabsContent>
@@ -551,14 +506,14 @@ export function ImageUpload() {
 
 					<Button
 						type="submit"
-						disabled={isPending || uploading}
+						disabled={isCreatingPhoto || uploading}
 						className="w-full"
 					>
-						{isPending || uploading ? (
+						{isCreatingPhoto || uploading ? (
 							<>
 								<Loader2 className="mr-2 h-4 w-4 animate-spin" />
 								{uploading
-									? 'Uploading files...'
+									? 'Uploading files to backend...'
 									: 'Saving photo...'}
 							</>
 						) : (

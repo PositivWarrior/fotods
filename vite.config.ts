@@ -35,7 +35,7 @@ export default defineConfig({
 		port: 5173, // Ensure Vite runs on a different port
 		proxy: {
 			'/api': {
-				target: 'http://localhost:5000', // Your backend server
+				target: 'http://localhost:3001', // Your backend server - corrected port
 				changeOrigin: true,
 				secure: false,
 			},

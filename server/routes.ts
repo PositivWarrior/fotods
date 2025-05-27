@@ -172,7 +172,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 	// File upload endpoint
 	app.post(
 		'/api/upload',
-		// isAdmin, // Temporarily commented out for testing
+		isAdmin, // Protect upload endpoint with admin authentication
 		upload.fields([
 			{ name: 'mainImage', maxCount: 1 },
 			{ name: 'thumbnailImage', maxCount: 1 },
