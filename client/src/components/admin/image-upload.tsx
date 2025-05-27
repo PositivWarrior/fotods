@@ -25,6 +25,23 @@ import { useToast } from '@/hooks/use-toast';
 import { Category, InsertPhoto } from '@shared/schema';
 import { Loader2, UploadCloud, Link as LinkIcon, Image } from 'lucide-react';
 
+// Upload function that uses backend endpoint
+async function uploadFileViaBackend(form: FormData) {
+	const res = await fetch(
+		`${import.meta.env.VITE_API_URL || ''}/api/upload`,
+		{
+			method: 'POST',
+			credentials: 'include', // Include cookies for authorization
+			body: form,
+		},
+	);
+	if (!res.ok) {
+		const err = await res.json();
+		throw new Error(err.message || 'Upload failed');
+	}
+	return res.json() as Promise<{ imageUrl: string; thumbnailUrl: string }>;
+}
+
 export function ImageUpload() {
 	const { toast } = useToast();
 	const fileInputRef = useRef<HTMLInputElement>(null);
@@ -164,36 +181,19 @@ export function ImageUpload() {
 
 			setUploading(true);
 			try {
-				// 1. Prepare FormData
+				// Prepare FormData for backend upload
 				const form = new FormData();
 				form.append('mainImage', mainImageFile);
 				if (thumbnailFile) {
 					form.append('thumbnailImage', thumbnailFile);
 				}
 
-				// 2. Send to your backend
-				const apiBaseUrl =
-					import.meta.env.VITE_API_URL ||
-					(import.meta.env.DEV
-						? ''
-						: 'https://fotods-production.up.railway.app');
-				const uploadRes = await fetch(`${apiBaseUrl}/api/upload`, {
-					method: 'POST',
-					credentials: 'include', // Include cookies for auth
-					body: form,
-				});
-
-				if (!uploadRes.ok) {
-					const err = await uploadRes.json();
-					throw new Error(err.message || 'Upload failed');
-				}
-
+				// Upload via backend
 				const {
 					imageUrl: uploadedImageUrl,
 					thumbnailUrl: uploadedThumbnailUrl,
-				} = await uploadRes.json();
+				} = await uploadFileViaBackend(form);
 
-				// 3. Use the URLs returned from backend
 				finalImageUrl = uploadedImageUrl;
 				finalThumbnailUrl = uploadedThumbnailUrl;
 			} catch (error: any) {

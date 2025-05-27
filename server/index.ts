@@ -43,8 +43,8 @@ const allowedOrigins = [
 	'http://localhost:5176', // Vite dev server (backup port)
 	'http://localhost:5177', // Vite dev server (backup port)
 	'http://localhost:3001', // Backend server port for fotods
-	'https://fotods.no', // Your production domain
-	'https://www.fotods.no', // Your production domain with www
+	'https://fotods.no', // Your Hostinger production domain
+	'https://www.fotods.no', // Your Hostinger production domain with www
 	'https://fotods-production.up.railway.app', // Your Railway production domain
 ];
 
