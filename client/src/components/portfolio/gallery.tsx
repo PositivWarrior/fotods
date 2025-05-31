@@ -7,309 +7,207 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
-import { ChevronDown } from 'lucide-react';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 
 interface GalleryProps {
 	category?: string;
 }
 
-// Number of images to load at once for infinite scroll
-const IMAGES_PER_PAGE = 6;
+const IMAGES_PER_PAGE = 9;
 
 export function Gallery({ category: categorySlugProp }: GalleryProps) {
-	const [activeFilter, setActiveFilter] = useState<string>('all');
 	const [lightboxOpen, setLightboxOpen] = useState(false);
 	const [currentImageIndex, setCurrentImageIndex] = useState(0);
 	const [visibleCount, setVisibleCount] = useState(IMAGES_PER_PAGE);
-	const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-	const dropdownRefs = useRef<Record<string, HTMLDivElement | null>>({});
+	const [activeLivsstilSubFilter, setActiveLivsstilSubFilter] = useState<
+		'all' | 'wedding' | 'portraits'
+	>('all');
 
-	// Ref for bottom loader element
 	const { ref: bottomRef, inView } = useInView();
 
-	// Fetch categories for filtering
-	const { data: categories } = useQuery<Category[]>({
-		queryKey: ['/api/categories'],
-	});
-
-	// Get main categories and subcategories
-	const mainCategories =
-		categories?.filter((cat) => !cat.parentCategory) || [];
-	const subcategories = categories?.filter((cat) => cat.parentCategory) || [];
-
-	// Fetch photos based on category or all photos
 	const queryKey = categorySlugProp
 		? [`/api/photos/category/${categorySlugProp}`]
 		: ['/api/photos'];
 
-	const { data: photos, isLoading } = useQuery<Photo[]>({
+	const {
+		data: photos,
+		isLoading,
+		error,
+	} = useQuery<Photo[]>({
 		queryKey,
 	});
 
-	// Close dropdown when clicking outside
-	useEffect(() => {
-		const handleClickOutside = (event: MouseEvent) => {
-			if (
-				activeDropdown &&
-				dropdownRefs.current[activeDropdown] &&
-				!dropdownRefs.current[activeDropdown]?.contains(
-					event.target as Node,
-				)
-			) {
-				setActiveDropdown(null);
-			}
-		};
+	// Fetch all categories for client-side lookup if photo.category is not populated by API
+	const { data: allCategories, isLoading: categoriesLoading } = useQuery<
+		Category[]
+	>({
+		queryKey: ['/api/categories'],
+		// Enabled: false, // Only enable if categorySlugProp === 'lifestyle' and photos are loaded?
+		// Consider fetching this conditionally or ensuring it's already cached by CategoryFilter
+	});
 
-		document.addEventListener('mousedown', handleClickOutside);
-		return () =>
-			document.removeEventListener('mousedown', handleClickOutside);
-	}, [activeDropdown]);
-
-	// Function to handle lightbox
 	const openLightbox = (index: number) => {
 		setCurrentImageIndex(index);
 		setLightboxOpen(true);
 	};
 
-	// Filter photos based on active category, but don't apply additional filtering if already filtered by URL
-	// Then sort by displayOrder for proper ordering
-	const filteredPhotos = (
-		categorySlugProp
-			? photos || []
-			: photos?.filter((photo) => {
-					if (activeFilter === 'all') return true;
-					return photo.categoryId === parseInt(activeFilter);
-			  }) || []
-	).sort((a, b) => {
-		// Sort by displayOrder if available, or fallback to id
-		if (a.displayOrder !== undefined && b.displayOrder !== undefined) {
+	const sortedPhotos = (photos || []).sort((a, b) => {
+		if (
+			a.displayOrder !== null &&
+			a.displayOrder !== undefined &&
+			b.displayOrder !== null &&
+			b.displayOrder !== undefined
+		) {
 			return a.displayOrder - b.displayOrder;
 		}
 		return a.id - b.id;
 	});
 
-	// Visible photos subset for infinite loading
-	const visiblePhotos = filteredPhotos.slice(0, visibleCount);
+	const subFilteredPhotos =
+		categorySlugProp === 'lifestyle' && allCategories
+			? sortedPhotos.filter((photo) => {
+					if (activeLivsstilSubFilter === 'all') return true;
 
-	// Reset visible count when filter changes
+					const photoCategory = allCategories.find(
+						(cat) => cat.id === photo.categoryId,
+					);
+
+					// Enhanced logging for debugging the Bryllup filter
+					if (activeLivsstilSubFilter === 'wedding') {
+						console.log(
+							`Photo ID: ${photo.id}, Photo CategoryID: ${
+								photo.categoryId
+							}, Found Category: ${JSON.stringify(
+								photoCategory,
+							)}, Expected Slug: 'lifestyle-wedding', Actual Slug: ${
+								photoCategory?.slug
+							}, Match: ${
+								photoCategory?.slug === 'lifestyle-wedding'
+							}`,
+						);
+					}
+
+					if (!photoCategory || !photoCategory.slug) return false;
+
+					if (activeLivsstilSubFilter === 'wedding') {
+						return photoCategory.slug === 'lifestyle-weddings';
+					}
+					if (activeLivsstilSubFilter === 'portraits') {
+						return photoCategory.slug === 'lifestyle-portraits';
+					}
+					return true;
+			  })
+			: sortedPhotos;
+
+	const visiblePhotos = subFilteredPhotos.slice(0, visibleCount);
+
 	useEffect(() => {
 		setVisibleCount(IMAGES_PER_PAGE);
-	}, [activeFilter, categorySlugProp]);
+		if (categorySlugProp !== 'lifestyle') {
+			setActiveLivsstilSubFilter('all');
+		}
+	}, [categorySlugProp]);
 
-	// Handle infinite scroll loading
 	useEffect(() => {
-		if (inView && visibleCount < filteredPhotos.length) {
-			// Add more photos when scrolled to bottom
+		setVisibleCount(IMAGES_PER_PAGE);
+	}, [categorySlugProp, activeLivsstilSubFilter]);
+
+	useEffect(() => {
+		if (inView && visibleCount < subFilteredPhotos.length) {
 			setTimeout(() => {
 				setVisibleCount((prev) =>
-					Math.min(prev + IMAGES_PER_PAGE, filteredPhotos.length),
+					Math.min(prev + IMAGES_PER_PAGE, subFilteredPhotos.length),
 				);
 			}, 300);
 		}
-	}, [inView, filteredPhotos.length, visibleCount]);
+	}, [inView, subFilteredPhotos.length, visibleCount]);
 
-	// Update active filter when category prop changes
-	useEffect(() => {
-		if (categorySlugProp && categories) {
-			const categoryObj = categories.find(
-				(cat) => cat.slug === categorySlugProp,
-			);
-			if (categoryObj) {
-				setActiveFilter(categoryObj.id.toString());
-			} else {
-				setActiveFilter('all');
-			}
-		} else {
-			setActiveFilter('all');
-		}
+	if (isLoading || (categorySlugProp === 'lifestyle' && categoriesLoading)) {
+		return <GallerySkeleton />;
+	}
 
-		// Also reset visible count when category or filter changes
-		setVisibleCount(IMAGES_PER_PAGE);
-	}, [categorySlugProp, categories]);
+	if (error) {
+		return (
+			<div className="text-center py-10">
+				<p className="text-red-500">Feil ved lasting av bilder.</p>
+			</div>
+		);
+	}
 
-	// Define navigation structure with dropdowns
-	const navigation = [
-		{
-			name: 'Alle',
-			href: '/portfolio',
-		},
-		{
-			name: 'Bolig',
-			href: '/portfolio/category/housing',
-			children: [
-				{
-					name: 'Detaljer',
-					href: '/portfolio/category/housing-details',
-				},
-				{
-					name: 'Drone',
-					href: '/portfolio/category/housing-drone',
-				},
-				{
-					name: 'Kveldsbilder',
-					href: '/portfolio/category/housing-evening',
-				},
-			],
-		},
-		{
-			name: 'Næring',
-			href: '/portfolio/category/business',
-			children: [
-				{
-					name: 'Portretter',
-					href: '/portfolio/category/business-portraits',
-				},
-			],
-		},
-		{
-			name: 'Livstil',
-			href: '/portfolio/category/lifestyle',
-			children: [
-				{
-					name: 'Portretter',
-					href: '/portfolio/category/lifestyle-portraits',
-				},
-				{
-					name: 'Bryllup',
-					href: '/portfolio/category/lifestyle-weddings',
-				},
-			],
-		},
-	];
-
-	// Check if current path matches
-	const isPathActive = (path: string) => {
-		// Check if the current browser path exactly matches or starts with the item's href
-		// This makes it more robust for parent categories with children
-		const currentPath = window.location.pathname;
-		if (path === '/portfolio' && currentPath === '/portfolio') return true; // Exact match for "All"
-		return currentPath.startsWith(path) && path !== '/portfolio';
-	};
+	if (!photos || photos.length === 0) {
+		return (
+			<div className="text-center py-10">
+				<p className="text-secondary">
+					Ingen bilder funnet for denne kategorien.
+				</p>
+			</div>
+		);
+	}
 
 	return (
 		<div>
-			{/* Category Dropdown Navigation */}
-			<div className="flex flex-wrap justify-center mb-10 space-x-8">
-				{navigation.map((item) => (
-					<div key={item.name} className="relative">
-						{item.children ? (
-							<div
-								ref={(el) =>
-									(dropdownRefs.current[item.name] = el)
-								}
-								className="inline-block"
-							>
-								<button
-									className={`flex items-center space-x-1 ${
-										isPathActive(item.href) // Use isPathActive for robust check
-											? 'text-primary font-medium'
-											: 'text-secondary hover:text-primary'
-									} transition-colors duration-300`}
-									onClick={() =>
-										setActiveDropdown(
-											activeDropdown === item.name
-												? null
-												: item.name,
-										)
-									}
-								>
-									<span>{item.name}</span>
-									<ChevronDown
-										className={`h-4 w-4 transition-transform ${
-											activeDropdown === item.name
-												? 'rotate-180'
-												: ''
-										}`}
-									/>
-								</button>
-
-								{activeDropdown === item.name && (
-									<motion.div
-										className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50"
-										initial={{ opacity: 0, y: 10 }}
-										animate={{ opacity: 1, y: 0 }}
-										transition={{ duration: 0.2 }}
-									>
-										<Link
-											href={item.href}
-											className="block px-4 py-2 text-secondary hover:text-primary hover:bg-gray-50"
-											onClick={() =>
-												setActiveDropdown(null)
-											}
-										>
-											Alle {item.name}
-										</Link>
-										{item.children?.map((child) => (
-											<Link
-												key={child.name}
-												href={child.href}
-												className="block px-4 py-2 text-secondary hover:text-primary hover:bg-gray-50"
-												onClick={() =>
-													setActiveDropdown(null)
-												}
-											>
-												{child.name}
-											</Link>
-										))}
-									</motion.div>
-								)}
-							</div>
-						) : (
-							<Link
-								href={item.href}
-								className={`${
-									isPathActive(item.href)
-										? 'text-primary font-medium'
-										: 'text-secondary hover:text-primary'
-								} transition-colors duration-300 px-3 py-1`} // Added some padding for non-dropdown links
-							>
-								{item.name}
-							</Link>
-						)}
-					</div>
-				))}
-			</div>
-
-			{/* Gallery Grid */}
-			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-				{isLoading ? (
-					// Loading skeletons
-					Array.from({ length: 6 }).map((_, index) => (
-						<GallerySkeleton key={index} />
-					))
-				) : visiblePhotos.length ? (
-					// Actual photos with lazy loading
-					visiblePhotos.map((photo, index) => (
-						<GalleryItem
-							key={photo.id}
-							photo={photo}
-							index={index}
-							onImageClick={() => openLightbox(index)}
-						/>
-					))
-				) : (
-					// No photos state
-					<div className="col-span-3 text-center py-10">
-						<p className="text-secondary">
-							Ingen bilder tilgjengelig i denne kategorien.
-						</p>
-					</div>
-				)}
-			</div>
-
-			{/* Loader for infinite scroll */}
-			{!isLoading && visibleCount < filteredPhotos.length && (
-				<div ref={bottomRef} className="py-8 flex justify-center">
-					<Skeleton className="h-10 w-10 rounded-full" />
+			{categorySlugProp === 'lifestyle' && (
+				<div className="flex justify-center space-x-2 md:space-x-4 mb-8">
+					<button
+						onClick={() => setActiveLivsstilSubFilter('all')}
+						className={`px-4 py-2 rounded-md text-sm font-medium transition-colors
+							${
+								activeLivsstilSubFilter === 'all'
+									? 'bg-primary text-white'
+									: 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
+							}`}
+					>
+						Alle Livsstil
+					</button>
+					<button
+						onClick={() => setActiveLivsstilSubFilter('wedding')}
+						className={`px-4 py-2 rounded-md text-sm font-medium transition-colors
+							${
+								activeLivsstilSubFilter === 'wedding'
+									? 'bg-primary text-white'
+									: 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
+							}`}
+					>
+						Bryllup
+					</button>
+					<button
+						onClick={() => setActiveLivsstilSubFilter('portraits')}
+						className={`px-4 py-2 rounded-md text-sm font-medium transition-colors
+							${
+								activeLivsstilSubFilter === 'portraits'
+									? 'bg-primary text-white'
+									: 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
+							}`}
+					>
+						Portretter
+					</button>
 				</div>
 			)}
 
-			{/* Enhanced Lightbox with navigation */}
-			{filteredPhotos.length > 0 && (
+			<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+				{visiblePhotos.map((photo, index) => (
+					<GalleryItem
+						key={photo.id}
+						photo={photo}
+						index={index}
+						onImageClick={() => openLightbox(index)}
+					/>
+				))}
+			</div>
+
+			{visibleCount < subFilteredPhotos.length && (
+				<div
+					ref={bottomRef}
+					className="h-20 flex justify-center items-center"
+				>
+					<p className="text-secondary">Laster flere bilder...</p>
+				</div>
+			)}
+
+			{lightboxOpen && (
 				<EnhancedLightbox
 					isOpen={lightboxOpen}
-					photos={filteredPhotos}
+					photos={visiblePhotos}
 					currentIndex={currentImageIndex}
 					onClose={() => setLightboxOpen(false)}
 				/>
@@ -324,63 +222,46 @@ interface GalleryItemProps {
 	onImageClick: () => void;
 }
 
-function GalleryItem({ photo, index, onImageClick }: GalleryItemProps) {
-	// Find category name
-	const { data: categoriesData } = useQuery<Category[]>({
-		queryKey: ['/api/categories'],
-	});
-
-	const photoCategory = categoriesData?.find(
-		(cat) => cat.id === photo.categoryId,
-	);
-
-	// Detect when item is in view for animation
-	const { ref, inView } = useInView({
-		threshold: 0.1,
-		triggerOnce: true,
-	});
-
+function GalleryItem({ photo, onImageClick }: GalleryItemProps) {
 	return (
 		<motion.div
-			ref={ref}
-			className="gallery-item"
+			className="group relative aspect-square overflow-hidden rounded-lg shadow-lg cursor-pointer"
+			onClick={onImageClick}
 			initial={{ opacity: 0, y: 20 }}
-			animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-			transition={{ duration: 0.4, delay: 0.1 }}
+			animate={{ opacity: 1, y: 0 }}
+			transition={{ duration: 0.5 }}
+			whileHover={{ scale: 1.03 }}
 		>
-			<div
-				className="overflow-hidden cursor-pointer gallery-img rounded-sm"
-				onClick={onImageClick}
-			>
-				<LazyLoadImage
-					src={photo.thumbnailUrl}
-					alt={photo.title}
-					effect="blur"
-					threshold={300}
-					wrapperClassName="w-full h-64"
-					className="w-full h-64 object-cover"
-					placeholderSrc="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjYwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjYwMCIgZmlsbD0iI2YyZjJmMiIvPjwvc3ZnPg=="
-				/>
+			<LazyLoadImage
+				alt={photo.title || 'Portfoliobilde'}
+				effect="blur"
+				src={photo.thumbnailUrl || photo.imageUrl}
+				width="100%"
+				height="100%"
+				style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+				className="transition-transform duration-300 ease-in-out group-hover:scale-110"
+			/>
+			<div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity duration-300 flex items-center justify-center p-4">
+				<div className="text-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+					{photo.title && (
+						<h3 className="text-white text-lg font-semibold mb-1">
+							{photo.title}
+						</h3>
+					)}
+				</div>
 			</div>
-			<h3 className="font-poppins font-medium mt-3 text-primary">
-				{photo.title}
-			</h3>
-			<p className="text-secondary text-sm">
-				{photoCategory?.name || 'Ukategorisert'}
-			</p>
-			{photo.location && (
-				<p className="text-secondary text-sm">{photo.location}</p>
-			)}
 		</motion.div>
 	);
 }
 
 function GallerySkeleton() {
 	return (
-		<div className="gallery-item">
-			<Skeleton className="w-full h-64 rounded-sm" />
-			<Skeleton className="h-6 w-3/4 mt-3" />
-			<Skeleton className="h-4 w-1/2 mt-1" />
+		<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+			{Array.from({ length: IMAGES_PER_PAGE }).map((_, index) => (
+				<div key={index} className="aspect-square">
+					<Skeleton className="w-full h-full rounded-lg" />
+				</div>
+			))}
 		</div>
 	);
 }

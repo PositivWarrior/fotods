@@ -95,8 +95,12 @@ export function Header() {
 		},
 		{ name: 'Video', href: '/portfolio/category/video' },
 		{
-			name: 'Portretter',
-			href: '/portfolio/category/business-portraits',
+			name: 'Næring',
+			href: '/portfolio/category/business',
+		},
+		{
+			name: 'Livsstil',
+			href: '/portfolio/category/lifestyle',
 		},
 		{ name: 'Om Meg', href: '/about' },
 		{ name: 'Priser', href: '/priser' },
@@ -286,6 +290,7 @@ export function Header() {
 							.filter((item) =>
 								[
 									'Bolig',
+									'Livsstil',
 									'Kveldsbilder',
 									'Drone',
 									'Kontakt',

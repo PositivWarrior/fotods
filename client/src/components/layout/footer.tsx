@@ -61,6 +61,14 @@ export function Footer() {
 							</li>
 							<li>
 								<Link
+									href="/portfolio/category/lifestyle"
+									className="text-white/80 hover:text-white transition-colors"
+								>
+									Livsstil
+								</Link>
+							</li>
+							<li>
+								<Link
 									href="/portfolio/housing-evening"
 									className="text-white/80 hover:text-white transition-colors"
 								>
