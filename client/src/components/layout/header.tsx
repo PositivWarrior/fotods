@@ -406,6 +406,7 @@ export function Header() {
 						ref={mobileButtonRef}
 						className="lg:hidden text-primary"
 						onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+						aria-label="Toggle navigation menu"
 					>
 						{isMobileMenuOpen ? (
 							<X className="h-6 w-6" />

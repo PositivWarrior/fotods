@@ -30,6 +30,7 @@ export default defineConfig({
 	build: {
 		outDir: path.resolve(__dirname, 'dist/public'),
 		emptyOutDir: true,
+		sourcemap: true,
 	},
 	server: {
 		port: 5173, // Ensure Vite runs on a different port

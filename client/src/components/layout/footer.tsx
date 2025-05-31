@@ -154,20 +154,20 @@ export function Footer() {
 				</div>
 
 				<div className="border-t border-white/20 mt-10 pt-6 flex flex-col md:flex-row justify-between items-center">
-					<p className="text-white/60 text-sm">
+					<p className="text-white text-sm">
 						© {new Date().getFullYear()} FotoDS. Alle rettigheter
 						forbeholdt.
 					</p>
 					<div className="flex space-x-6 mt-4 md:mt-0">
 						<button
 							onClick={() => setIsPrivacyModalOpen(true)}
-							className="text-white/60 text-sm hover:text-white transition-colors cursor-pointer"
+							className="text-white text-sm hover:text-white transition-colors cursor-pointer"
 						>
 							Personvernerklæring
 						</button>
 						<button
 							onClick={() => setIsTermsModalOpen(true)}
-							className="text-white/60 text-sm hover:text-white transition-colors cursor-pointer"
+							className="text-white text-sm hover:text-white transition-colors cursor-pointer"
 						>
 							Bruksvilkår
 						</button>
