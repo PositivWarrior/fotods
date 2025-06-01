@@ -1,17 +1,29 @@
 import { Link } from 'wouter';
 import { motion } from 'framer-motion';
-import logoImage from '../../assets/logo_no_bg.png';
-import heroBackgroundImage from '../../assets/Hero.jpg';
+import logoImage from '../../assets/logo_no_bg.webp';
+import heroBackgroundImageJPEG from '../../assets/Hero.jpg';
+import heroBackgroundImageWEBP from '../../assets/Hero.webp';
 
 export function Hero() {
 	return (
 		<section id="home" className="relative min-h-screen">
 			<div className="absolute inset-0 bg-black">
-				<img
-					src={heroBackgroundImage}
-					alt="Profesjonell interiørfotografering av FotoDS"
-					className="w-full h-full object-cover opacity-85"
-				/>
+				<picture>
+					<source
+						srcSet={heroBackgroundImageWEBP}
+						type="image/webp"
+					/>
+					<source
+						srcSet={heroBackgroundImageJPEG}
+						type="image/jpeg"
+					/>
+					<img
+						src={heroBackgroundImageJPEG}
+						alt="Profesjonell interiørfotografering av FotoDS"
+						className="w-full h-full object-cover opacity-85"
+						loading="eager"
+					/>
+				</picture>
 			</div>
 			<div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/50"></div>
 

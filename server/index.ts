@@ -23,6 +23,7 @@ console.log(
 // Now import everything else
 import express, { type Request, Response, NextFunction } from 'express';
 import cors from 'cors'; // Import the cors package
+import compression from 'compression'; // Import compression middleware
 import { registerRoutes } from './routes';
 import { createServer } from 'http';
 import fs from 'fs';
@@ -34,6 +35,9 @@ const app = express();
 app.get('/health', (_req, res) => {
 	res.status(200).send('OK');
 });
+
+// Use compression middleware
+app.use(compression());
 
 // CORS configuration using the cors package
 const allowedOrigins = [
