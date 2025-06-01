@@ -55,7 +55,7 @@ export default function AboutPage() {
 				</section>
 
 				{/* About Content */}
-				<AboutSection />
+				<AboutSection showHeroImage={true} />
 
 				{/* Additional About Section */}
 				<section className="py-20 bg-muted">
