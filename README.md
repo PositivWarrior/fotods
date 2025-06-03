@@ -47,20 +47,23 @@ The project is built with a modern tech stack, focusing on performance, accessib
 fotods/
 ├── client/         # Frontend React application (Vite)
 │   ├── public/
+│   ├── src/
 │   │   ├── assets/
+│   │   ├── components/
 │   │   │   ├── layout/
 │   │   │   ├── ui/
 │   │   │   └── ... (other shared components)
 │   │   ├── hooks/
 │   │   ├── lib/
 │   │   ├── pages/
+│   │   ├── __mocks__/ # Jest mocks
+│   │   │   └── fileMock.js
 │   │   ├── App.tsx
 │   │   ├── main.tsx
-│   │   └── index.css
+│   │   ├── index.css
+│   │   └── jest.setup.ts # Jest setup
 │   ├── index.html
-│   ├── vite.config.ts
-│   ├── tsconfig.json
-│   └── package.json
+│   └── vite.config.ts # Note: Main tsconfig.json is at root
 │
 ├── server/         # Backend Express.js application
 │   ├── src/
@@ -69,9 +72,18 @@ fotods/
 │   │   ├── middleware/
 │   │   ├── models/ (if applicable)
 │   │   └── index.ts
-│   ├── tsconfig.json
-│   └── package.json
+│   └── .env          # Server environment variables (example)
 │
+├── public/           # Vite public assets (served from root by Vite)
+├── node_modules/
+├── dist/             # Production build output
+├── .env              # Root .env for server in dev (if applicable for `dotenv-cli`)
+├── package.json      # Project (root) dependencies and scripts
+├── package-lock.json
+├── tsconfig.json     # Root TypeScript configuration
+├── tailwind.config.ts
+├── vite.config.ts    # Root Vite configuration (for client)
+├── jest.config.js    # Jest configuration
 └── README.md
 ```
 
@@ -82,63 +94,76 @@ fotods/
 -   Node.js (version compatible with project dependencies, e.g., >=18.x.x)
 -   npm or yarn
 
-### Backend (`server/`)
+### Running the Application
 
-1.  Navigate to the `server` directory:
+1.  **Clone the repository** (if you haven't already).
+2.  **Navigate to the project root directory:**
     ```bash
-    cd server
+    cd fotods
     ```
-2.  Install dependencies:
+3.  **Install dependencies** (this will install dependencies for both client and server as defined in the root `package.json`):
     ```bash
     npm install
     # or
     yarn install
     ```
-3.  Create a `.env` file based on `.env.example` (if one exists) and populate it with necessary environment variables (e.g., `PORT`, `DATABASE_URL`, `JWT_SECRET`).
-4.  Start the development server:
+4.  **Environment Variables:**
+
+    -   **Server:** Create a `server/.env` file. You might want to copy from an example if one exists (e.g., `server/.env.example`). Populate it with necessary environment variables (e.g., `PORT`, `DATABASE_URL`, `JWT_SECRET`).
+    -   **Client (Vite):** If your client needs specific environment variables (e.g., `VITE_API_BASE_URL`), they are typically placed in a `.env` file in the `client` directory (e.g., `client/.env`) or in the root `.env` file, prefixed with `VITE_`. Refer to Vite's documentation on environment variables. The `dev:client` script uses `vite`, which will automatically load these.
+
+5.  **Start the development servers** (this command from the root `package.json` runs both client and server concurrently):
     ```bash
     npm run dev
-    # or
-    yarn dev
     ```
-    The backend server will typically run on a port like `3001` (check your `server/.env` or `server/index.ts`).
-
-### Frontend (`client/`)
-
-1.  Navigate to the `client` directory:
-    ```bash
-    cd client
-    ```
-2.  Install dependencies:
-    ```bash
-    npm install
-    # or
-    yarn install
-    ```
-3.  Create a `.env` file if needed, especially for `VITE_API_BASE_URL` to point to your backend server (e.g., `VITE_API_BASE_URL=http://localhost:3001/api`).
-4.  Start the Vite development server:
-    ```bash
-    npm run dev
-    # or
-    yarn dev
-    ```
-    The frontend development server will typically run on `http://localhost:5173` (or another port if 5173 is in use).
+    This typically involves:
+    -   **Backend server** (Express.js) running on a port like `3001` (controlled by `server/.env`).
+    -   **Frontend Vite development server** running on a port like `5173`.
 
 ## Available Scripts
 
-### Client (`client/package.json`)
+All scripts are run from the **project root directory**.
 
--   `npm run dev`: Starts the Vite development server.
--   `npm run build`: Builds the production-ready static assets into the `dist` folder.
--   `npm run preview`: Serves the production build locally to preview.
--   `npm run lint`: Runs ESLint (if configured).
+-   `npm run dev`: Starts both the backend server and frontend Vite development server concurrently.
+-   `npm run dev:server`: Starts the backend Express server in development mode (using `tsx` and `dotenv`).
+-   `npm run dev:client`: Starts the frontend Vite development server.
+-   `npm run build`: Builds both the frontend and backend for production.
+    -   Frontend: Uses `vite build`.
+    -   Backend: Uses `esbuild`.
+-   `npm run build:frontend`: Builds only the frontend application.
+-   `npm run start`: Starts the production Node.js server (expects a prior build).
+-   `npm run check`: Runs TypeScript checks.
+-   `npm run test`: Runs Jest tests for the client-side components.
+-   `npm run test:watch`: Runs Jest tests in watch mode.
+-   `npm run db:push`: Pushes Drizzle ORM schema changes.
+-   `npm run db:generate-migration`: Generates Drizzle ORM migrations.
+-   `npm run db:migrate`: Applies Drizzle ORM migrations.
 
-### Server (`server/package.json`)
+## Testing
 
--   `npm run dev`: Starts the Express server with a watcher (e.g., using `nodemon` or `ts-node-dev`).
--   `npm run build`: Compiles TypeScript to JavaScript (typically into a `dist` folder).
--   `npm run start`: Runs the compiled JavaScript application (for production).
--   `npm run lint`: Runs ESLint (if configured).
+The frontend React components are tested using **Jest** and **React Testing Library**.
+
+### Setup
+
+-   **Jest Configuration:** `jest.config.js` in the project root.
+    -   Uses `ts-jest` for TypeScript.
+    -   Environment is `jsdom`.
+    -   Tests are located in `client/src`.
+    -   Handles static asset imports and the `@/` path alias.
+-   **Jest Setup File:** `client/jest.setup.ts` imports `@testing-library/jest-dom` for extended DOM matchers.
+-   **Mocking:** Static files (images, etc.) are mocked using `client/__mocks__/fileMock.js`. CSS imports can be mocked using `identity-obj-proxy` (install if needed: `npm install --save-dev identity-obj-proxy`).
+
+### Running Tests
+
+-   To run all tests once:
+    ```bash
+    npm test
+    ```
+-   To run tests in interactive watch mode:
+    `bash
+npm run test:watch
+`
+    Test files are typically named `*.test.tsx` or `*.spec.tsx` within the `client/src` directory, often co-located with the components they test.
 
 ## Deployment
 
