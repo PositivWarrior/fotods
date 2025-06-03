@@ -21,9 +21,10 @@ const pricingPackages = [
 	{
 		category: 'Eiendomsfotografering',
 		name: 'Liten pakke',
-		price: '4000 NOK',
+		price: '4500 NOK',
 		features: [
 			'15-20 bilder',
+			'plantegning 2D',
 			'Høy oppløsning (digitalt)',
 			'Profesjonell redigering',
 		],
@@ -35,7 +36,8 @@ const pricingPackages = [
 		price: '6000 NOK',
 		features: [
 			'20-30 bilder',
-			'Plus 2 matskifte foto',
+			'Plus 2 maste foto',
+			'plantegning 2D',
 			'Høy oppløsning (digitalt)',
 			'Profesjonell redigering',
 		],
@@ -47,7 +49,8 @@ const pricingPackages = [
 		price: '8000 NOK',
 		features: [
 			'30-40 bilder',
-			'Plus 2 matmoto',
+			'Plus 2 maste foto',
+			'plantegning 2D',
 			'Høy oppløsning (digitalt)',
 			'Profesjonell redigering',
 		],
@@ -59,8 +62,9 @@ const pricingPackages = [
 		price: '10000 NOK',
 		features: [
 			'45-60 bilder',
-			'Plus 2 matskifte foto',
+			'Plus 2 maste foto',
 			'Plus 5 drone bilder',
+			'plantegning 2D',
 			'Høy oppløsning (digitalt)',
 			'Profesjonell redigering',
 		],
@@ -69,33 +73,26 @@ const pricingPackages = [
 	},
 	{
 		category: 'Tilleggstjenester',
-		name: 'Planlegging 2.0',
+		name: 'Plantegning 2D',
 		price: '500 NOK',
-		features: [
-			'Planlegging av fotografering',
-			'Konsultasjon og veiledning',
-		],
+		features: ['Plantegning 2D'],
 		icon: Settings,
 	},
 	{
 		category: 'Tilleggstjenester',
-		name: 'Planlegging 3D',
+		name: 'Plantegning 3D',
 		price: '1000 NOK',
-		features: [
-			'3D planlegging av fotografering',
-			'Avansert konsultasjon',
-			'Detaljert gjennomgang',
-		],
+		features: ['Plantegning 3D'],
 		icon: Settings,
 	},
 ];
 
 const extraServices = [
 	{
-		name: 'Kviteis bilder',
+		name: 'Kvelds bilder',
 		items: [
-			{ description: 'Sommerhaksted', price: '4500 NOK' },
-			{ description: 'Vinterhaksted', price: '3000 NOK' },
+			{ description: 'Sommerhalvåret', price: '4500 NOK' },
+			{ description: 'Vinterhalvåret', price: '3000 NOK' },
 		],
 	},
 	{
@@ -118,7 +115,10 @@ const extraServices = [
 	},
 	{
 		name: 'Andre tjenester',
-		items: [{ description: 'Nettsal renting', price: '300 NOK' }],
+		items: [
+			{ description: 'Nøkkel henting', price: '300 NOK' },
+			{ description: 'Avbestilling samme dag', price: '1500 NOK' },
+		],
 	},
 ];
 
@@ -396,12 +396,12 @@ export default function PriserPage() {
 								</h3>
 							</div>
 							<p className="text-secondary leading-relaxed mb-4">
-								Fotografering fastnes kjøring med 5 kr per
-								kilometer fra retur til Fredrikstad.
+								Fotografen fakturerer kjøring med 5 kr per
+								kilometer tur- retur.
 							</p>
 							<p className="text-secondary leading-relaxed text-sm">
-								Alle omkostninger og parkering kommer i tillegg
-								eller kortteng.
+								Evt. Bompenger og parkering kommer i tillegg
+								etter kvittering.
 							</p>
 						</motion.div>
 
@@ -419,22 +419,32 @@ export default function PriserPage() {
 								</h3>
 							</div>
 							<div className="text-secondary leading-relaxed space-y-2 text-sm">
-								<p>• Alle priser inkluderer mva</p>
+								<p>• Alle priser inkluderer mva.</p>
 								<p>
-									• Fotografering fastnes kjøring med 5 kr per
-									kilometer fra retur til Fredrikstad
+									• Fotografen fakturerer kjøring med 5 kr per
+									kilometer tur- retur.
 								</p>
 								<p>
-									• Alle omkostninger og parkering kommer i
-									tillegg
+									• Evt. Bompenger og parkering kommer i
+									tillegg etter kvittering.
 								</p>
 								<p>
-									• Ventetid for redigerte bilder er opptil 3
-									uker
+									• Bilder leveres senest neste dag.
+									Fredagsfoto leveres i løpet av helgen hvis
+									ikke annet blir avtalt!
 								</p>
 								<p>
 									• 50% forskuddsbetaling som ikke blir
-									returnert om kunden ombestemmer seg
+									returnert om kunden ombestemmer seg.
+								</p>
+								<p>
+									• Leiligheter som ikke er foto klar når
+									fotograf kommer faktureres med kr 500,-
+									ekstra for tid som går med til rydding.
+								</p>
+								<p>
+									• Er boligen ikke foto klar i det hele tatt
+									faktureres kr 2500,- for avlyst oppdrag!
 								</p>
 							</div>
 						</motion.div>
