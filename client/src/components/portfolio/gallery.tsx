@@ -19,9 +19,6 @@ export function Gallery({ category: categorySlugProp }: GalleryProps) {
 	const [lightboxOpen, setLightboxOpen] = useState(false);
 	const [currentImageIndex, setCurrentImageIndex] = useState(0);
 	const [visibleCount, setVisibleCount] = useState(IMAGES_PER_PAGE);
-	const [activeLivsstilSubFilter, setActiveLivsstilSubFilter] = useState<
-		'all' | 'wedding' | 'portraits'
-	>('all');
 
 	const { ref: bottomRef, inView } = useInView();
 
@@ -29,21 +26,12 @@ export function Gallery({ category: categorySlugProp }: GalleryProps) {
 		? [`/api/photos/category/${categorySlugProp}`]
 		: ['/api/photos'];
 
-	const {
-		data: photos,
-		isLoading,
-		error,
-	} = useQuery<Photo[]>({
-		queryKey,
-	});
+	const { data: photos, isLoading, error } = useQuery<Photo[]>({ queryKey });
 
-	// Fetch all categories for client-side lookup if photo.category is not populated by API
 	const { data: allCategories, isLoading: categoriesLoading } = useQuery<
 		Category[]
 	>({
 		queryKey: ['/api/categories'],
-		// Enabled: false, // Only enable if categorySlugProp === 'lifestyle' and photos are loaded?
-		// Consider fetching this conditionally or ensuring it's already cached by CategoryFilter
 	});
 
 	const openLightbox = (index: number) => {
@@ -63,66 +51,35 @@ export function Gallery({ category: categorySlugProp }: GalleryProps) {
 		return a.id - b.id;
 	});
 
-	const subFilteredPhotos =
-		categorySlugProp === 'lifestyle' && allCategories
-			? sortedPhotos.filter((photo) => {
-					if (activeLivsstilSubFilter === 'all') return true;
+	const currentCategoryForFilter =
+		allCategories && categorySlugProp
+			? allCategories.find((cat) => cat.slug === categorySlugProp)
+			: null;
 
-					const photoCategory = allCategories.find(
-						(cat) => cat.id === photo.categoryId,
-					);
-
-					// Enhanced logging for debugging the Bryllup filter
-					if (activeLivsstilSubFilter === 'wedding') {
-						console.log(
-							`Photo ID: ${photo.id}, Photo CategoryID: ${
-								photo.categoryId
-							}, Found Category: ${JSON.stringify(
-								photoCategory,
-							)}, Expected Slug: 'lifestyle-wedding', Actual Slug: ${
-								photoCategory?.slug
-							}, Match: ${
-								photoCategory?.slug === 'lifestyle-wedding'
-							}`,
-						);
-					}
-
-					if (!photoCategory || !photoCategory.slug) return false;
-
-					if (activeLivsstilSubFilter === 'wedding') {
-						return photoCategory.slug === 'lifestyle-weddings';
-					}
-					if (activeLivsstilSubFilter === 'portraits') {
-						return photoCategory.slug === 'lifestyle-portraits';
-					}
-					return true;
-			  })
+	const filteredPhotos =
+		currentCategoryForFilter && allCategories
+			? sortedPhotos.filter(
+					(photo) => photo.categoryId === currentCategoryForFilter.id,
+			  )
 			: sortedPhotos;
 
-	const visiblePhotos = subFilteredPhotos.slice(0, visibleCount);
+	const visiblePhotos = filteredPhotos.slice(0, visibleCount);
 
 	useEffect(() => {
 		setVisibleCount(IMAGES_PER_PAGE);
-		if (categorySlugProp !== 'lifestyle') {
-			setActiveLivsstilSubFilter('all');
-		}
 	}, [categorySlugProp]);
 
 	useEffect(() => {
-		setVisibleCount(IMAGES_PER_PAGE);
-	}, [categorySlugProp, activeLivsstilSubFilter]);
-
-	useEffect(() => {
-		if (inView && visibleCount < subFilteredPhotos.length) {
+		if (inView && visibleCount < filteredPhotos.length) {
 			setTimeout(() => {
 				setVisibleCount((prev) =>
-					Math.min(prev + IMAGES_PER_PAGE, subFilteredPhotos.length),
+					Math.min(prev + IMAGES_PER_PAGE, filteredPhotos.length),
 				);
 			}, 300);
 		}
-	}, [inView, subFilteredPhotos.length, visibleCount]);
+	}, [inView, filteredPhotos.length, visibleCount]);
 
-	if (isLoading || (categorySlugProp === 'lifestyle' && categoriesLoading)) {
+	if (isLoading || (categorySlugProp && categoriesLoading)) {
 		return <GallerySkeleton />;
 	}
 
@@ -146,44 +103,6 @@ export function Gallery({ category: categorySlugProp }: GalleryProps) {
 
 	return (
 		<div>
-			{categorySlugProp === 'lifestyle' && (
-				<div className="flex justify-center space-x-2 md:space-x-4 mb-8">
-					<button
-						onClick={() => setActiveLivsstilSubFilter('all')}
-						className={`px-4 py-2 rounded-md text-sm font-medium transition-colors
-							${
-								activeLivsstilSubFilter === 'all'
-									? 'bg-primary text-white'
-									: 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
-							}`}
-					>
-						Alle Livsstil
-					</button>
-					<button
-						onClick={() => setActiveLivsstilSubFilter('wedding')}
-						className={`px-4 py-2 rounded-md text-sm font-medium transition-colors
-							${
-								activeLivsstilSubFilter === 'wedding'
-									? 'bg-primary text-white'
-									: 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
-							}`}
-					>
-						Bryllup
-					</button>
-					<button
-						onClick={() => setActiveLivsstilSubFilter('portraits')}
-						className={`px-4 py-2 rounded-md text-sm font-medium transition-colors
-							${
-								activeLivsstilSubFilter === 'portraits'
-									? 'bg-primary text-white'
-									: 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
-							}`}
-					>
-						Portretter
-					</button>
-				</div>
-			)}
-
 			<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
 				{visiblePhotos.map((photo, index) => (
 					<GalleryItem
@@ -195,7 +114,7 @@ export function Gallery({ category: categorySlugProp }: GalleryProps) {
 				))}
 			</div>
 
-			{visibleCount < subFilteredPhotos.length && (
+			{visibleCount < filteredPhotos.length && (
 				<div
 					ref={bottomRef}
 					className="h-20 flex justify-center items-center"
@@ -207,7 +126,7 @@ export function Gallery({ category: categorySlugProp }: GalleryProps) {
 			{lightboxOpen && (
 				<EnhancedLightbox
 					isOpen={lightboxOpen}
-					photos={visiblePhotos}
+					photos={filteredPhotos}
 					currentIndex={currentImageIndex}
 					onClose={() => setLightboxOpen(false)}
 				/>
@@ -243,11 +162,11 @@ function GalleryItem({ photo, onImageClick }: GalleryItemProps) {
 			/>
 			<div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity duration-300 flex items-center justify-center p-4">
 				<div className="text-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-					{photo.title && (
+					{/* photo.title && (
 						<h3 className="text-white text-lg font-semibold mb-1">
 							{photo.title}
 						</h3>
-					)}
+					) // Photo title display removed as per request */}
 				</div>
 			</div>
 		</motion.div>

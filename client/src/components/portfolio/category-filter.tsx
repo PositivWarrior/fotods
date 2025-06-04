@@ -60,26 +60,12 @@ export function CategoryFilter() {
 			],
 		},
 		{
-			name: 'Næring',
+			name: 'Portretter',
 			href: '/portfolio/category/business',
 			children: [
 				{
 					name: 'Portretter',
 					href: '/portfolio/category/business-portraits',
-				},
-			],
-		},
-		{
-			name: 'Livsstil',
-			href: '/portfolio/category/lifestyle',
-			children: [
-				{
-					name: 'Portretter',
-					href: '/portfolio/category/lifestyle-portraits',
-				},
-				{
-					name: 'Bryllup',
-					href: '/portfolio/category/lifestyle-wedding',
 				},
 			],
 		},
