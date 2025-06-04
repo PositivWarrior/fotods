@@ -382,7 +382,7 @@ export default function PriserPage() {
 							</p>
 						</motion.div>
 
-						<motion.div
+						{/* <motion.div
 							className="bg-white p-8 rounded-lg shadow-lg border border-border"
 							initial={{ opacity: 0, x: 50 }}
 							whileInView={{ opacity: 1, x: 0 }}
@@ -403,9 +403,9 @@ export default function PriserPage() {
 								Evt. Bompenger og parkering kommer i tillegg
 								etter kvittering.
 							</p>
-						</motion.div>
+						</motion.div> */}
 
-						<motion.div
+						{/* <motion.div
 							className="bg-white p-8 rounded-lg shadow-lg border border-border"
 							initial={{ opacity: 0, x: -50 }}
 							whileInView={{ opacity: 1, x: 0 }}
@@ -447,7 +447,7 @@ export default function PriserPage() {
 									faktureres kr 2500,- for avlyst oppdrag!
 								</p>
 							</div>
-						</motion.div>
+						</motion.div> */}
 					</div>
 				</section>
 			</main>

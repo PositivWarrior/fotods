@@ -95,12 +95,8 @@ export function Header() {
 		},
 		{ name: 'Video', href: '/portfolio/category/video' },
 		{
-			name: 'Næring',
+			name: 'Portretter',
 			href: '/portfolio/category/business',
-		},
-		{
-			name: 'Livsstil',
-			href: '/portfolio/category/lifestyle',
 		},
 		{ name: 'Om Meg', href: '/about' },
 		{ name: 'Priser', href: '/priser' },
@@ -290,7 +286,7 @@ export function Header() {
 							.filter((item) =>
 								[
 									'Bolig',
-									'Livsstil',
+									'Portretter',
 									'Kveldsbilder',
 									'Drone',
 									'Kontakt',
@@ -419,61 +415,103 @@ export function Header() {
 				{/* Mobile Navigation Menu */}
 				{isMobileMenuOpen && (
 					<div
+						className={`lg:hidden absolute top-full right-0 mt-2 w-64 bg-white rounded-md shadow-lg py-1 z-40 transform transition-transform duration-300 ease-in-out ${
+							isMobileMenuOpen
+								? 'translate-x-0'
+								: 'translate-x-full'
+						}`}
 						ref={mobileMenuRef}
-						className="lg:hidden bg-white py-4 space-y-3 mt-4 rounded-lg shadow-md"
 					>
 						{navigation.map((item) => (
-							<div
-								key={item.name + '-mobile'}
-								className="text-center"
-							>
-								<Link
-									href={item.href}
-									className={`block py-2 ${
-										isActive(item.href)
-											? 'text-primary font-semibold'
-											: 'text-secondary hover:text-primary'
-									} transition-colors duration-300`}
-									onClick={(e) => {
-										e.preventDefault();
-										handleMobileLinkClick(item.href);
-									}}
-								>
-									{item.name}
-								</Link>
+							<div key={item.name + '-mobile-main'}>
+								{item.children ? (
+									<>
+										<button
+											className={`w-full text-left flex items-center justify-between px-4 py-2 text-lg font-medium ${
+												isActive(item.href)
+													? 'text-primary'
+													: 'text-secondary hover:text-primary'
+											} transition-colors duration-300`}
+											onClick={() =>
+												setActiveDropdown(
+													activeDropdown === item.name
+														? null
+														: item.name,
+												)
+											}
+										>
+											{item.name}
+											<ChevronDown
+												className={`h-5 w-5 transition-transform duration-200 ${
+													activeDropdown === item.name
+														? 'rotate-180'
+														: ''
+												}`}
+											/>
+										</button>
+										{activeDropdown === item.name && (
+											<div className="pl-4 border-l-2 border-gray-200 ml-2">
+												<Link
+													href={item.href}
+													className="block px-4 py-2 text-md font-medium text-secondary hover:text-primary transition-colors duration-300"
+													onClick={() =>
+														handleMobileLinkClick(
+															item.href,
+														)
+													}
+												>
+													Alle {item.name}
+												</Link>
+												{item.children.map((child) =>
+													child.href ===
+													'#admin-logout' ? (
+														<button
+															key={child.name}
+															className="block w-full text-left px-4 py-2 text-md font-medium text-secondary hover:text-primary transition-colors duration-300"
+															onClick={() => {
+																logoutMutation.mutate();
+																handleMobileLinkClick(
+																	item.href,
+																);
+															}}
+														>
+															{child.name}
+														</button>
+													) : (
+														<Link
+															key={child.name}
+															href={child.href}
+															className="block px-4 py-2 text-md font-medium text-secondary hover:text-primary transition-colors duration-300"
+															onClick={() =>
+																handleMobileLinkClick(
+																	child.href,
+																)
+															}
+														>
+															{child.name}
+														</Link>
+													),
+												)}
+											</div>
+										)}
+									</>
+								) : (
+									<Link
+										href={item.href}
+										className={`block px-4 py-2 text-lg font-medium transition-colors duration-300 ${
+											isActive(item.href)
+												? 'text-primary'
+												: 'text-secondary hover:text-primary'
+										}`}
+										onClick={() =>
+											handleMobileLinkClick(item.href)
+										}
+									>
+										{item.name}
+									</Link>
+								)}
 							</div>
 						))}
-
-						{!user ? (
-							<div className="text-center">
-								<Link
-									href="/auth"
-									className={`block py-2 text-secondary hover:text-primary transition-colors duration-300`}
-									onClick={(e) => {
-										e.preventDefault();
-										handleMobileLinkClick('/auth');
-									}}
-								>
-									Logg Inn
-								</Link>
-							</div>
-						) : (
-							user &&
-							!user.isAdmin && (
-								<div className="text-center">
-									<Button
-										variant="ghost"
-										className="text-secondary hover:text-primary hover:bg-transparent p-0"
-										onClick={() => {
-											logoutMutation.mutate();
-											setIsMobileMenuOpen(false);
-										}}
-									>
-										Logg Ut
-									</Button>
-								</div>
-							)
-						)}
 					</div>
 				)}
 			</div>

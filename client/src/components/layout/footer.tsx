@@ -50,21 +50,13 @@ export function Footer() {
 						<h3 className="text-lg font-medium mb-4">
 							Hurtiglenker
 						</h3>
-						<ul className="space-y-2">
+						<ul className="grid grid-cols-2 gap-x-4 gap-y-2">
 							<li>
 								<Link
 									href="/portfolio/housing"
 									className="text-white/80 hover:text-white transition-colors"
 								>
 									Bolig
-								</Link>
-							</li>
-							<li>
-								<Link
-									href="/portfolio/category/lifestyle"
-									className="text-white/80 hover:text-white transition-colors"
-								>
-									Livsstil
 								</Link>
 							</li>
 							<li>
@@ -81,6 +73,22 @@ export function Footer() {
 									className="text-white/80 hover:text-white transition-colors"
 								>
 									Drone
+								</Link>
+							</li>
+							<li>
+								<Link
+									href="/portfolio/category/video"
+									className="text-white/80 hover:text-white transition-colors"
+								>
+									Video
+								</Link>
+							</li>
+							<li>
+								<Link
+									href="/portfolio/category/business"
+									className="text-white/80 hover:text-white transition-colors"
+								>
+									Portretter
 								</Link>
 							</li>
 							<li>

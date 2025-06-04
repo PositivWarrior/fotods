@@ -1,4 +1,4 @@
-import { Camera, Lightbulb, Edit } from 'lucide-react';
+import { Camera, Lightbulb, Edit, Instagram, Facebook } from 'lucide-react';
 import { motion } from 'framer-motion';
 import dawidImage from '../../assets/Dawid_hero.jpg';
 
@@ -27,6 +27,29 @@ export function AboutSection({ showHeroImage = false }: AboutSectionProps) {
 				'Nøyaktig etterbehandling for å oppnå perfekt farge, kontrast og komposisjon',
 		},
 	];
+
+	const socialLinks = (
+		<div className="flex justify-center md:justify-start space-x-4 mt-6 mb-8">
+			<a
+				href="https://www.instagram.com/fotods.no/"
+				target="_blank"
+				rel="noopener noreferrer"
+				className="text-secondary hover:text-primary transition-colors"
+				aria-label="Instagram"
+			>
+				<Instagram size={24} />
+			</a>
+			<a
+				href="https://www.facebook.com/fotods.no"
+				target="_blank"
+				rel="noopener noreferrer"
+				className="text-secondary hover:text-primary transition-colors"
+				aria-label="Facebook"
+			>
+				<Facebook size={24} />
+			</a>
+		</div>
+	);
 
 	// For the original layout when showHeroImage is false
 	const originalTextContent = (
@@ -58,7 +81,7 @@ export function AboutSection({ showHeroImage = false }: AboutSectionProps) {
 				som ikke bare viser frem eiendommer, men også vekker følelser og
 				skaper varige inntrykk.
 			</p>
-
+			{socialLinks}
 			<div className="space-y-4 mb-8">
 				{features.map((feature, index) => (
 					<motion.div
@@ -199,6 +222,7 @@ export function AboutSection({ showHeroImage = false }: AboutSectionProps) {
 									{/* Paragraph 3 for large screens, in the text column */}
 									<div className="hidden lg:block">
 										{paragraph3Content}
+										{socialLinks}
 									</div>
 								</div>
 							</div>
@@ -206,6 +230,7 @@ export function AboutSection({ showHeroImage = false }: AboutSectionProps) {
 							{/* Paragraph 3 for medium screens (and smaller), full width */}
 							<div className="block lg:hidden mt-8 mb-8">
 								{paragraph3Content}
+								{socialLinks}
 							</div>
 
 							{/* Features and Contact Button, spaced from content above */}

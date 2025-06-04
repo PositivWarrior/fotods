@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { Instagram, Facebook } from 'lucide-react';
 
 export function Introduction() {
 	const stats = [
@@ -28,6 +29,27 @@ export function Introduction() {
 						hjelper bildene mine eiendommer å skille seg ut i et
 						konkurranseutsatt marked.
 					</p>
+
+					<div className="flex justify-center space-x-4">
+						<a
+							href="https://www.instagram.com/fotods.no/"
+							target="_blank"
+							rel="noopener noreferrer"
+							className="text-secondary hover:text-primary transition-colors"
+							aria-label="Instagram"
+						>
+							<Instagram size={28} />
+						</a>
+						<a
+							href="https://www.facebook.com/fotods.no"
+							target="_blank"
+							rel="noopener noreferrer"
+							className="text-secondary hover:text-primary transition-colors"
+							aria-label="Facebook"
+						>
+							<Facebook size={28} />
+						</a>
+					</div>
 
 					<div className="flex flex-wrap justify-center gap-8">
 						{stats.map((stat, index) => (

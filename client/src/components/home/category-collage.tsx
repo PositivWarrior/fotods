@@ -15,7 +15,7 @@ export function CategoryCollage() {
 		queryKey: ['/api/photos'],
 	});
 
-	// Specifically use only the main categories in this order: Bolig, Næring, Livsstil
+	// Displaying specific main categories in the collage: Bolig, Kveldsbilder, Drone
 	const mainCategoryNames = ['Bolig', 'Kveldsbilder', 'Drone'];
 	const mainCategories = categories
 		? (mainCategoryNames
@@ -42,73 +42,32 @@ export function CategoryCollage() {
 
 	// Returns photos for a given category and its subcategories
 	const getCategoryPhotos = (categoryId: number, limit = 4) => {
-		const mainCatForLog = categories?.find((c) => c.id === categoryId);
+		const categoryForLog = categories?.find((c) => c.id === categoryId);
+		const categoryName = categoryForLog?.name || `ID ${categoryId}`;
+
 		console.log(
-			`[Collage] Processing getCategoryPhotos for: ${mainCatForLog?.name} (ID: ${mainCatForLog?.id}, Slug: ${mainCatForLog?.slug})`,
-		);
-		console.log(
-			`[Collage] Getting photos for MAIN category: ${mainCatForLog?.name} (ID: ${categoryId})`,
+			`[Collage] Getting photos for COLLAGE TILE category: ${categoryName} (ID: ${categoryId})`,
 		);
 
-		// Get direct photos of this category
-		const directPhotos =
+		// Get direct photos of this category. For the collage tiles, we are intentionally
+		// not including photos from sub-categories to keep each tile specific.
+		let directPhotos =
 			photos?.filter((photo) => photo.categoryId === categoryId) || [];
+
 		console.log(
-			`[Collage] Direct photos for ${mainCatForLog?.name}:`,
-			directPhotos.map((p) => p.title),
-		);
-
-		// Find subcategories
-		const parentSlug = categories?.find((c) => c.id === categoryId)?.slug;
-		const subCategories =
-			categories?.filter((cat) => cat.parentCategory === parentSlug) ||
-			[];
-		if (parentSlug)
-			console.log(
-				`[Collage] Subcategories for ${mainCatForLog?.name} (parentSlug: ${parentSlug}):`,
-				subCategories.map((s) => ({
-					name: s.name,
-					slug: s.slug,
-					parentSlug: s.parentCategory,
-				})),
-			);
-
-		// Get photos from subcategories
-		const subCategoryPhotos =
-			subCategories.flatMap((subCat) => {
-				const subCatPhotos =
-					photos?.filter((photo) => photo.categoryId === subCat.id) ||
-					[];
-				console.log(
-					`[Collage] Photos for subcategory ${subCat.name}:`,
-					subCatPhotos.map((p) => p.title),
-				);
-				return subCatPhotos;
-			}) || [];
-
-		// Combine all photos
-		let combined = [...directPhotos, ...subCategoryPhotos];
-		console.log(
-			`[Collage] Combined photos for ${mainCatForLog?.name} (before featured sort):`,
-			combined.map((p) => ({ title: p.title, featured: p.featured })),
+			`[Collage] Direct photos for ${categoryName} (before featured sort):`,
+			directPhotos.map((p) => ({ title: p.title, featured: p.featured })),
 		);
 
 		// Prioritize featured photos
-		const featuredPhotos = combined.filter((photo) => photo.featured);
-		const nonFeaturedPhotos = combined.filter((photo) => !photo.featured);
-		console.log(
-			`[Collage] Featured photos for ${mainCatForLog?.name}:`,
-			featuredPhotos.map((p) => p.title),
-		);
-		console.log(
-			`[Collage] Non-featured photos for ${mainCatForLog?.name}:`,
-			nonFeaturedPhotos.map((p) => p.title),
+		const featuredPhotos = directPhotos.filter((photo) => photo.featured);
+		const nonFeaturedPhotos = directPhotos.filter(
+			(photo) => !photo.featured,
 		);
 
-		// Always put featured photos first
-		combined = [...featuredPhotos, ...nonFeaturedPhotos];
+		let combined = [...featuredPhotos, ...nonFeaturedPhotos];
 		console.log(
-			`[Collage] Combined photos for ${mainCatForLog?.name} (AFTER featured sort, before limit):`,
+			`[Collage] Photos for ${categoryName} (AFTER featured sort, before limit):`,
 			combined.map((p) => p.title),
 		);
 
@@ -116,7 +75,7 @@ export function CategoryCollage() {
 		const finalPhotos =
 			combined.length > limit ? combined.slice(0, limit) : combined;
 		console.log(
-			`[Collage] Final photos for ${mainCatForLog?.name} (limited to ${limit}):`,
+			`[Collage] Final photos for ${categoryName} (limited to ${limit}):`,
 			finalPhotos.map((p) => p.title),
 		);
 
