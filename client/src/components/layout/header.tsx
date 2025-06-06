@@ -110,14 +110,6 @@ export function Header() {
 			{
 				name: 'Admin',
 				href: '/admin',
-				children: [
-					{ name: 'Dashboard', href: '/admin' },
-					{ name: 'Photos', href: '/admin/photos' },
-					{ name: 'Categories', href: '/admin/categories' },
-					{ name: 'Testimonials', href: '/admin/testimonials' },
-					{ name: 'Messages', href: '/admin/messages' },
-					{ name: 'Logg Ut', href: '#admin-logout' },
-				],
 			},
 		];
 	}
@@ -202,15 +194,19 @@ export function Header() {
 														: 'left-0'
 												} mt-2 w-40 bg-white rounded-md shadow-lg py-1 z-50`}
 											>
-												<Link
-													href={item.href}
-													className="block px-4 py-2 text-secondary hover:text-primary hover:bg-gray-50"
-													onClick={() =>
-														setActiveDropdown(null)
-													}
-												>
-													Alle {item.name}
-												</Link>
+												{item.name !== 'Admin' && (
+													<Link
+														href={item.href}
+														className="block px-4 py-2 text-secondary hover:text-primary hover:bg-gray-50"
+														onClick={() =>
+															setActiveDropdown(
+																null,
+															)
+														}
+													>
+														Alle {item.name}
+													</Link>
+												)}
 												{item.children?.map((child) =>
 													child.href ===
 													'#admin-logout' ? (
@@ -290,6 +286,7 @@ export function Header() {
 									'Kveldsbilder',
 									'Drone',
 									'Kontakt',
+									'Admin',
 								].includes(item.name),
 							)
 							.map((item) => (
@@ -330,34 +327,55 @@ export function Header() {
 											{activeDropdown ===
 												item.name + '-medium' && (
 												<div className="absolute left-0 mt-2 w-40 bg-white rounded-md shadow-lg py-1 z-50">
-													<Link
-														href={item.href}
-														className="block px-4 py-2 text-secondary hover:text-primary hover:bg-gray-50"
-														onClick={() =>
-															setActiveDropdown(
-																null,
-															)
-														}
-													>
-														Alle {item.name}
-													</Link>
+													{item.name !== 'Admin' && (
+														<Link
+															href={item.href}
+															className="block px-4 py-2 text-secondary hover:text-primary hover:bg-gray-50"
+															onClick={() =>
+																setActiveDropdown(
+																	null,
+																)
+															}
+														>
+															Alle {item.name}
+														</Link>
+													)}
 													{item.children?.map(
-														(child) => (
-															<Link
-																key={child.name}
-																href={
-																	child.href
-																}
-																className="block px-4 py-2 text-secondary hover:text-primary hover:bg-gray-50"
-																onClick={() =>
-																	setActiveDropdown(
-																		null,
-																	)
-																}
-															>
-																{child.name}
-															</Link>
-														),
+														(child) =>
+															child.href ===
+															'#admin-logout' ? (
+																<button
+																	key={
+																		child.name
+																	}
+																	className="block w-full text-left px-4 py-2 text-secondary hover:text-primary hover:bg-gray-50"
+																	onClick={() => {
+																		logoutMutation.mutate();
+																		setActiveDropdown(
+																			null,
+																		);
+																	}}
+																>
+																	{child.name}
+																</button>
+															) : (
+																<Link
+																	key={
+																		child.name
+																	}
+																	href={
+																		child.href
+																	}
+																	className="block px-4 py-2 text-secondary hover:text-primary hover:bg-gray-50"
+																	onClick={() =>
+																		setActiveDropdown(
+																			null,
+																		)
+																	}
+																>
+																	{child.name}
+																</Link>
+															),
 													)}
 												</div>
 											)}
@@ -451,17 +469,19 @@ export function Header() {
 										</button>
 										{activeDropdown === item.name && (
 											<div className="pl-4 border-l-2 border-gray-200 ml-2">
-												<Link
-													href={item.href}
-													className="block px-4 py-2 text-md font-medium text-secondary hover:text-primary transition-colors duration-300"
-													onClick={() =>
-														handleMobileLinkClick(
-															item.href,
-														)
-													}
-												>
-													Alle {item.name}
-												</Link>
+												{item.name !== 'Admin' && (
+													<Link
+														href={item.href}
+														className="block px-4 py-2 text-md font-medium text-secondary hover:text-primary transition-colors duration-300"
+														onClick={() =>
+															handleMobileLinkClick(
+																item.href,
+															)
+														}
+													>
+														Alle {item.name}
+													</Link>
+												)}
 												{item.children.map((child) =>
 													child.href ===
 													'#admin-logout' ? (
@@ -470,8 +490,11 @@ export function Header() {
 															className="block w-full text-left px-4 py-2 text-md font-medium text-secondary hover:text-primary transition-colors duration-300"
 															onClick={() => {
 																logoutMutation.mutate();
-																handleMobileLinkClick(
-																	item.href,
+																setActiveDropdown(
+																	null,
+																);
+																setIsMobileMenuOpen(
+																	false,
 																);
 															}}
 														>

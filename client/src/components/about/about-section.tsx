@@ -31,7 +31,7 @@ export function AboutSection({ showHeroImage = false }: AboutSectionProps) {
 	const socialLinks = (
 		<div className="flex justify-center md:justify-start space-x-4 mt-6 mb-8">
 			<a
-				href="https://www.instagram.com/fotods.no/"
+				href="https://www.instagram.com/eiendom_fotods.no/"
 				target="_blank"
 				rel="noopener noreferrer"
 				className="text-secondary hover:text-primary transition-colors"

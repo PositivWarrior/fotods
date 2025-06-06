@@ -234,6 +234,55 @@ export default function AdminPhotos() {
 		return category ? category.name : 'Uncategorized';
 	};
 
+	// Function to check if photo appears in homepage collage
+	const isInHomepageCollage = (photo: Photo, index: number) => {
+		if (!categories) return false;
+
+		// Check if photo belongs to main collage categories
+		const collageCategoryNames = ['Bolig', 'Kveldsbilder', 'Drone'];
+		const photoCategory = categories.find(
+			(cat) => cat.id === photo.categoryId,
+		);
+
+		if (
+			!photoCategory ||
+			!collageCategoryNames.includes(photoCategory.name)
+		) {
+			return false;
+		}
+
+		// If filtering by a specific category, check if this photo is in top 4
+		if (selectedCategory !== 'all') {
+			const categoryPhotos = orderedPhotos.filter(
+				(p) => p.categoryId?.toString() === selectedCategory,
+			);
+			const photoIndex = categoryPhotos.findIndex(
+				(p) => p.id === photo.id,
+			);
+			return photoIndex < 4; // Top 4 photos appear in collage
+		}
+
+		// If showing all categories, need to check within each category
+		const categoryId = photoCategory.id;
+		const categoryPhotos =
+			photos?.filter((p) => p.categoryId === categoryId) || [];
+
+		// Sort same way as collage component
+		const featuredPhotos = categoryPhotos
+			.filter((p) => p.featured)
+			.sort((a, b) => (a.displayOrder ?? 999) - (b.displayOrder ?? 999));
+		const nonFeaturedPhotos = categoryPhotos
+			.filter((p) => !p.featured)
+			.sort((a, b) => (a.displayOrder ?? 999) - (b.displayOrder ?? 999));
+
+		const sortedCategoryPhotos = [...featuredPhotos, ...nonFeaturedPhotos];
+		const photoIndexInCategory = sortedCategoryPhotos.findIndex(
+			(p) => p.id === photo.id,
+		);
+
+		return photoIndexInCategory < 4; // Top 4 photos appear in collage
+	};
+
 	return (
 		<AdminLayout title="Manage Photos">
 			<div className="flex justify-between items-center mb-6">
@@ -246,7 +295,9 @@ export default function AdminPhotos() {
 					<p className="text-muted-foreground mt-1">
 						Use the{' '}
 						<Star className="h-4 w-4 inline fill-yellow-500 text-yellow-500" />{' '}
-						icon to mark photos as featured on the homepage.
+						icon to mark photos as featured on the homepage. The
+						"Homepage" column shows which photos appear in the
+						category collage section.
 					</p>
 				</div>
 				<div className="flex gap-2">
@@ -316,9 +367,11 @@ export default function AdminPhotos() {
 									</TableHead>
 									<TableHead>Title</TableHead>
 									<TableHead>Category</TableHead>
-
 									<TableHead className="w-[100px]">
 										Featured
+									</TableHead>
+									<TableHead className="w-[100px]">
+										Homepage
 									</TableHead>
 									<TableHead className="w-[100px]">
 										Actions
@@ -344,6 +397,9 @@ export default function AdminPhotos() {
 											<Skeleton className="h-5 w-5 rounded-full" />
 										</TableCell>
 										<TableCell>
+											<Skeleton className="h-5 w-5 rounded-full" />
+										</TableCell>
+										<TableCell>
 											<Skeleton className="h-8 w-20" />
 										</TableCell>
 									</TableRow>
@@ -363,6 +419,9 @@ export default function AdminPhotos() {
 										<TableHead>Category</TableHead>
 										<TableHead className="w-[100px]">
 											Featured
+										</TableHead>
+										<TableHead className="w-[100px]">
+											Homepage
 										</TableHead>
 										<TableHead className="w-[100px]">
 											Actions
@@ -459,6 +518,20 @@ export default function AdminPhotos() {
 																	</Button>
 																</TableCell>
 																<TableCell>
+																	{isInHomepageCollage(
+																		photo,
+																		index,
+																	) ? (
+																		<span className="text-green-500">
+																			Yes
+																		</span>
+																	) : (
+																		<span className="text-red-500">
+																			No
+																		</span>
+																	)}
+																</TableCell>
+																<TableCell>
 																	<DropdownMenu>
 																		<DropdownMenuTrigger
 																			asChild
@@ -517,9 +590,11 @@ export default function AdminPhotos() {
 									</TableHead>
 									<TableHead>Title</TableHead>
 									<TableHead>Category</TableHead>
-
 									<TableHead className="w-[100px]">
 										Featured
+									</TableHead>
+									<TableHead className="w-[100px]">
+										Homepage
 									</TableHead>
 									<TableHead className="w-[100px]">
 										Actions
@@ -529,7 +604,7 @@ export default function AdminPhotos() {
 							<TableBody>
 								<TableRow>
 									<TableCell
-										colSpan={7}
+										colSpan={8}
 										className="text-center py-6"
 									>
 										No photos found. Add some photos to your

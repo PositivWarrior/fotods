@@ -23,8 +23,10 @@ const pricingPackages = [
 		name: 'Liten pakke',
 		price: '4500 NOK',
 		features: [
-			'15-20 bilder',
-			'plantegning 2D',
+			'20 bilder +',
+			'1 drone foto',
+			'2 maste foto',
+			'Plantegning 2D',
 			'Høy oppløsning (digitalt)',
 			'Profesjonell redigering',
 		],
@@ -32,12 +34,13 @@ const pricingPackages = [
 	},
 	{
 		category: 'Eiendomsfotografering',
-		name: 'Mellom pakke',
-		price: '6000 NOK',
+		name: 'Medium pakke',
+		price: '7500 NOK',
 		features: [
-			'20-30 bilder',
-			'Plus 2 maste foto',
-			'plantegning 2D',
+			'30 bilder +',
+			'2 maste foto',
+			'2 drone foto',
+			'Plantegning 2D',
 			'Høy oppløsning (digitalt)',
 			'Profesjonell redigering',
 		],
@@ -45,26 +48,14 @@ const pricingPackages = [
 	},
 	{
 		category: 'Eiendomsfotografering',
-		name: 'Stor pakke',
-		price: '8000 NOK',
-		features: [
-			'30-40 bilder',
-			'Plus 2 maste foto',
-			'plantegning 2D',
-			'Høy oppløsning (digitalt)',
-			'Profesjonell redigering',
-		],
-		icon: Home,
-	},
-	{
-		category: 'Eiendomsfotografering',
-		name: 'Premium',
+		name: 'Premium pakke',
 		price: '10000 NOK',
 		features: [
-			'45-60 bilder',
-			'Plus 2 maste foto',
-			'Plus 5 drone bilder',
-			'plantegning 2D',
+			'45 bilder +',
+			'2 maste foto',
+			'5 drone bilder',
+			'5 kvelds bilder',
+			'Plantegning 2D',
 			'Høy oppløsning (digitalt)',
 			'Profesjonell redigering',
 		],
@@ -74,14 +65,14 @@ const pricingPackages = [
 	{
 		category: 'Tilleggstjenester',
 		name: 'Plantegning 2D',
-		price: '500 NOK',
+		price: '300 NOK',
 		features: ['Plantegning 2D'],
 		icon: Settings,
 	},
 	{
 		category: 'Tilleggstjenester',
 		name: 'Plantegning 3D',
-		price: '1000 NOK',
+		price: '7000 NOK',
 		features: ['Plantegning 3D'],
 		icon: Settings,
 	},
@@ -104,12 +95,12 @@ const extraServices = [
 		items: [
 			{
 				description: '30 sekunders video presentasjon av bolig',
-				price: '2500 NOK',
+				price: '2000 NOK',
 			},
 			{
 				description:
-					'30 sekunders video presentasjon av bolig med drone video inkludert',
-				price: '4000 NOK',
+					'60 sekunders video presentasjon av bolig med drone video inkludert',
+				price: '3500 NOK',
 			},
 		],
 	},
@@ -186,7 +177,7 @@ export default function PriserPage() {
 							<h2 className="text-3xl font-poppins font-semibold text-center mb-12 text-primary">
 								Eiendomsfotografering
 							</h2>
-							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
+							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
 								{pricingPackages
 									.filter(
 										(pkg) =>

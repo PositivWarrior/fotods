@@ -55,20 +55,39 @@ export function CategoryCollage() {
 			photos?.filter((photo) => photo.categoryId === categoryId) || [];
 
 		console.log(
-			`[Collage] Direct photos for ${categoryName} (before featured sort):`,
-			directPhotos.map((p) => ({ title: p.title, featured: p.featured })),
+			`[Collage] Direct photos for ${categoryName} (before sorting):`,
+			directPhotos.map((p) => ({
+				title: p.title,
+				featured: p.featured,
+				displayOrder: p.displayOrder,
+			})),
 		);
 
-		// Prioritize featured photos
-		const featuredPhotos = directPhotos.filter((photo) => photo.featured);
-		const nonFeaturedPhotos = directPhotos.filter(
-			(photo) => !photo.featured,
-		);
+		// Sort by featured status first, then by displayOrder within each group
+		const featuredPhotos = directPhotos
+			.filter((photo) => photo.featured)
+			.sort((a, b) => {
+				const aOrder = a.displayOrder ?? 999;
+				const bOrder = b.displayOrder ?? 999;
+				return aOrder - bOrder;
+			});
+
+		const nonFeaturedPhotos = directPhotos
+			.filter((photo) => !photo.featured)
+			.sort((a, b) => {
+				const aOrder = a.displayOrder ?? 999;
+				const bOrder = b.displayOrder ?? 999;
+				return aOrder - bOrder;
+			});
 
 		let combined = [...featuredPhotos, ...nonFeaturedPhotos];
 		console.log(
-			`[Collage] Photos for ${categoryName} (AFTER featured sort, before limit):`,
-			combined.map((p) => p.title),
+			`[Collage] Photos for ${categoryName} (AFTER sorting by featured + displayOrder):`,
+			combined.map((p) => ({
+				title: p.title,
+				featured: p.featured,
+				displayOrder: p.displayOrder,
+			})),
 		);
 
 		// Return limited number of photos
@@ -76,7 +95,11 @@ export function CategoryCollage() {
 			combined.length > limit ? combined.slice(0, limit) : combined;
 		console.log(
 			`[Collage] Final photos for ${categoryName} (limited to ${limit}):`,
-			finalPhotos.map((p) => p.title),
+			finalPhotos.map((p) => ({
+				title: p.title,
+				featured: p.featured,
+				displayOrder: p.displayOrder,
+			})),
 		);
 
 		return finalPhotos;

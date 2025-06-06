@@ -135,7 +135,7 @@ export function ContactForm() {
 									</h3>
 									<div className="flex space-x-4">
 										<a
-											href="https://www.instagram.com/fotods.no/"
+											href="https://www.instagram.com/eiendom_fotods.no/"
 											target="_blank"
 											rel="noopener noreferrer"
 											className="w-10 h-10 bg-accent rounded-full flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-colors duration-300"

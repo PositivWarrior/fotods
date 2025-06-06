@@ -26,7 +26,7 @@ describe('Footer component', () => {
 
 	test('renders social media links with correct hrefs', () => {
 		const instagramLink = container.querySelector(
-			'a[href="https://www.instagram.com/fotods.no/"]',
+			'a[href="https://www.instagram.com/eiendom_fotods.no/"]',
 		);
 		const facebookLink = container.querySelector(
 			'a[href="https://www.facebook.com/fotods.no"]',
