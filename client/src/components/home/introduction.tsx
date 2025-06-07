@@ -22,7 +22,7 @@ export function Introduction() {
 						Velkommen til FotoDS
 					</h2>
 					<p className="text-secondary text-lg leading-relaxed mb-10">
-						Spesialisert innen interiør- og arkitekturfotografering,
+						Spesialisert innen bolig- og eniendomsfotografering,
 						skaper jeg imponerende visuelle fortellinger som
 						fremhever eiendommer i sitt beste lys. Med nøye
 						oppmerksomhet på komposisjon, lyssetting og detaljer,

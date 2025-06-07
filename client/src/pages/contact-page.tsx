@@ -17,7 +17,7 @@ export default function ContactPage() {
 				<title>Kontakt | FotoDS - Dawid Siedlec Fotografi</title>
 				<meta
 					name="description"
-					content="Ta kontakt med Dawid Siedlec for profesjonelle interiørfototjenester. Spør om bestillinger, priser og tilgjengelighet for prosjektet ditt."
+					content="Kontakt Dawid Siedlec for en uforpliktende prat om dine fotograferingsbehov. Tilgjengelig for prosjekter i hele Norge."
 				/>
 				<meta
 					property="og:title"
@@ -25,7 +25,7 @@ export default function ContactPage() {
 				/>
 				<meta
 					property="og:description"
-					content="Ta kontakt med Dawid Siedlec for profesjonelle interiørfototjenester. Spør om bestillinger, priser og tilgjengelighet for prosjektet ditt."
+					content="Kontakt Dawid Siedlec for en uforpliktende prat om dine fotograferingsbehov. Tilgjengelig for prosjekter i hele Norge."
 				/>
 				<meta property="og:type" content="website" />
 			</Helmet>
@@ -47,8 +47,8 @@ export default function ContactPage() {
 							</h1>
 							<p className="text-secondary text-lg">
 								Har du et prosjekt i tankene? Jeg vil gjerne
-								høre fra deg. Ta kontakt for å diskutere dine
-								behov for interiørfotografering.
+								høre fra deg. Ta kontakt for en uforpliktende
+								prat.
 							</p>
 						</motion.div>
 					</div>

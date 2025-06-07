@@ -70,11 +70,11 @@ function App() {
 				<TooltipProvider>
 					<Helmet>
 						<title>
-							FotoDS | Dawid Siedlec - Interior Photography
+							FotoDS | Dawid Siedlec - Bolig- og eiendomsfotograf
 						</title>
 						<meta
 							name="description"
-							content="Professional interior and architectural photography by Dawid Siedlec."
+							content="Profesjonell bolig- og eiendomsfotograf Dawid Siedlec."
 						/>
 					</Helmet>
 					<Toaster />

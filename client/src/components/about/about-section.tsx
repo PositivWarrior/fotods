@@ -58,28 +58,26 @@ export function AboutSection({ showHeroImage = false }: AboutSectionProps) {
 				Om Meg
 			</h2>
 			<p className="text-secondary mb-6 leading-relaxed">
-				Hei! Jeg er{' '}
-				<span className="font-semibold text-primary">
-					Dawid Siedlec
-				</span>
-				, en lidenskapelig interiør- og arkitekturfotograf basert i
-				Norge. Med over fire år med erfaring i å fange rom, har jeg
-				utviklet et skarpt øye for detaljer og komposisjon som fremhever
-				den sanne karakteren og skjønnheten i hvert miljø jeg
-				fotograferer.
+				Hei! Mitt navn er{' '}
+				<span className="font-semibold text-primary">Dawid </span>
+				og jeg elsker jobben min.
 			</p>
 			<p className="text-secondary mb-6 leading-relaxed">
-				Min tilnærming kombinerer teknisk presisjon med kunstnerisk
-				visjon, og sikrer at hvert bilde forteller en fengslende visuell
-				historie. Hvert rom har sin egen unike atmosfære og personlighet
-				- min jobb er å fange den essensen på en måte som appellerer til
-				betrakteren.
+				Jeg har jobbet med foto i mange år og det å kunne inspirere
+				andre med mitt arbeidet er velig givende.
 			</p>
 			<p className="text-secondary mb-8 leading-relaxed">
-				Jeg jobber tett med eiendomsmeglere, interiørdesignere,
-				arkitekter, bedriftseiere og huseiere for å skape fotografier
-				som ikke bare viser frem eiendommer, men også vekker følelser og
-				skaper varige inntrykk.
+				Boligbransjen handler ikke bare om bilder. Jeg er jeg først og
+				fremst serviceinnstilt. Det som er veldig viktig for meg er at
+				både boligselger og megler sitter med en god opplevelse etter
+				hvert fotooppdrag.
+			</p>
+			<p className="text-secondary mb-8 leading-relaxed">
+				Boligselgerne stoler på at fotografen skal gjøre absolutt alt
+				for at det endelige produktet blir tiltrekkende og skal fremheve
+				boligens beste sider. Derfor tar jeg meg alt tid til å finne de
+				perfekte vinklene, belysningen og detaljene. Jeg fotograferer
+				hver bolig som om den var min egen.
 			</p>
 			{socialLinks}
 			<div className="space-y-4 mb-8">
@@ -130,10 +128,10 @@ export function AboutSection({ showHeroImage = false }: AboutSectionProps) {
 		<p className="text-secondary mb-6 leading-relaxed">
 			Hei! Jeg er{' '}
 			<span className="font-semibold text-primary">Dawid Siedlec</span>,
-			en lidenskapelig interiør- og arkitekturfotograf basert i Norge. Med
-			over fire år med erfaring i å fange rom, har jeg utviklet et skarpt
-			øye for detaljer og komposisjon som fremhever den sanne karakteren
-			og skjønnheten i hvert miljø jeg fotograferer.
+			en lidenskapelig bolig- og eiendomsfotograf basert i Norge. Med over
+			fire år med erfaring i å fange rom, bolig og eiendom, har jeg
+			utviklet et skarpt øye for detaljer og komposisjon som fremhever den
+			sanne karakteren og skjønnheten i hvert miljø jeg fotograferer.
 		</p>
 	);
 

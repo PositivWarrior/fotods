@@ -124,7 +124,7 @@ export default function PriserPage() {
 				<title>Priser | FotoDS - Dawid Siedlec Fotografi</title>
 				<meta
 					name="description"
-					content="Oversikt over priser og pakker for bryllupsfotografering, portrett, familiebilder og mer hos FotoDS."
+					content="Oversikt over priser og pakker for eiendomsfotografering og tilleggstjenester hos FotoDS."
 				/>
 				<meta
 					property="og:title"
@@ -132,7 +132,7 @@ export default function PriserPage() {
 				/>
 				<meta
 					property="og:description"
-					content="Oversikt over priser og pakker for bryllupsfotografering, portrett, familiebilder og mer hos FotoDS."
+					content="Oversikt over priser og pakker for eiendomsfotografering og tilleggstjenester hos FotoDS."
 				/>
 				<meta property="og:type" content="website" />
 			</Helmet>

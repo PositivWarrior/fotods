@@ -105,7 +105,7 @@ export default function PortfolioPage() {
 				<meta
 					name="description"
 					content={`Se profesjonell ${
-						activeCategory?.name || 'interiør'
+						activeCategory?.name.toLowerCase() || 'interiør'
 					}fotografering av Dawid Siedlec. Høykvalitetsbilder som viser vakre rom og arkitektoniske detaljer.`}
 				/>
 				<meta
@@ -117,7 +117,7 @@ export default function PortfolioPage() {
 				<meta
 					property="og:description"
 					content={`Se profesjonell ${
-						activeCategory?.name || 'interiør'
+						activeCategory?.name.toLowerCase() || 'interiør'
 					}fotografering av Dawid Siedlec. Høykvalitetsbilder som viser vakre rom og arkitektoniske detaljer.`}
 				/>
 				<meta property="og:type" content="website" />

@@ -18,7 +18,7 @@ export default function AboutPage() {
 				<title>Om Meg | FotoDS - Dawid Siedlec Fotografi</title>
 				<meta
 					name="description"
-					content="Lær om Dawid Siedlec, profesjonell interiør- og arkitekturfotograf basert i Norge. Med over et tiår med erfaring i å fange vakre rom."
+					content="Lær mer om Dawid Siedlec, en profesjonell interiørfotograf i Norge med en lidenskap for å fange skjønnheten i arkitektur og design."
 				/>
 				<meta
 					property="og:title"
@@ -26,7 +26,7 @@ export default function AboutPage() {
 				/>
 				<meta
 					property="og:description"
-					content="Lær om Dawid Siedlec, profesjonell interiør- og arkitekturfotograf basert i Norge. Med over et tiår med erfaring i å fange vakre rom."
+					content="Lær mer om Dawid Siedlec, en profesjonell interiørfotograf i Norge med en lidenskap for å fange skjønnheten i arkitektur og design."
 				/>
 				<meta property="og:type" content="website" />
 			</Helmet>
@@ -48,7 +48,7 @@ export default function AboutPage() {
 							</h1>
 							<p className="text-secondary text-lg">
 								Bli kjent med personen bak linsen og min
-								tilnærming til interiørfotografering.
+								tilnærming til bolig- og eiendomsfotografering.
 							</p>
 						</motion.div>
 					</div>
