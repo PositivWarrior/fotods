@@ -1,13 +1,9 @@
 import { motion } from 'framer-motion';
-import { Instagram, Facebook } from 'lucide-react';
+import { Link } from 'wouter';
+import { services } from '@/lib/services';
+import { ArrowRight } from 'lucide-react';
 
 export function Introduction() {
-	const stats = [
-		{ value: '150+', label: 'Prosjekter Fullført' },
-		// { value: '98%', label: 'Kundetilfredshet' },
-		{ value: '4+', label: 'Års Erfaring' },
-	];
-
 	return (
 		<section className="py-20 bg-white">
 			<div className="container mx-auto px-6">
@@ -18,62 +14,46 @@ export function Introduction() {
 					transition={{ duration: 0.6 }}
 					viewport={{ once: true }}
 				>
-					<h2 className="text-3xl font-poppins font-semibold mb-6">
-						Velkommen til FotoDS
+					<h2 className="text-3xl font-poppins font-semibold mb-4">
+						Drone • Foto • Video
 					</h2>
-					<p className="text-secondary text-lg leading-relaxed mb-10">
-						Spesialisert innen bolig- og eniendomsfotografering,
-						skaper jeg imponerende visuelle fortellinger som
-						fremhever eiendommer i sitt beste lys. Med nøye
-						oppmerksomhet på komposisjon, lyssetting og detaljer,
-						hjelper bildene mine eiendommer å skille seg ut i et
-						konkurranseutsatt marked.
+					<p className="text-secondary text-lg leading-relaxed mb-12">
+						Profesjonelle fototjenester som fremhever det beste i
+						din eiendom.
 					</p>
-
-					<div className="flex justify-center space-x-4">
-						<a
-							href="https://www.instagram.com/eiendom_fotods.no/"
-							target="_blank"
-							rel="noopener noreferrer"
-							className="text-secondary hover:text-primary transition-colors"
-							aria-label="Instagram"
-						>
-							<Instagram size={28} />
-						</a>
-						<a
-							href="https://www.facebook.com/fotods.no"
-							target="_blank"
-							rel="noopener noreferrer"
-							className="text-secondary hover:text-primary transition-colors"
-							aria-label="Facebook"
-						>
-							<Facebook size={28} />
-						</a>
-					</div>
-
-					<div className="flex flex-wrap justify-center gap-8">
-						{stats.map((stat, index) => (
-							<motion.div
-								key={index}
-								className="text-center"
-								initial={{ opacity: 0, y: 20 }}
-								whileInView={{ opacity: 1, y: 0 }}
-								transition={{
-									duration: 0.6,
-									delay: index * 0.1,
-								}}
-								viewport={{ once: true }}
-							>
-								{/* <span className="block text-4xl font-semibold mb-2">
-									{stat.value}
-								</span>
-								<span className="text-secondary">
-									{stat.label}
-								</span> */}
-							</motion.div>
-						))}
-					</div>
 				</motion.div>
+
+				<div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+					{services.map((service, index) => (
+						<motion.div
+							key={index}
+							className="bg-muted p-8 rounded-lg text-center flex flex-col"
+							initial={{ opacity: 0, y: 20 }}
+							whileInView={{ opacity: 1, y: 0 }}
+							transition={{ duration: 0.6, delay: index * 0.1 }}
+							viewport={{ once: true }}
+						>
+							<img
+								src={service.icon}
+								alt={`${service.title} icon`}
+								className="h-12 w-12 mx-auto mb-6 text-primary"
+							/>
+							<h3 className="text-2xl font-poppins font-semibold mb-4">
+								{service.title}
+							</h3>
+							<p className="text-secondary leading-relaxed mb-6 flex-grow">
+								{service.description}
+							</p>
+							<Link
+								href={service.href}
+								className="text-primary font-semibold hover:text-primary/80 transition-colors self-end mt-auto"
+							>
+								Se Galleri{' '}
+								<ArrowRight className="inline-block h-4 w-4 ml-1" />
+							</Link>
+						</motion.div>
+					))}
+				</div>
 			</div>
 		</section>
 	);

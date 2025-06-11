@@ -140,11 +140,11 @@ export default function PortfolioPage() {
 									? `${activeCategory.name} Fotografering`
 									: 'Portefølje'}
 							</h1>
-							<p className="text-secondary text-lg mb-8">
+							{/* <p className="text-secondary text-lg mb-8">
 								{activeCategory
 									? `Se min samling av profesjonell ${activeCategory.name.toLowerCase()}fotografering som viser vakre interiører og arkitektoniske detaljer.`
 									: 'Utforsk min varierte samling av interiør- og arkitekturfotografering, som viser skjønnheten og funksjonaliteten til forskjellige rom.'}
-							</p>
+							</p> */}
 						</motion.div>
 
 						{/* CategoryFilter might be intended here if it shows category links */}

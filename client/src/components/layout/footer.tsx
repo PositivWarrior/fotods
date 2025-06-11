@@ -93,14 +93,6 @@ export function Footer() {
 							</li>
 							<li>
 								<Link
-									href="/about"
-									className="text-white/80 hover:text-white transition-colors"
-								>
-									Om Meg
-								</Link>
-							</li>
-							<li>
-								<Link
 									href="/priser"
 									className="text-white/80 hover:text-white transition-colors"
 								>

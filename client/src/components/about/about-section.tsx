@@ -80,7 +80,7 @@ export function AboutSection({ showHeroImage = false }: AboutSectionProps) {
 				hver bolig som om den var min egen.
 			</p>
 			{socialLinks}
-			<div className="space-y-4 mb-8">
+			{/* <div className="space-y-4 mb-8">
 				{features.map((feature, index) => (
 					<motion.div
 						key={index}
@@ -106,7 +106,7 @@ export function AboutSection({ showHeroImage = false }: AboutSectionProps) {
 						</div>
 					</motion.div>
 				))}
-			</div>
+			</div> */}
 
 			<a
 				href="#contact"
@@ -149,7 +149,7 @@ export function AboutSection({ showHeroImage = false }: AboutSectionProps) {
 			Jeg jobber tett med eiendomsmeglere, interiørdesignere, arkitekter,
 			bedriftseiere og huseiere for å skape fotografier som ikke bare
 			viser frem eiendommer, men også vekker følelser og skaper varige
-			inntrykk. TEST TEST TEST
+			inntrykk.
 		</p>
 	);
 
@@ -238,8 +238,29 @@ export function AboutSection({ showHeroImage = false }: AboutSectionProps) {
 							</div>
 						</div>
 					) : (
-						<div className="w-full lg:w-3/4 xl:w-2/3 mx-auto">
-							{originalTextContent}
+						<div className="flex flex-col md:flex-row md:items-center md:space-x-12">
+							<motion.div
+								className="w-full md:w-7/12"
+								initial={{ opacity: 0, x: -20 }}
+								whileInView={{ opacity: 1, x: 0 }}
+								transition={{ duration: 0.6 }}
+								viewport={{ once: true }}
+							>
+								{originalTextContent}
+							</motion.div>
+							<motion.div
+								className="w-full md:w-5/12 mt-8 md:mt-0"
+								initial={{ opacity: 0, x: 20 }}
+								whileInView={{ opacity: 1, x: 0 }}
+								transition={{ duration: 0.6 }}
+								viewport={{ once: true }}
+							>
+								<img
+									src={dawidImage}
+									alt="Dawid Siedlec - Fotograf"
+									className="rounded-lg shadow-xl w-full h-full object-cover"
+								/>
+							</motion.div>
 						</div>
 					)}
 				</motion.div>

@@ -98,7 +98,6 @@ export function Header() {
 			name: 'Portretter',
 			href: '/portfolio/category/business',
 		},
-		{ name: 'Om Meg', href: '/about' },
 		{ name: 'Priser', href: '/priser' },
 		{ name: 'Kontakt', href: '/contact' },
 	];

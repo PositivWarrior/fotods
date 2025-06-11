@@ -60,10 +60,10 @@ export function Hero() {
 					transition={{ duration: 0.8, delay: 1.2 }}
 				>
 					<h1 className="text-4xl md:text-6xl font-poppins font-semibold leading-tight mb-6">
-						Fanger essensen av interiørrom
+						Dawid Siedlec
 					</h1>
 					<p className="text-xl md:text-2xl mb-10 text-white/90">
-						Profesjonell interiørfotografering av Dawid Siedlec
+						Profesjonell Eiendomsfotograf
 					</p>
 					<Link
 						href="/contact"

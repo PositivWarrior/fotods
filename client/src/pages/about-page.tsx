@@ -58,7 +58,7 @@ export default function AboutPage() {
 				<AboutSection showHeroImage={true} />
 
 				{/* Additional About Section */}
-				<section className="py-20 bg-muted">
+				{/* <section className="py-20 bg-muted">
 					<div className="container mx-auto px-6">
 						<div className="max-w-3xl mx-auto">
 							<motion.div
@@ -102,7 +102,7 @@ export default function AboutPage() {
 							</motion.div>
 						</div>
 					</div>
-				</section>
+				</section> */}
 
 				{/* Testimonials */}
 				<Testimonials />

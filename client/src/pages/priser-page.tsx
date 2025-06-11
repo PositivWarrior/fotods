@@ -27,8 +27,6 @@ const pricingPackages = [
 			'1 drone foto',
 			'2 maste foto',
 			'Plantegning 2D',
-			'Høy oppløsning (digitalt)',
-			'Profesjonell redigering',
 		],
 		icon: Home,
 	},
@@ -41,8 +39,6 @@ const pricingPackages = [
 			'2 maste foto',
 			'2 drone foto',
 			'Plantegning 2D',
-			'Høy oppløsning (digitalt)',
-			'Profesjonell redigering',
 		],
 		icon: Home,
 	},
@@ -56,8 +52,6 @@ const pricingPackages = [
 			'5 drone bilder',
 			'5 kvelds bilder',
 			'Plantegning 2D',
-			'Høy oppløsning (digitalt)',
-			'Profesjonell redigering',
 		],
 		icon: Home,
 		popular: true,
@@ -65,14 +59,14 @@ const pricingPackages = [
 	{
 		category: 'Tilleggstjenester',
 		name: 'Plantegning 2D',
-		price: '300 NOK',
+		price: '400 NOK',
 		features: ['Plantegning 2D'],
 		icon: Settings,
 	},
 	{
 		category: 'Tilleggstjenester',
 		name: 'Plantegning 3D',
-		price: '7000 NOK',
+		price: '1000 NOK',
 		features: ['Plantegning 3D'],
 		icon: Settings,
 	},
@@ -347,7 +341,7 @@ export default function PriserPage() {
 				</section>
 
 				{/* Additional Information Section */}
-				<section className="py-16 lg:py-24 bg-muted">
+				{/* <section className="py-16 lg:py-24 bg-muted">
 					<div className="container mx-auto px-6 space-y-12">
 						<motion.div
 							className="bg-white p-8 rounded-lg shadow-lg border border-border"
@@ -371,9 +365,9 @@ export default function PriserPage() {
 								omhu for å vise frem rommenes potensial og
 								atmosfære."
 							</p>
-						</motion.div>
+						</motion.div> */}
 
-						{/* <motion.div
+				{/* <motion.div
 							className="bg-white p-8 rounded-lg shadow-lg border border-border"
 							initial={{ opacity: 0, x: 50 }}
 							whileInView={{ opacity: 1, x: 0 }}
@@ -396,7 +390,7 @@ export default function PriserPage() {
 							</p>
 						</motion.div> */}
 
-						{/* <motion.div
+				{/* <motion.div
 							className="bg-white p-8 rounded-lg shadow-lg border border-border"
 							initial={{ opacity: 0, x: -50 }}
 							whileInView={{ opacity: 1, x: 0 }}
@@ -439,8 +433,8 @@ export default function PriserPage() {
 								</p>
 							</div>
 						</motion.div> */}
-					</div>
-				</section>
+				{/* </div>
+				</section> */}
 			</main>
 
 			<Footer />
