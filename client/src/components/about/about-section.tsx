@@ -153,33 +153,33 @@ export function AboutSection({ showHeroImage = false }: AboutSectionProps) {
 		</p>
 	);
 
-	const featuresDisplayHorizontal = (
-		<div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-			{features.map((feature, index) => (
-				<motion.div
-					key={index}
-					className="flex flex-col items-center text-center md:items-start md:text-left"
-					initial={{ opacity: 0, y: 10 }}
-					whileInView={{ opacity: 1, y: 0 }}
-					transition={{
-						duration: 0.4,
-						delay: index * 0.1,
-					}}
-					viewport={{ once: true }}
-				>
-					<div className="w-16 h-16 bg-accent rounded-full flex items-center justify-center mb-4">
-						{feature.icon}
-					</div>
-					<h3 className="font-poppins font-medium text-lg mb-2">
-						{feature.title}
-					</h3>
-					<p className="text-secondary text-sm">
-						{feature.description}
-					</p>
-				</motion.div>
-			))}
-		</div>
-	);
+	// const featuresDisplayHorizontal = (
+	// 	<div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+	// 		{features.map((feature, index) => (
+	// 			<motion.div
+	// 				key={index}
+	// 				className="flex flex-col items-center text-center md:items-start md:text-left"
+	// 				initial={{ opacity: 0, y: 10 }}
+	// 				whileInView={{ opacity: 1, y: 0 }}
+	// 				transition={{
+	// 					duration: 0.4,
+	// 					delay: index * 0.1,
+	// 				}}
+	// 				viewport={{ once: true }}
+	// 			>
+	// 				<div className="w-16 h-16 bg-accent rounded-full flex items-center justify-center mb-4">
+	// 					{feature.icon}
+	// 				</div>
+	// 				<h3 className="font-poppins font-medium text-lg mb-2">
+	// 					{feature.title}
+	// 				</h3>
+	// 				<p className="text-secondary text-sm">
+	// 					{feature.description}
+	// 				</p>
+	// 			</motion.div>
+	// 		))}
+	// 	</div>
+	// );
 
 	const contactButton = (
 		<div className="text-center md:text-left">
@@ -233,7 +233,7 @@ export function AboutSection({ showHeroImage = false }: AboutSectionProps) {
 
 							{/* Features and Contact Button, spaced from content above */}
 							<div className="mt-8">
-								{featuresDisplayHorizontal}
+								{/* {featuresDisplayHorizontal} */}
 								{contactButton}
 							</div>
 						</div>
