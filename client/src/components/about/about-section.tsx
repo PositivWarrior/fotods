@@ -149,7 +149,7 @@ export function AboutSection({ showHeroImage = false }: AboutSectionProps) {
 			Jeg jobber tett med eiendomsmeglere, interiørdesignere, arkitekter,
 			bedriftseiere og huseiere for å skape fotografier som ikke bare
 			viser frem eiendommer, men også vekker følelser og skaper varige
-			inntrykk. TEST TEST
+			inntrykk. TEST TEST TEST
 		</p>
 	);
 
