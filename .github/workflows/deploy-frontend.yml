@@ -1,0 +1,55 @@
+name: 🚀 Deploy Frontend to Hostinger
+
+on:
+    push:
+        branches: [main, master]
+        paths:
+            - 'client/**'
+            - 'public/**'
+            - 'package.json'
+            - 'vite.config.ts'
+            - 'tailwind.config.ts'
+    workflow_dispatch: # Allow manual trigger
+
+jobs:
+    deploy-frontend:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: 📥 Checkout code
+              uses: actions/checkout@v4
+
+            - name: 📦 Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '18'
+                  cache: 'npm'
+
+            - name: 🔧 Install dependencies
+              run: npm ci
+
+            - name: 🏗️ Build frontend
+              run: npm run build:frontend
+              env:
+                  NODE_ENV: production
+
+            - name: 🚀 Deploy to Hostinger
+              uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+              with:
+                  server: ${{ secrets.HOSTINGER_FTP_SERVER }}
+                  username: ${{ secrets.HOSTINGER_FTP_USERNAME }}
+                  password: ${{ secrets.HOSTINGER_FTP_PASSWORD }}
+                  local-dir: ./dist/public/
+                  server-dir: ./public_html/
+                  exclude: |
+                      **/.git*
+                      **/.git*/**
+                      **/node_modules/**
+                      **/*.map
+                      .htaccess
+                  state-name: .ftp-deploy-sync-state.json
+
+            - name: ✅ Deployment complete
+              run: |
+                  echo "🎉 Frontend deployed successfully!"
+                  echo "📱 Your site should be updated in a few moments"
