@@ -2,7 +2,8 @@ name: 🚀 Deploy Frontend to Hostinger
 
 on:
     push:
-        branches: [main, master]
+        branches:
+            - main
         paths:
             - 'client/**'
             - 'public/**'
@@ -12,42 +13,51 @@ on:
     workflow_dispatch: # Allow manual trigger
 
 jobs:
-    deploy-frontend:
+    deploy:
+        name: Upload frontend via FTP
         runs-on: ubuntu-latest
 
         steps:
-            - name: 📥 Checkout code
+            - name: 📦 Checkout Repo
               uses: actions/checkout@v4
 
-            - name: 📦 Setup Node.js
+            - name: ⚙️ Setup Node.js
               uses: actions/setup-node@v4
               with:
                   node-version: '20'
-                  cache: 'npm'
 
-            - name: 🔧 Install dependencies
-              run: npm ci
+            - name: 🧪 Install Dependencies
+              run: npm install
 
-            - name: 🏗️ Build frontend
+            - name: 🛠 Build Frontend
               run: npm run build:frontend
-              env:
-                  NODE_ENV: production
 
-            - name: 🚀 Deploy to Hostinger
-              uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+            - name: 📋 List generated files
+              run: |
+                  echo "Contents of ./dist/ directory:"
+                  ls -la ./dist/ || echo "dist directory not found"
+                  echo "Contents of ./dist/public/ directory:"
+                  ls -la ./dist/public/ || echo "dist/public directory not found"
+                  echo "Looking for build output:"
+                  find . -name "index.html" -type f
+                  echo "Total files to upload:"
+                  find ./dist/public/ -type f | wc -l || echo "Could not count files"
+
+            - name: 📤 Upload Files to Hostinger
+              uses: samkirkland/ftp-deploy-action@v4.3.5
               with:
                   server: ${{ secrets.HOSTINGER_FTP_SERVER }}
                   username: ${{ secrets.HOSTINGER_FTP_USERNAME }}
                   password: ${{ secrets.HOSTINGER_FTP_PASSWORD }}
                   local-dir: ./dist/public/
-                  server-dir: ./public_html/
+                  server-dir: /public_html/
+                  dry-run: false
+                  log-level: verbose
                   exclude: |
                       **/.git*
                       **/.git*/**
                       **/node_modules/**
                       **/*.map
-                      .htaccess
-                  state-name: .ftp-deploy-sync-state.json
 
             - name: ✅ Deployment complete
               run: |
