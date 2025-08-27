@@ -196,4 +196,3 @@ Continuous monitoring with Lighthouse has been a key part of development, focusi
 
 ---
 
-This README provides a professional overview of the FotoDS project. Remember to keep it updated as the project evolves.
