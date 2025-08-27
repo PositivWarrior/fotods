@@ -21,31 +21,21 @@ const pricingPackages = [
 	{
 		category: 'Eiendomsfotografering',
 		name: 'Liten pakke',
-		price: '4500 NOK',
-		features: [
-			'20 bilder +',
-			'1 drone foto',
-			'2 maste foto',
-			'Plantegning 2D',
-		],
+		price: '3500 NOK',
+		features: ['20 bilder +', '2 maste foto', 'Plantegning 2D'],
 		icon: Home,
 	},
 	{
 		category: 'Eiendomsfotografering',
 		name: 'Medium pakke',
-		price: '7500 NOK',
-		features: [
-			'30 bilder +',
-			'2 maste foto',
-			'2 drone foto',
-			'Plantegning 2D',
-		],
+		price: '6500 NOK',
+		features: ['30 bilder +', '2 maste foto', 'Plantegning 2D'],
 		icon: Home,
 	},
 	{
 		category: 'Eiendomsfotografering',
 		name: 'Premium pakke',
-		price: '10000 NOK',
+		price: '8000 NOK',
 		features: [
 			'45 bilder +',
 			'2 maste foto',
